@@ -61,6 +61,11 @@
       :entity-context="entityContext"
       :close="closeContextMenu"
     />
+    <NewVideoDialog 
+      v-if="showNewVideoDialog"
+      v-model="showNewVideoDialog"
+      :parent="$route.params.entityName"
+    />
     <NewFolderDialog
       v-if="showNewFolderDialog"
       v-model="showNewFolderDialog"
@@ -186,6 +191,7 @@ import GridView from "@/components/GridView.vue"
 import DriveToolBar from "@/components/DriveToolBar.vue"
 import NoFilesSection from "@/components/NoFilesSection.vue"
 import NewFolderDialog from "@/components/NewFolderDialog.vue"
+import NewVideoDialog from "@/components/Modals/NewVideoDialog.vue"
 import RenameDialog from "@/components/RenameDialog.vue"
 import ShareDialog from "@/components/ShareDialog/ShareDialog.vue"
 import GeneralDialog from "@/components/GeneralDialog.vue"
@@ -228,6 +234,7 @@ export default {
     DriveToolBar,
     NoFilesSection,
     NewFolderDialog,
+    NewVideoDialog,
     RenameDialog,
     MoveDialog,
     DeleteDialog,
@@ -303,6 +310,7 @@ export default {
     folderItems: null,
     previewEntity: null,
     showPreview: false,
+    showNewVideoDialog: false,
     showNewFolderDialog: false,
     showRenameDialog: false,
     showShareDialog: false,
@@ -403,15 +411,15 @@ export default {
         {
           label: "Upload File",
           icon: FileUpload,
-          handler: () => this.emitter.emit("uploadFile"),
+          handler: () => (this.showNewVideoDialog = true),  //this.emitter.emit("uploadFile"),
           isEnabled: () => this.selectedEntities.length === 0,
         },
-        {
-          label: "Upload Folder",
-          icon: FolderUpload,
-          handler: () => this.emitter.emit("uploadFolder"),
-          isEnabled: () => this.selectedEntities.length === 0,
-        },
+        // {
+        //   label: "Upload Folder",
+        //   icon: FolderUpload,
+        //   handler: () => this.emitter.emit("uploadFolder"),
+        //   isEnabled: () => this.selectedEntities.length === 0,
+        // },
         {
           label: "New Folder",
           icon: NewFolder,

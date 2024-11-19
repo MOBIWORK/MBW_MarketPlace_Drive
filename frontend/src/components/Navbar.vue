@@ -126,6 +126,10 @@
       </div>
     </div>
   </nav>
+  <NewVideoDialog
+    v-model="showNewVideoDialog"
+    :parent="$route.params.entityName"
+  />
   <NewFolderDialog
     v-model="showNewFolderDialog"
     :parent="$route.params.entityName"
@@ -152,6 +156,7 @@
 import UsersBar from "./UsersBar.vue"
 import { Dropdown, FeatherIcon, Button } from "frappe-ui"
 import NewFolderDialog from "@/components/NewFolderDialog.vue"
+import NewVideoDialog from "@/components/Modals/NewVideoDialog.vue"
 import RenameDialog from "@/components/RenameDialog.vue"
 import Breadcrumbs from "@/components/Breadcrumbs.vue"
 import { formatDate } from "@/utils/format"
@@ -177,6 +182,7 @@ export default {
   components: {
     RenameDialog,
     NewFolderDialog,
+    NewVideoDialog,
     Dropdown,
     FeatherIcon,
     Button,
@@ -199,6 +205,7 @@ export default {
     return {
       previewEntity: null,
       showPreview: false,
+      showNewVideoDialog: false,
       showNewFolderDialog: false,
       showRenameDialog: false,
       newEntityOptions: [
@@ -208,14 +215,14 @@ export default {
             {
               label: "Upload File",
               icon: FileUpload,
-              onClick: () => this.emitter.emit("uploadFile"),
+              onClick: () => (this.showNewVideoDialog = true),   //this.emitter.emit("uploadFile"),
             },
-            {
-              label: "Upload Folder",
-              icon: FolderUpload,
-              onClick: () => this.emitter.emit("uploadFolder"),
-              isEnabled: () => this.selectedEntities.length === 0,
-            },
+            // {
+            //   label: "Upload Folder",
+            //   icon: FolderUpload,
+            //   onClick: () => this.emitter.emit("uploadFolder"),
+            //   isEnabled: () => this.selectedEntities.length === 0,
+            // },
           ],
         },
         {

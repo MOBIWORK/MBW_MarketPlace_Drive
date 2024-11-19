@@ -153,6 +153,7 @@ onMounted(() => {
     },
   })
   dropzone.value.on("addedfile", function (file) {
+    console.log("Dòng 156 ", file)
     file.parent = store.state.currentFolderID
     store.commit("pushToUploads", {
       uuid: file.upload.uuid,
@@ -218,6 +219,7 @@ onMounted(() => {
     return directUplodEntityName.value
   }); */
   emitter.on("uploadFile", () => {
+    console.log("Dòng 221 ", dropzone.value)
     if (dropzone.value.hiddenFileInput) {
       dropzone.value.hiddenFileInput.removeAttribute("webkitdirectory")
       dropzone.value.hiddenFileInput.click()

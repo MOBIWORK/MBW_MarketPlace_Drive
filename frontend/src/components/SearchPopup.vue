@@ -112,9 +112,9 @@
             Favourites
           </div>
         </div>
-        <span class="mt-3 mb-1 px-4.5 text-base text-gray-600">Actions</span>
+        <!-- <span class="mt-3 mb-1 px-4.5 text-base text-gray-600">Actions</span> -->
         <div class="px-2.5">
-          <div
+          <!-- <div
             class="flex w-full min-w-0 items-center rounded px-2 py-2 text-base font-medium text-gray-700 hover:bg-gray-100"
             @click="
               emitter.emit('uploadFile'), emitter.emit('showSearchPopup', false)
@@ -122,8 +122,8 @@
           >
             <FileUpload class="stroke-[1.35] mr-2 h-4 w-4 text-gray-700" />
             Upload File
-          </div>
-          <div
+          </div> -->
+          <!-- <div
             class="flex w-full min-w-0 items-center rounded px-2 py-2 text-base font-medium text-gray-700 hover:bg-gray-100"
             @click="
               emitter.emit('uploadFolder'),
@@ -132,7 +132,7 @@
           >
             <FolderUpload class="stroke-[1.35] mr-2 h-4 w-4 text-gray-700" />
             Upload Folder
-          </div>
+          </div> -->
           <!--       <div class="flex w-full min-w-0 items-center rounded px-2 py-2 text-base font-medium text-gray-700 hover:bg-gray-100">
         <FeatherIcon name="folder-plus" class="mr-2 h-4 w-4 text-gray-700"/>
         New Folder

@@ -6,6 +6,8 @@ import hashlib
 from PIL import Image, ImageOps
 from drive.locks.distributed_lock import DistributedLock
 import cv2
+from tempfile import NamedTemporaryFile
+from drive.utils.s3 import get_conn
 
 
 def create_user_directory():
@@ -186,3 +188,66 @@ def create_thumbnail(entity_name, path, mime_type):
                     retry_count += 1
             else:
                 print("Failed to create thumbnail after maximum retries.")
+
+def create_thumbnail_by_object(entity_name, object_id, mime_type):
+
+    # Tạo thư mục lưu thumbnail
+    user_thumbnails_directory = None
+    try:
+        user_thumbnails_directory = get_user_thumbnails_directory()
+    except FileNotFoundError:
+        user_thumbnails_directory = create_user_thumbnails_directory()
+
+    thumbnail_savepath = Path(user_thumbnails_directory, entity_name)
+    # Tải tệp từ S3 về tệp tạm thời
+    with NamedTemporaryFile(delete=True) as temp_file:
+        try:
+            conn = get_conn()
+            conn.download_fileobj("eov-geoviz", object_id, temp_file)
+            temp_file.flush()
+            temp_path = temp_file.name
+
+            if mime_type.startswith("image"):
+                max_retries = 3
+                retry_count = 0
+                while retry_count < max_retries:
+                    try:
+                        with Image.open(temp_path).convert("RGB") as image:
+                            image = ImageOps.exif_transpose(image)
+                            image.thumbnail((512, 512))
+                            image.save(str(thumbnail_savepath) + ".thumbnail", format="webp")
+                        break
+                    except Exception as e:
+                        print(f"Failed to create image thumbnail. Retry {retry_count+1}/{max_retries}")
+                        retry_count += 1
+                else:
+                    print("Failed to create image thumbnail after maximum retries.")
+            
+            elif mime_type.startswith("video"):
+                max_retries = 3
+                retry_count = 0
+                while retry_count < max_retries:
+                    try:
+                        cap = cv2.VideoCapture(temp_path)
+                        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+                        target_frame = int(frame_count / 2)
+                        cap.set(cv2.CAP_PROP_POS_FRAMES, target_frame)
+                        ret, frame = cap.read()
+                        cap.release()
+                        
+                        if ret:
+                            _, thumbnail_encoded = cv2.imencode(
+                                ".webp",
+                                frame,
+                                [int(cv2.IMWRITE_WEBP_QUALITY), 50],
+                            )
+                            with open(str(thumbnail_savepath) + ".thumbnail", "wb") as f:
+                                f.write(thumbnail_encoded)
+                        break
+                    except Exception as e:
+                        print(f"Failed to create video thumbnail. Retry {retry_count+1}/{max_retries}")
+                        retry_count += 1
+                else:
+                    print("Failed to create video thumbnail after maximum retries.")
+        except Exception as e:
+            print(f"Failed to download or process the file from S3: {e}")

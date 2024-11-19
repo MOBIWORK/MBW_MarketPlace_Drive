@@ -13,9 +13,10 @@ from werkzeug.wrappers import Response
 from werkzeug.utils import secure_filename
 from drive.api.files import (
     get_user_directory,
-    create_drive_entity,
+    create_drive_entity
 )
-from drive.utils.files import create_thumbnail
+from drive.utils.files import create_thumbnail, create_thumbnail_by_object, _get_user_directory_name
+from drive.utils.s3 import upload_file
 
 
 @frappe.whitelist(allow_guest=True, methods=["PATCH", "HEAD", "POST", "GET" "OPTIONS", "GET"])
@@ -137,23 +138,39 @@ def handle_tus_request(fileID=None):
             parent = frappe.cache.hget(f"drive_{fileID}", "fileParent")
             if not parent:
                 parent = get_user_directory().name
-            save_path = Path(get_user_directory().path) / f"{secure_filename(file_name)}"
-            os.rename(temp_path, save_path)
+            save_path = f"{_get_user_directory_name()}/{secure_filename(file_name)}"
+            
+            #Lưu dữ liệu trên S3, thay vì lưu trên ổ đĩa disk
+            #os.rename(temp_path, save_path)
+            upload_file(temp_path, save_path)
+
+            #Tạo entity lưu trữ với save_path là object_id tương ứng trong s3
             create_drive_entity(
                 name, title, parent, save_path, file_size, file_ext, mime_type, last_modified
             )
             if mime_type.startswith(("image", "video")):
                 frappe.enqueue(
-                    create_thumbnail,
+                    create_thumbnail_by_object,
                     queue="default",
                     timeout=None,
                     now=True,
                     at_front=True,
-                    # will set to false once reactivity in new UI is solved
                     entity_name=name,
-                    path=save_path,
-                    mime_type=mime_type,
+                    object_id=save_path,
+                    mime_type=mime_type
                 )
+                #Tạo thumb dựa trên disk
+                # frappe.enqueue(
+                #     create_thumbnail,
+                #     queue="default",
+                #     timeout=None,
+                #     now=True,
+                #     at_front=True,
+                #     # will set to false once reactivity in new UI is solved
+                #     entity_name=name,
+                #     path=save_path,
+                #     mime_type=mime_type,
+                # )
             frappe.cache.delete(f"drive_{fileID}")
 
         response.headers.add("Upload-Offset", offset_counter)
