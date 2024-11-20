@@ -76,6 +76,35 @@ def get_file(object_key):
     else:
         return None
 
+def get_connect_by_setting(aws_access_key_id, aws_secret_access_key):
+    return boto3.client(
+        "s3",
+        aws_access_key_id = aws_access_key_id,
+        aws_secret_access_key = aws_secret_access_key
+    )
+
+def get_object_with_conn(connect, object_key):
+    return connect.get_object(
+        Bucket = BUCKET_NAME,
+        Key = object_key
+    )
+
+def upload_image_with_b_conn(connect, content, object_key):
+    try:
+        connect.head_bucket(Bucket=BUCKET_NAME)
+    except ClientError as e:
+        connect.create_bucket(Bucket=BUCKET_NAME)
+    
+    try:
+        connect.put_object(
+            Bucket=BUCKET_NAME,
+            Key=object_key,
+            Body=content,
+            ContentType="image/png"
+        )
+    except Exception as e:
+        print(f"Lỗi khi tải lên s3: {e}")
+
 @frappe.whitelist()
 def list_objects(bucket_name):
     return conn.list_objects(Bucket=bucket_name)
