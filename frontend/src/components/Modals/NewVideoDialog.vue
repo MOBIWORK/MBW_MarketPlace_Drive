@@ -69,10 +69,11 @@
 </template>
 
 <script>
-import { Dialog, FeatherIcon, FormControl, ErrorMessage, Button } from 'frappe-ui'
+import { Dialog, FeatherIcon, FormControl, ErrorMessage, Button, createResource } from 'frappe-ui'
 import Uppy from '@uppy/core'
 import Tus from '@uppy/tus'
 import { v4 as uuidv4 } from "uuid"
+import { toast } from "@/utils/toasts.js"
 
 export default {
     name: 'NewVideoDialog',
@@ -105,7 +106,10 @@ export default {
             uppy: null,
             completedUpload: false,
             completedCount: 0,
-            errorMessage: ""
+            errorMessage: "",
+            nameFVideo: null,
+            nameSVideo: null,
+            nameGPS: null
         }
     },
     computed: {
@@ -134,14 +138,29 @@ export default {
                         "Content-Type": "application/offset+octet-stream",
                     }
                 })
-                this.uppy.on('upload-success', (file) => {
+                this.uppy.on("file-added", (file) => {
+                    this.uppy.setFileMeta(file.id, {
+                        fileId: file.id,
+                        fileParent: this.$store.state.currentFolderID,
+                        lastModified: file.data.lastModified,
+                    })
+                })
+                this.uppy.on('upload-success', async (file, response) => {
+                    let fileIDs = response.uploadURL.split("?")
+                    let urlInfoFile = "/api/method/drive.api.upload.get_file_info?" + fileIDs[1]
+                    let fetInfoFile = await fetch(urlInfoFile)
+                    let objFile = await fetInfoFile.json()
                     if(this.typeInput == "Video_GPS"){
+                        if(this.completedCount == 0) this.nameFVideo = objFile.message.name_entity
+                        else if(this.completedCount == 1) this.nameSVideo = objFile.message.name_entity
+                        else if(this.completedCount == 2) this.nameGPS = objFile.message.name_entity
                         this.completedCount += 1
-                        if(this.completedCount == 2){
+                        if(this.completedCount == 3){
                             this.completedUpload = true
                             this.onAnalyticVideo()
                         }
                     }else{
+                        this.nameFVideo = objFile.message.name_entity
                         this.onAnalyticVideo()
                     }
                 })
@@ -219,7 +238,33 @@ export default {
             }
         },
         onAnalyticVideo(){
-            console.log("Call service analytic video")
+            if(this.typeInput == "Video_GPS"){
+
+            }else{
+                var me = this
+                createResource({
+                    url: "drive.api.analysis_video.analytic_without_geometry",
+                    method: "POST",
+                    auto: true,
+                    params: {
+                        name_fvideo: this.nameFVideo,
+                        velocity: this.velocity,
+                        parent: this.$store.state.currentFolderID
+                    },
+                    onSuccess(data){
+                        console.log("Dòng 252 ", data)
+                        if(data.name != null){
+                            me.open = false
+                            toast({
+                                title: "Tải video lên thành công. Quá trình phân tích mất khoảng thời gian, xin vui lòng đợi",
+                                position: "bottom-right",
+                                timeout: 2,
+                            })
+                            me.$emit("success")
+                        }
+                    }
+                })
+            }
         },
         onCleanData(){
             this.typeInput = "Video_Velocity"
@@ -232,6 +277,9 @@ export default {
             this.completedUpload = false
             this.completedCount = 0
             this.errorMessage = ""
+            this.nameFVideo = null
+            this.nameSVideo = null
+            this.nameGPS = null
         }
     },
     beforeDestroy(){

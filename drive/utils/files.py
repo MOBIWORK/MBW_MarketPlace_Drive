@@ -7,7 +7,8 @@ from PIL import Image, ImageOps
 from drive.locks.distributed_lock import DistributedLock
 import cv2
 from tempfile import NamedTemporaryFile
-from drive.utils.s3 import get_conn
+from drive.utils.s3 import get_conn, init_conn
+from drive.utils.const import BUCKET_NAME
 
 
 def create_user_directory():
@@ -200,10 +201,14 @@ def create_thumbnail_by_object(entity_name, object_id, mime_type):
 
     thumbnail_savepath = Path(user_thumbnails_directory, entity_name)
     # Tải tệp từ S3 về tệp tạm thời
+    doc_setting = frappe.get_single('Drive Instance Settings')
+    aws_access_key = doc_setting.aws_access_key
+    aws_secret_access_key = doc_setting.get_password('aws_secret_key')
+    init_conn(aws_access_key, aws_secret_access_key)
     with NamedTemporaryFile(delete=True) as temp_file:
         try:
             conn = get_conn()
-            conn.download_fileobj("eov-geoviz", object_id, temp_file)
+            conn.download_fileobj(BUCKET_NAME, object_id, temp_file)
             temp_file.flush()
             temp_path = temp_file.name
 

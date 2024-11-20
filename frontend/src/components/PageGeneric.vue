@@ -65,6 +65,7 @@
       v-if="showNewVideoDialog"
       v-model="showNewVideoDialog"
       :parent="$route.params.entityName"
+      @success="() => handleListMutation()"
     />
     <NewFolderDialog
       v-if="showNewFolderDialog"
@@ -761,6 +762,7 @@ export default {
     },
   },
   mounted() {
+    var me = this
     this.fetchNextPage()
     this.emitter.on("fetchFolderContents", () => {
       this.handleListMutation()
@@ -816,6 +818,12 @@ export default {
     if (this.isEmpty) return
     this.updateContainerRect()
     visualViewport.addEventListener("resize", this.updateContainerRect)
+    this.$realtime.on('event_analytic_video_job', (data) => {
+      let objData = JSON.parse(data)
+      if(objData["status"] == "success"){
+        me.handleListMutation()
+      }
+    })
   },
   unmounted() {
     this.folderItems = []
@@ -828,6 +836,7 @@ export default {
     document.removeEventListener("keydown", this.selectAllListener)
     document.removeEventListener("keydown", this.copyListener)
     document.removeEventListener("keydown", this.cutListener)
+    this.$realtime.off("event_analytic_video_job")
   },
   methods: {
     dragSelectStart(event) {

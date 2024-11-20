@@ -16,7 +16,7 @@ from drive.api.files import (
     create_drive_entity
 )
 from drive.utils.files import create_thumbnail, create_thumbnail_by_object, _get_user_directory_name
-from drive.utils.s3 import upload_file
+from drive.utils.s3 import upload_file, init_conn
 
 
 @frappe.whitelist(allow_guest=True, methods=["PATCH", "HEAD", "POST", "GET" "OPTIONS", "GET"])
@@ -142,6 +142,10 @@ def handle_tus_request(fileID=None):
             
             #Lưu dữ liệu trên S3, thay vì lưu trên ổ đĩa disk
             #os.rename(temp_path, save_path)
+            doc_setting = frappe.get_single('Drive Instance Settings')
+            aws_access_key = doc_setting.aws_access_key
+            aws_secret_access_key = doc_setting.get_password('aws_secret_key')
+            init_conn(aws_access_key, aws_secret_access_key)
             upload_file(temp_path, save_path)
 
             #Tạo entity lưu trữ với save_path là object_id tương ứng trong s3
@@ -171,7 +175,7 @@ def handle_tus_request(fileID=None):
                 #     path=save_path,
                 #     mime_type=mime_type,
                 # )
-            frappe.cache.delete(f"drive_{fileID}")
+            frappe.cache.hset(f"drive_{fileID}", "name_entity", name)
 
         response.headers.add("Upload-Offset", offset_counter)
         return response
@@ -203,3 +207,13 @@ def handle_tus_request(fileID=None):
 
 
 # background job to wipe file in /uploads if expiry is up
+
+@frappe.whitelist(allow_guest=True, methods=["GET"])
+def get_file_info(fileID):
+    meta = frappe.cache.exists(f"drive_{fileID}")
+    if not meta:
+        frappe.throw("File not found", frappe.exceptions.DoesNotExistError)
+    name_entity = frappe.cache.hget(f"drive_{fileID}", "name_entity")
+    print("Dòng 218 ", name_entity)
+    frappe.cache.delete(f"drive_{fileID}")
+    return {"name_entity": name_entity}

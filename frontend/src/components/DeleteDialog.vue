@@ -41,7 +41,7 @@ export default {
     entities: {
       type: Array,
       required: false,
-      default: null,
+      default: [],
     },
   },
   emits: ["update:modelValue", "success"],
@@ -66,6 +66,7 @@ export default {
         },
         onSuccess(data) {
           this.entities.map((entity) => del(entity.name))
+          console.log("Dòng 69 ", this.entities)
           this.$emit("success", data)
         },
         onError(error) {

@@ -26,6 +26,7 @@ import urllib.parse
 from frappe.utils import cint
 from drive.api.notifications import notify_mentions
 from drive.api.storage import get_storage_allowed
+from drive.utils.s3 import delete_file, init_conn
 
 
 def if_folder_exists(folder_name, parent):
@@ -855,6 +856,8 @@ def unshare_entities(entity_names, move=False):
 
 
 def delete_background_job(entity, ignore_permissions):
+    doc_entity = frappe.get_doc('Drive Entity', entity)
+    delete_file(doc_entity.path)
     frappe.delete_doc("Drive Entity", entity, ignore_permissions=ignore_permissions)
 
 
@@ -892,6 +895,10 @@ def delete_entities(entity_names=None, clear_all=None):
         )
         ignore_permissions = owns_root_entity or has_write_access
         frappe.db.set_value("Drive Entity", entity, "is_active", -1)
+        doc_setting = frappe.get_single('Drive Instance Settings')
+        aws_access_key = doc_setting.aws_access_key
+        aws_secret_access_key = doc_setting.get_password('aws_secret_key')
+        init_conn(aws_access_key, aws_secret_access_key)
         frappe.enqueue(
             delete_background_job,
             queue="default",
