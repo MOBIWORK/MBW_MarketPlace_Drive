@@ -269,10 +269,8 @@ export default {
   computed: {
     isButtonDisabled() {
       if (document.getElementById("headlessui-portal-root")) {
-        console.log("TRUE")
         return true
       }
-      console.log(document.getElementById("headlessui-portal-root"))
       return false
     },
     selectedEntities() {

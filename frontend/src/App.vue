@@ -61,7 +61,8 @@
       leave-from-class="translate-y-0 opacity-100"
       leave-to-class="translate-y-1 opacity-0"
     >
-      <UploadTracker v-if="showUploadTracker" />
+      <!-- <UploadTracker v-if="showUploadTracker" /> -->
+      <AnalysisTracker v-if="showAnalysisTracker" />
     </Transition>
     <Toasts />
   </template>
@@ -80,6 +81,7 @@ import SearchPopup from "./components/SearchPopup.vue"
 import FileUploader from "./components/FileUploader.vue"
 import BottomBar from "./components/BottomBar.vue"
 import { init as initTelemetry } from "@/telemetry"
+import AnalysisTracker from "@/components/AnalysisTracker.vue"
 
 export default {
   name: "App",
@@ -97,6 +99,7 @@ export default {
     SearchPopup,
     FileUploader,
     BottomBar,
+    AnalysisTracker
   },
   data() {
     return {
@@ -117,6 +120,9 @@ export default {
     },
     showUploadTracker() {
       return this.isLoggedIn && this.$store.state.uploads.length > 0
+    },
+    showAnalysisTracker(){
+      return this.isLoggedIn && this.$store.state.analysis.length > 0
     },
     hideInfoSideBar() {
       if (this.$route.meta.documentPage) {
@@ -172,7 +178,6 @@ export default {
         url: "drive.utils.users.drive_user_level",
         cache: "is_admin",
         onSuccess(data) {
-          console.log(data)
           this.$store.state.user.role = data
         },
         onError(error) {

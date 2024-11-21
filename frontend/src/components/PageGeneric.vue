@@ -155,11 +155,11 @@
           : $resources.folderContents.data
       "
       @success="
-        () => {
+        () => { 
           offset = 0
           folderItems = null
           selectedEntities = []
-          fetchNextPage()
+          resetAndFetch()
           showDeleteDialog = false
         }
       "
@@ -821,7 +821,20 @@ export default {
     this.$realtime.on('event_analytic_video_job', (data) => {
       let objData = JSON.parse(data)
       if(objData["status"] == "success"){
+        me.$store.commit("updateAnalysis", {
+          uuid: objData["name"],
+          completed: true,
+          progress: 100,
+          folder_name: objData["message"]
+        })
         me.handleListMutation()
+      }else{
+        me.$store.commit("updateAnalysis", {
+          uuid: objData["name"],
+          completed: true,
+          progress: 100,
+          error: objData["message"]
+        })
       }
     })
   },

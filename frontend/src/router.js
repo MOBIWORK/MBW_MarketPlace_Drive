@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from "vue-router"
 import store from "./store"
 
 function redir404(to, from, next) {
-  console.log(to)
   if (store.getters.isLoggedIn) {
     next()
   } else {

@@ -92,7 +92,8 @@ export default {
       return (
         this.previewEntity.mime_type === "video/mp4" ||
         this.previewEntity.mime_type === "video/webm" ||
-        this.previewEntity.mime_type === "video/quicktime"
+        this.previewEntity.mime_type === "video/quicktime" ||
+        this.previewEntity.mime_type === "video/x-m4v"
       )
     },
     isFrappeDoc() {
@@ -156,6 +157,7 @@ export default {
           "video/quicktime",
           "video/webm",
           "video/mp4",
+          "video/x-m4v",
           "audio",
           "text",
           "text/x-python",

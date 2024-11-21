@@ -1,9 +1,9 @@
 <template>
   <Dialog v-model="open" :options="{ title: 'Delete Forever?', size: 'sm' }">
     <template #body-content>
-      <p class="text-gray-600">
+      <p class="text-gray-600" v-if="entities != null">
         {{
-          entities.length === 1
+            entities.length === 1
             ? `${entities.length} item`
             : `${entities.length} items`
         }}
@@ -57,6 +57,7 @@ export default {
   },
   resources: {
     delete() {
+      var me = this
       return {
         url: "drive.api.files.delete_entities",
         params: {
@@ -65,9 +66,8 @@ export default {
           ),
         },
         onSuccess(data) {
-          this.entities.map((entity) => del(entity.name))
-          console.log("Dòng 69 ", this.entities)
-          this.$emit("success", data)
+          me.entities.map((entity) => del(entity.name))
+          me.$emit("success")
         },
         onError(error) {
           if (error.messages) {

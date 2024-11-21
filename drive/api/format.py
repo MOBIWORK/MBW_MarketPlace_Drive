@@ -65,6 +65,7 @@ def mime_to_human(mime_type, is_group):
         "video/ogg": "Video",
         "video/quicktime": "Video",
         "video/x-matroska": "Video",
+        "video/x-m4v": "Video",
         # Book
         "application/epub+zip": "Book",
         "application/x-mobipocket-ebook": "Book",

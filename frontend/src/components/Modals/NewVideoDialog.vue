@@ -16,7 +16,7 @@
                     <div class="text-sm mb-1 text-gray-600">Video 1</div>
                     <div class="h-28 border-2 border-dashed rounded-lg flex cursor-pointer items-center justify-center"
                         @click="onChooseVideoFirst">
-                        <input class="hidden" type="file" id="video_1" @change="onChangeFirstVideo" />
+                        <input class="hidden" type="file" accept="video/mp4" id="video_1" @change="onChangeFirstVideo" />
                         <div class="flex flex-col items-center text-center">
                             <FeatherIcon name="plus" class="h-6" />
                             <div class="text-center" v-if="fFile != null">
@@ -30,7 +30,7 @@
                     <div class="text-sm mb-1 text-gray-600">Video 2</div>
                     <div class="h-28 border-2 border-dashed rounded-lg flex cursor-pointer items-center justify-center"
                         @click="onChooseVideoSecond">
-                        <input class="hidden" type="file" id="video_2" @change="onChangeSecondVideo" />
+                        <input class="hidden" type="file" accept="video/mp4" id="video_2" @change="onChangeSecondVideo" />
                         <div class="flex flex-col items-center text-center">
                             <FeatherIcon name="plus" class="h-6" />
                             <div class="text-center" v-if="sFile != null">
@@ -45,7 +45,7 @@
                 <div class="text-sm mb-1 text-gray-600">File GPS</div>
                 <div class="h-28 border-2 border-dashed rounded-lg flex cursor-pointer items-center justify-center"
                     @click="onChooseFileGPS">
-                    <input class="hidden" type="file" id="f_gps" @change="onChangeFileGPS" />
+                    <input class="hidden" type="file" accept="video/mp4" id="f_gps" @change="onChangeFileGPS" />
                     <div class="flex flex-col items-center text-center">
                         <FeatherIcon name="plus" class="h-6" />
                         <div class="text-center" v-if="fGPS != null">
@@ -62,7 +62,7 @@
         </template>
         <template #actions>
             <div class="flex flex-row-reverse gap-2">
-                <Button variant="solid" label="Tạo mới" :loading="isVideoCreating" @click="createNewVideo" />
+                <Button variant="solid" :label="label" :loading="isVideoCreating" @click="createNewVideo" />
             </div>
         </template>
     </Dialog>
@@ -109,7 +109,8 @@ export default {
             errorMessage: "",
             nameFVideo: null,
             nameSVideo: null,
-            nameGPS: null
+            nameGPS: null,
+            label: "Tạo mới"
         }
     },
     computed: {
@@ -222,7 +223,7 @@ export default {
                 this.errorMessage = "Field velocity is not empty"
                 return
             }
-
+            this.label = "Tải lên"
             this.isVideoCreating = true
             this.completedUpload = false
             this.completedCount = 0
@@ -242,6 +243,12 @@ export default {
 
             }else{
                 var me = this
+                this.$store.commit("pushToAnalysis", {
+                    uuid: this.nameFVideo,
+                    name: this.fFile.name,
+                    completed: false,
+                    progress: 0
+                })
                 createResource({
                     url: "drive.api.analysis_video.analytic_without_geometry",
                     method: "POST",
@@ -252,7 +259,6 @@ export default {
                         parent: this.$store.state.currentFolderID
                     },
                     onSuccess(data){
-                        console.log("Dòng 252 ", data)
                         if(data.name != null){
                             me.open = false
                             toast({
@@ -280,6 +286,7 @@ export default {
             this.nameFVideo = null
             this.nameSVideo = null
             this.nameGPS = null
+            this.label = "Tạo mới"
         }
     },
     beforeDestroy(){

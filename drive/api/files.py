@@ -26,7 +26,12 @@ import urllib.parse
 from frappe.utils import cint
 from drive.api.notifications import notify_mentions
 from drive.api.storage import get_storage_allowed
-from drive.utils.s3 import delete_file, init_conn
+from drive.utils.s3 import delete_object_with_connect, get_object_with_connect, get_connect_s3
+from io import BytesIO
+from redis import Redis
+
+#Kết nối Redis
+redis_client = Redis(host="localhost", port=6379, decode_responses=False)
 
 
 def if_folder_exists(folder_name, parent):
@@ -414,9 +419,32 @@ def get_file_content(entity_name, trigger_download=0):  #
     if drive_entity.is_active != 1:
         raise FileNotFoundError
 
+    #Tạo key cache dựa trên đường dẫn file
+    cache_key = f"file_cache:{drive_entity.path}"
+    cached_content = redis_client.get(cache_key)
+    if cached_content:
+        byte_stream = BytesIO(cached_content)
+        byte_stream.seek(0)
+    else:
+        #Kết nối S3 và lấy object
+        doc_setting = frappe.get_single('Drive Instance Settings')
+        aws_access_key = doc_setting.aws_access_key
+        aws_secret_access_key = doc_setting.get_password('aws_secret_key')
+        connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
+        response = get_object_with_connect(connect_s3, drive_entity.path)
+        content = response["Body"].read()
+
+        #Lưu nội dung vào Redis cache trong 1 giờ
+        redis_client.setex(cache_key, 3600, content)
+
+        #Chuẩn bị stream dữ liệu
+        byte_stream = BytesIO(content)
+        byte_stream.seek(0)
+    
+    #Trả file với lock
     with DistributedLock(drive_entity.path, exclusive=False):
         return send_file(
-            drive_entity.path,
+            byte_stream,
             mimetype=drive_entity.mime_type,
             as_attachment=trigger_download,
             conditional=True,
@@ -855,9 +883,10 @@ def unshare_entities(entity_names, move=False):
         doc.unshare(frappe.session.user)
 
 
-def delete_background_job(entity, ignore_permissions):
+def delete_background_job(entity, ignore_permissions, aws_access_key, aws_secret_access_key):
+    connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
     doc_entity = frappe.get_doc('Drive Entity', entity)
-    delete_file(doc_entity.path)
+    delete_object_with_connect(connect_s3, doc_entity.path)
     frappe.delete_doc("Drive Entity", entity, ignore_permissions=ignore_permissions)
 
 
@@ -898,13 +927,14 @@ def delete_entities(entity_names=None, clear_all=None):
         doc_setting = frappe.get_single('Drive Instance Settings')
         aws_access_key = doc_setting.aws_access_key
         aws_secret_access_key = doc_setting.get_password('aws_secret_key')
-        init_conn(aws_access_key, aws_secret_access_key)
         frappe.enqueue(
             delete_background_job,
             queue="default",
             timeout=None,
             entity=entity,
             ignore_permissions=ignore_permissions,
+            aws_access_key=aws_access_key,
+            aws_secret_access_key=aws_secret_access_key
         )
 
 

@@ -70,8 +70,6 @@ uppy.use(DropTarget, {
   target: document.body,
 })
 uppy.on("file-added", (file) => {
-  console.log(uppy.getFile(file.id))
-  console.log(uuidv4())
   uppy.setFileMeta(file.id, {
     fileId: file.id,
     fileParent: store.state.currentFolderID,

@@ -31,6 +31,7 @@ const store = createStore({
       secondaryMessage: "The resource you're looking for does not exist",
     },
     uploads: [],
+    analysis: [],
     connectedUsers: [],
     sortOrder: JSON.parse(localStorage.getItem("sortOrder")) || {
       label: "Name",
@@ -92,6 +93,15 @@ const store = createStore({
     uploadsCompleted: (state) => {
       return state.uploads.filter((upload) => upload.completed && !upload.error)
     },
+    analysisInProgress: (state) => {
+      return state.analysis.filter((analysis) => !analysis.completed)
+    },
+    analysisCompleted: (state) => {
+      return state.analysis.filter((analysis) => analysis.completed && !analysis.error)
+    },
+    analysisFailed: (state) => {
+      return state.analysis.filter((analysis) => analysis.error)
+    }
   },
   mutations: {
     setElementExists(state, val) {
@@ -120,6 +130,18 @@ const store = createStore({
     },
     setUploads(state, uploads) {
       state.uploads = uploads
+    },
+    setAnalysis(state, analysis){
+      state.analysis = analysis
+    },
+    pushToAnalysis(state, item){
+      state.analysis.push(item)
+    },
+    updateAnalysis(state, payload){
+      let index = state.analysis.findIndex(
+        (item) => item.uuid == payload.uuid
+      )
+      Object.assign(state.analysis[index], payload)
     },
     setConnectedUsers(state, connectedUsers) {
       state.connectedUsers = connectedUsers
@@ -226,6 +248,9 @@ const store = createStore({
     clearUploads({ commit }) {
       commit("setUploads", [])
     },
+    clearAnalysis({ commit}) {
+      commit("setAnalysis", [])
+    }
   },
 })
 

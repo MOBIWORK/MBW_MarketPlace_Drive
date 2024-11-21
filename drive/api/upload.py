@@ -16,7 +16,7 @@ from drive.api.files import (
     create_drive_entity
 )
 from drive.utils.files import create_thumbnail, create_thumbnail_by_object, _get_user_directory_name
-from drive.utils.s3 import upload_file, init_conn
+from drive.utils.s3 import upload_file_with_connect, get_connect_s3
 
 
 @frappe.whitelist(allow_guest=True, methods=["PATCH", "HEAD", "POST", "GET" "OPTIONS", "GET"])
@@ -145,8 +145,8 @@ def handle_tus_request(fileID=None):
             doc_setting = frappe.get_single('Drive Instance Settings')
             aws_access_key = doc_setting.aws_access_key
             aws_secret_access_key = doc_setting.get_password('aws_secret_key')
-            init_conn(aws_access_key, aws_secret_access_key)
-            upload_file(temp_path, save_path)
+            connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
+            upload_file_with_connect(connect_s3, temp_path, save_path)
 
             #Tạo entity lưu trữ với save_path là object_id tương ứng trong s3
             create_drive_entity(
