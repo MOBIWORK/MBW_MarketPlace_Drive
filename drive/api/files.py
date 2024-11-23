@@ -17,6 +17,8 @@ from drive.utils.files import (
     get_user_thumbnails_directory,
     create_user_thumbnails_directory,
     create_thumbnail,
+    create_thumbnail_by_object,
+    _get_user_directory_name
 )
 from drive.locks.distributed_lock import DistributedLock
 from datetime import date, timedelta
@@ -26,12 +28,13 @@ import urllib.parse
 from frappe.utils import cint
 from drive.api.notifications import notify_mentions
 from drive.api.storage import get_storage_allowed
-from drive.utils.s3 import delete_object_with_connect, get_object_with_connect, get_connect_s3
+from drive.utils.s3 import delete_object_with_connect, get_object_with_connect, get_connect_s3, upload_file_with_connect
 from io import BytesIO
 from redis import Redis
+from drive.utils.const import REDIS_HOST, REDIS_PORT
 
 #Kết nối Redis
-redis_client = Redis(host="localhost", port=6379, decode_responses=False)
+redis_client = Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=False)
 
 
 def if_folder_exists(folder_name, parent):
@@ -157,8 +160,8 @@ def upload_file(fullpath=None, parent=None, last_modified=None):
     upload_session = frappe.form_dict.uuid
     title = get_new_title(file.filename, parent)
 
-    current_chunk = int(frappe.form_dict.chunk_index)
-    total_chunks = int(frappe.form_dict.total_chunk_count)
+    chunk_index = frappe.form_dict.chunk_index
+    total_chunk_count = frappe.form_dict.total_chunk_count
 
     save_path = Path(user_directory.path) / f"{parent}_{secure_filename(title)}"
     temp_path = (
@@ -166,54 +169,94 @@ def upload_file(fullpath=None, parent=None, last_modified=None):
         / f"{upload_session}_{secure_filename(title)}"
     )
 
-    if get_storage_allowed() < int(frappe.form_dict.total_file_size):
+    #Tính kích thước tệp gửi lên
+    uploaded_file_size = int(frappe.form_dict.get("total_file_size", 0))
+    if uploaded_file_size == 0:
+        uploaded_file_size = file.stream.seek(0, os.SEEK_END)
+        file.stream.seek(0)
+
+    if get_storage_allowed() < uploaded_file_size:
         frappe.throw("Out of allocated storage", ValueError)
 
-    with temp_path.open("ab") as f:
-        f.seek(int(frappe.form_dict.chunk_byte_offset))
-        f.write(file.stream.read())
-        if not f.tell() >= int(frappe.form_dict.total_file_size):
-            return
-        else:
-            pass
+    if chunk_index is not None and total_chunk_count is not None:
+        current_chunk = int(chunk_index)
+        total_chunks = int(total_chunk_count)
+        with temp_path.open("ab") as f:
+            f.seek(int(frappe.form_dict.chunk_byte_offset))
+            f.write(file.stream.read())
+            if not f.tell() >= int(frappe.form_dict.total_file_size):
+                return
+            else:
+                pass
+        
+        if current_chunk + 1 == total_chunks:
+            return _finalize_upload(temp_path, save_path, frappe.form_dict, title, parent, last_modified)
+    else:
+        file.save(save_path)
+        return _finalize_upload(save_path, save_path, frappe.form_dict, title, parent, last_modified)
 
-    if current_chunk + 1 == total_chunks:
-        file_size = temp_path.stat().st_size
-        if file_size != int(frappe.form_dict.total_file_size):
-            temp_path.unlink()
-            frappe.throw("Size on disk does not match specified filesize", ValueError)
-        else:
-            os.rename(temp_path, save_path)
-        mime_type, _ = mimetypes.guess_type(temp_path)
+def _finalize_upload(temp_path, save_path, form_dict, title, parent, last_modified):
+    """
+    Finalize the file upload, perform validation, and create the DriveEntity document.
+    """
+    # Validate file size
+    file_size = temp_path.stat().st_size
+    if "total_file_size" in form_dict and file_size != int(form_dict["total_file_size"]):
+        temp_path.unlink()
+        frappe.throw("Size on disk does not match specified filesize", ValueError)
 
-        if mime_type is None:
-            # Read the first 2KB of the binary stream to determine the file type if string checking failed
-            # Do a rejection workflow to reject undesired mime types
-            mime_type = magic.from_buffer(open(save_path, "rb").read(2048), mime=True)
+    # Move temp file to final destination
+    if temp_path != save_path:
+        os.rename(temp_path, save_path)
 
-        file_name, file_ext = os.path.splitext(title)
-        name = uuid.uuid4().hex
-        path = save_path.parent / f"{name}{save_path.suffix}"
-        save_path.rename(path)
+    # Determine MIME type
+    mime_type, _ = mimetypes.guess_type(save_path)
+    if not mime_type:
+        mime_type = magic.from_buffer(open(save_path, "rb").read(2048), mime=True)
 
-        drive_entity = create_drive_entity(
-            name, title, parent, path, file_size, file_ext, mime_type, last_modified
+    # Create unique file name
+    file_name, file_ext = os.path.splitext(title)
+    name = uuid.uuid4().hex
+    path = save_path.parent / f"{name}{save_path.suffix}"
+    save_path.rename(path)
+
+    #Save file in S3
+    doc_setting = frappe.get_single('Drive Instance Settings')
+    aws_access_key = doc_setting.aws_access_key
+    aws_secret_access_key = doc_setting.get_password('aws_secret_key')
+    key_object = f"{_get_user_directory_name()}/{secure_filename(file_name)}"
+    connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
+    upload_file_with_connect(connect_s3, path, key_object)
+
+    # Create DriveEntity
+    drive_entity = create_drive_entity(
+        name, title, parent, key_object, file_size, file_ext, mime_type, last_modified
+    )
+
+    # Generate thumbnail for images and videos
+    if mime_type.startswith(("image", "video")):
+        frappe.enqueue(
+            create_thumbnail_by_object,
+            queue="default",
+            timeout=None,
+            now=True,
+            at_front=True,
+            entity_name=name,
+            object_id=key_object,
+            mime_type=mime_type
         )
+        # frappe.enqueue(
+        #     create_thumbnail,
+        #     queue="default",
+        #     timeout=None,
+        #     now=True,
+        #     at_front=True,
+        #     entity_name=name,
+        #     path=path,
+        #     mime_type=mime_type,
+        # )
 
-        if mime_type.startswith(("image", "video")):
-            frappe.enqueue(
-                create_thumbnail,
-                queue="default",
-                timeout=None,
-                now=True,
-                at_front=True,
-                # will set to false once reactivity in new UI is solved
-                entity_name=name,
-                path=path,
-                mime_type=mime_type,
-            )
-        return drive_entity
-
+    return drive_entity
 
 def create_drive_entity(name, title, parent, path, file_size, file_ext, mime_type, last_modified):
     drive_entity = frappe.get_doc(

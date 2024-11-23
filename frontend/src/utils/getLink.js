@@ -1,6 +1,7 @@
 import { toast } from "../utils/toasts.js"
 
 export async function getLink(entity) {
+  console.log(entity)
   const link = entity.is_group
     ? `${window.location.origin}/drive/folder/${entity.name}`
     : entity.document

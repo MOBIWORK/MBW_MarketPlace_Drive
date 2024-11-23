@@ -35,6 +35,7 @@
     <ImagePreview v-if="isImage" :preview-entity="previewEntity" />
     <DocPreview v-if="isDocx" :preview-entity="previewEntity" />
     <PDFPreview v-if="isPdf" :preview-entity="previewEntity" />
+    <GeoJsonPreview v-if="isGeoJson" :preview-entity="previewEntity" />
   </template>
 </template>
 <script>
@@ -46,6 +47,7 @@ import PDFPreview from "./FileTypePreview/PDFPreview.vue"
 import VideoPreview from "./FileTypePreview/VideoPreview.vue"
 import TextPreview from "./FileTypePreview/TextPreview.vue"
 import AudioPreview from "@/components/FileTypePreview/AudioPreview.vue"
+import GeoJsonPreview from "@/components/FileTypePreview/GeoJsonPreview.vue"
 
 export default {
   name: "FileRender",
@@ -59,6 +61,7 @@ export default {
     TextPreview,
     AudioPreview,
     FeatherIcon,
+    GeoJsonPreview
   },
   props: {
     previewEntity: {
@@ -119,6 +122,11 @@ export default {
         this.previewEntity.mime_type === "text/x-python"
       )
     },
+    isGeoJson(){
+      return (
+        this.previewEntity.mime_type === "application/geo+json"
+      )
+    },
     open: {
       get() {
         return this.modelValue
@@ -166,6 +174,7 @@ export default {
           "application/pdf",
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "application/geo+json",
           "frappe_doc",
         ].some((type) => this.previewEntity.mime_type.startsWith(type))
 

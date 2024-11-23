@@ -79,6 +79,8 @@ def mime_to_human(mime_type, is_group):
         "application/x-tar": "Archive",
         "application/gzip": "Archive",
         "application/x-bzip2": "Archive",
+        #GeoJson
+        "application/geo+json": "GeoJson"
     }
     if is_group:
         return "Folder"

@@ -42,3 +42,9 @@ def oauth_providers():
 @frappe.whitelist(allow_guest=True)
 def get_server_timezone():
     return frappe.db.get_single_value('System Settings', 'time_zone')
+
+@frappe.whitelist()
+def get_setting_map():
+    doc_setting = frappe.get_single('Drive Instance Settings')
+    api_key_map = doc_setting.api_key_map
+    return {'api_key_map': api_key_map}

@@ -244,7 +244,7 @@ export default {
     FolderContentsError,
     EntityContextMenu,
     EmptyEntityContextMenu,
-    CTADeleteDialog,
+    CTADeleteDialog
   },
   props: {
     url: {
@@ -331,7 +331,7 @@ export default {
     selectionElementStyle: {},
     selectionCoordinates: { x1: 0, x2: 0, y1: 0, y2: 0 },
     containerRect: null,
-    selectedIDs: null,
+    selectedIDs: null
   }),
 
   computed: {
@@ -476,7 +476,6 @@ export default {
             label: "Preview",
             icon: Preview,
             onClick: () => {
-              console.log(this.selectedEntities[0].is_group)
               this.openEntity(this.selectedEntities[0])
             },
             isEnabled: () => {
@@ -722,7 +721,7 @@ export default {
             },
             isEnabled: () => {
               const allOwned = this.selectedEntities.every((entity) => {
-                return entity.owner === "You"
+                return entity.owner === "You" && this.$store.getters.completeAnalysisStatus(entity.name)
               })
               return this.selectedEntities.length > 0 && allOwned
             },

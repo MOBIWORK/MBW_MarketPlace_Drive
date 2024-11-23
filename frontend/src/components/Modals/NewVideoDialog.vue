@@ -7,8 +7,7 @@
             <div class="flex items-center mt-3">
                 <input type="radio" value="Video_GPS" v-model="typeInput" id="Video_GPS" />
                 <label for="Video_GPS" class="ml-2">Video + GPS</label>
-                <input class="ml-10" type="radio" value="Video_Velocity" v-model="typeInput"
-                    id="Video_Velocity" />
+                <input class="ml-10" type="radio" value="Video_Velocity" v-model="typeInput" id="Video_Velocity" />
                 <label for="Video_Velocity" class="ml-2">Video + Speed</label>
             </div>
             <div class="grid gap-5 mt-3" :class="typeInput == 'Video_GPS' ? 'grid-cols-2' : 'grid-cols-1'">
@@ -16,7 +15,9 @@
                     <div class="text-sm mb-1 text-gray-600">Video 1</div>
                     <div class="h-28 border-2 border-dashed rounded-lg flex cursor-pointer items-center justify-center"
                         @click="onChooseVideoFirst">
-                        <input class="hidden" type="file" accept="video/mp4" id="video_1" @change="onChangeFirstVideo" />
+                        <input class="hidden" type="file" accept="video/mp4" id="video_1"
+                            @change="onChangeFirstVideo" />
+                        <div id="dropzone-area" class="hidden"></div>
                         <div class="flex flex-col items-center text-center">
                             <FeatherIcon name="plus" class="h-6" />
                             <div class="text-center" v-if="fFile != null">
@@ -30,7 +31,8 @@
                     <div class="text-sm mb-1 text-gray-600">Video 2</div>
                     <div class="h-28 border-2 border-dashed rounded-lg flex cursor-pointer items-center justify-center"
                         @click="onChooseVideoSecond">
-                        <input class="hidden" type="file" accept="video/mp4" id="video_2" @change="onChangeSecondVideo" />
+                        <input class="hidden" type="file" accept="video/mp4" id="video_2"
+                            @change="onChangeSecondVideo" />
                         <div class="flex flex-col items-center text-center">
                             <FeatherIcon name="plus" class="h-6" />
                             <div class="text-center" v-if="sFile != null">
@@ -45,7 +47,7 @@
                 <div class="text-sm mb-1 text-gray-600">File GPS</div>
                 <div class="h-28 border-2 border-dashed rounded-lg flex cursor-pointer items-center justify-center"
                     @click="onChooseFileGPS">
-                    <input class="hidden" type="file" accept="video/mp4" id="f_gps" @change="onChangeFileGPS" />
+                    <input class="hidden" type="file" id="f_gps" @change="onChangeFileGPS" />
                     <div class="flex flex-col items-center text-center">
                         <FeatherIcon name="plus" class="h-6" />
                         <div class="text-center" v-if="fGPS != null">
@@ -70,10 +72,8 @@
 
 <script>
 import { Dialog, FeatherIcon, FormControl, ErrorMessage, Button, createResource } from 'frappe-ui'
-import Uppy from '@uppy/core'
-import Tus from '@uppy/tus'
-import { v4 as uuidv4 } from "uuid"
 import { toast } from "@/utils/toasts.js"
+import Dropzone from "dropzone";
 
 export default {
     name: 'NewVideoDialog',
@@ -103,14 +103,14 @@ export default {
             fGPS: null,
             velocity: 7,
             isVideoCreating: false,
-            uppy: null,
             completedUpload: false,
             completedCount: 0,
             errorMessage: "",
             nameFVideo: null,
             nameSVideo: null,
             nameGPS: null,
-            label: "Tạo mới"
+            label: "Tạo mới",
+            dropzone: null
         }
     },
     computed: {
@@ -124,102 +124,125 @@ export default {
         },
     },
     methods: {
-        initUppy(){
-            if(!this.uppy){
-                this.uppy = new Uppy({
-                    autoProceed: false,
-                    showProgressDetails: false
-                })
-                this.uppy.use(Tus, {
-                    endpoint: "/api/method/drive.api.upload.handle_tus_request",
-                    chunkSize: 20 * 1024 * 1024,
+        initDropzone() {
+            var me = this
+            if (!this.dropzone) {
+                this.dropzone = new Dropzone("#dropzone-area", {
+                    url: "/api/method/drive.api.files.upload_file",
+                    autoProcessQueue: true,
+                    addRemoveLinks: false,
+                    chunking: true,
+                    maxFilesize: 10 * 1024, // 10GB
+                    timeout: 240000, // 4 minutes
+                    chunkSize: 20 * 1024 * 1024, // 20MB
                     headers: {
-                        "X-Frappe-CSRF-Token": window.csrf_token,
-                        "X-Request-ID": uuidv4(),
-                        "Content-Type": "application/offset+octet-stream",
-                    }
-                })
-                this.uppy.on("file-added", (file) => {
-                    this.uppy.setFileMeta(file.id, {
-                        fileId: file.id,
-                        fileParent: this.$store.state.currentFolderID,
-                        lastModified: file.data.lastModified,
-                    })
-                })
-                this.uppy.on('upload-success', async (file, response) => {
-                    let fileIDs = response.uploadURL.split("?")
-                    let urlInfoFile = "/api/method/drive.api.upload.get_file_info?" + fileIDs[1]
-                    let fetInfoFile = await fetch(urlInfoFile)
-                    let objFile = await fetInfoFile.json()
-                    if(this.typeInput == "Video_GPS"){
-                        if(this.completedCount == 0) this.nameFVideo = objFile.message.name_entity
-                        else if(this.completedCount == 1) this.nameSVideo = objFile.message.name_entity
-                        else if(this.completedCount == 2) this.nameGPS = objFile.message.name_entity
-                        this.completedCount += 1
-                        if(this.completedCount == 3){
-                            this.completedUpload = true
-                            this.onAnalyticVideo()
+                        "X-CSRF-Token": window.csrf_token
+                    },
+                    accept: function (file, done) {
+                        if (file.size == 0) {
+                            done("Empty files will not be uploaded.")
+                        } else {
+                            done()
                         }
-                    }else{
-                        this.nameFVideo = objFile.message.name_entity
-                        this.onAnalyticVideo()
+                    },
+                    sending: function (file, xhr, formData) {
+                        if (file.lastModified) {
+                            formData.append("last_modified", file.lastModified)
+                        }
+                        if (file.parent) {
+                            formData.append("parent", file.parent)
+                        }
+                        if (file.newFullPath) {
+                            formData.append("fullpath", file.newFullPath)
+                        } else if (file.webkitRelativePath) {
+                            formData.append("fullpath", file.webkitRelativePath)
+                        } else if (file.fullPath) {
+                            formData.append("fullpath", file.fullPath)
+                        }
+                        console.log("Form Data:", formData);
+                    },
+                    params: function (files, xhr, chunk) {
+                        if (chunk) {
+                            return {
+                                uuid: chunk.file.upload.uuid,
+                                chunk_index: chunk.index,
+                                total_file_size: chunk.file.size,
+                                chunk_size: me.dropzone.options.chunkSize,
+                                total_chunk_count: chunk.file.upload.totalChunkCount,
+                                chunk_byte_offset: chunk.index * me.dropzone.options.chunkSize,
+                            }
+                        }
                     }
                 })
-                this.uppy.on('error', (error) => {
-                    //Thông báo lỗi 
-                    this.isVideoCreating = false 
+                this.dropzone.on('success', function (file, response) {
+                    if (me.typeInput == "Video_GPS") {
+                        let name_entity = response["message"]["name"]
+                        if (file.name == me.fFile.name) me.nameFVideo = name_entity
+                        else if (file.name == me.sFile.name) me.nameSVideo = name_entity
+                        else if (file.name == me.fGPS.name) me.nameGPS = name_entity
+                        me.completedCount += 1
+                        console.log(me.completedCount)
+                        if (me.completedCount == 3) {
+                            me.completedUpload = true
+                            me.onAnalyticVideo()
+                        }
+                    } else {
+                        me.nameFVideo = response["message"]["name"]
+                        me.onAnalyticVideo()
+                    }
+                })
+                this.dropzone.on('error', function (file, errorMessage) {
+                    me.errorMessage = errorMessage
+                    me.isVideoCreating = false
                 })
             }
         },
-        onAddFileToUppy(file){
-            this.uppy.addFile({
-                name: file.name,
-                type: file.type,
-                data: file
-            })
+        onAddFileToDropZone(file) {
+            this.dropzone.addFile(file)
+            console.log(this.dropzone)
         },
-        onChooseVideoFirst(){
+        onChooseVideoFirst() {
             document.getElementById('video_1').click()
         },
-        onChooseVideoSecond(){
+        onChooseVideoSecond() {
             document.getElementById('video_2').click()
         },
-        onChooseFileGPS(){
+        onChooseFileGPS() {
             document.getElementById('f_gps').click()
         },
-        onChangeFirstVideo(evt){
+        onChangeFirstVideo(evt) {
             this.fFile = evt.target.files[0]
         },
-        onChangeSecondVideo(evt){
+        onChangeSecondVideo(evt) {
             this.sFile = evt.target.files[0]
         },
-        onChangeFileGPS(evt){
+        onChangeFileGPS(evt) {
             this.fGPS = evt.target.files[0]
         },
-        renderFileName(file){
+        renderFileName(file) {
             return file.name
         },
-        renderFileSize(file){
+        renderFileSize(file) {
             return (file.size / (1024 * 1024)).toFixed(2)
         },
-        createNewVideo(){
-            if(this.fFile == null && this.typeInput == "Video_GPS"){
+        createNewVideo() {
+            if (this.fFile == null && this.typeInput == "Video_GPS") {
                 this.errorMessage = "First file video is not empty"
                 return
             }
-            if(this.sFile == null && this.typeInput == "Video_GPS"){
+            if (this.sFile == null && this.typeInput == "Video_GPS") {
                 this.errorMessage = "Second file video is not empty"
                 return
             }
-            if(this.fGPS == null && this.typeInput == "Video_GPS"){
+            if (this.fGPS == null && this.typeInput == "Video_GPS") {
                 this.errorMessage = "File GPS is not empty"
                 return
             }
-            if(this.fFile == null && this.typeInput == "Video_Velocity"){
+            if (this.fFile == null && this.typeInput == "Video_Velocity") {
                 this.errorMessage = "File video is not empty"
                 return
             }
-            if(this.velocity <= 0 && this.typeInput == "Video_Velocity"){
+            if (this.velocity <= 0 && this.typeInput == "Video_Velocity") {
                 this.errorMessage = "Field velocity is not empty"
                 return
             }
@@ -227,22 +250,47 @@ export default {
             this.isVideoCreating = true
             this.completedUpload = false
             this.completedCount = 0
-            this.initUppy()
-            if(this.typeInput == "Video_Velocity"){
-                this.onAddFileToUppy(this.fFile)
-                this.uppy.upload()
-            }else{
-                this.onAddFileToUppy(this.fFile)
-                this.onAddFileToUppy(this.sFile)
-                this.onAddFileToUppy(this.fGPS)
-                this.uppy.upload()
+            this.initDropzone()
+            if (this.typeInput == "Video_Velocity") {
+                this.onAddFileToDropZone(this.fFile)
+            } else {
+                this.onAddFileToDropZone(this.fFile)
+                this.onAddFileToDropZone(this.sFile)
+                this.onAddFileToDropZone(this.fGPS)
             }
         },
-        onAnalyticVideo(){
-            if(this.typeInput == "Video_GPS"){
-
-            }else{
-                var me = this
+        onAnalyticVideo() {
+            var me = this
+            if (this.typeInput == "Video_GPS") {
+                this.$store.commit("pushToAnalysis", {
+                    uuid: this.nameFVideo,
+                    name: `${this.fFile.name}_${this.sFile.name}`,
+                    completed: false,
+                    progress: 0
+                })
+                createResource({
+                    url: "drive.api.analysis_video.analytic_with_geometry",
+                    method: "POST",
+                    auto: true,
+                    params: {
+                        name_fvideo: this.nameFVideo,
+                        name_svideo: this.nameSVideo,
+                        name_gps: this.nameGPS,
+                        parent: this.$store.state.currentFolderID
+                    },
+                    onSuccess(data) {
+                        if (data.name != null) {
+                            me.open = false
+                            toast({
+                                title: "Tải video lên thành công. Quá trình phân tích mất khoảng thời gian, xin vui lòng đợi",
+                                position: "bottom-right",
+                                timeout: 2,
+                            })
+                            me.$emit("success")
+                        }
+                    }
+                })
+            } else {
                 this.$store.commit("pushToAnalysis", {
                     uuid: this.nameFVideo,
                     name: this.fFile.name,
@@ -258,8 +306,8 @@ export default {
                         velocity: this.velocity,
                         parent: this.$store.state.currentFolderID
                     },
-                    onSuccess(data){
-                        if(data.name != null){
+                    onSuccess(data) {
+                        if (data.name != null) {
                             me.open = false
                             toast({
                                 title: "Tải video lên thành công. Quá trình phân tích mất khoảng thời gian, xin vui lòng đợi",
@@ -272,14 +320,14 @@ export default {
                 })
             }
         },
-        onCleanData(){
+        onCleanData() {
             this.typeInput = "Video_Velocity"
             this.fFile = null
             this.sFile = null
             this.fGPS = null
             this.velocity = 7
             this.isVideoCreating = false
-            this.uppy = null
+            this.dropzone = null
             this.completedUpload = false
             this.completedCount = 0
             this.errorMessage = ""
@@ -287,11 +335,6 @@ export default {
             this.nameSVideo = null
             this.nameGPS = null
             this.label = "Tạo mới"
-        }
-    },
-    beforeDestroy(){
-        if(this.uppy){
-            this.uppy.close()
         }
     }
 }

@@ -59,6 +59,10 @@ def delete_object_with_connect(connect, object_key):
 
 @frappe.whitelist()
 def list_objects(bucket_name):
+    doc_setting = frappe.get_single('Drive Instance Settings')
+    aws_access_key = doc_setting.aws_access_key
+    aws_secret_access_key = doc_setting.get_password('aws_secret_key')
+    connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
     return connect_s3.list_objects(Bucket=bucket_name)
 
 @frappe.whitelist()
@@ -69,6 +73,10 @@ def list_bucket():
 def delete_objects(bucket_name):
     # Liệt kê các đối tượng trong bucket
     objects_to_delete = []
+    doc_setting = frappe.get_single('Drive Instance Settings')
+    aws_access_key = doc_setting.aws_access_key
+    aws_secret_access_key = doc_setting.get_password('aws_secret_key')
+    connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
     response = connect_s3.list_objects_v2(Bucket=bucket_name)
     
     # Kiểm tra xem có đối tượng nào trong bucket không

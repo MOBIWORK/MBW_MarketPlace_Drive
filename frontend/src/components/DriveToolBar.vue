@@ -169,6 +169,7 @@ import Image from "./MimeIcons/Image.vue"
 import Video from "./MimeIcons/Video.vue"
 import PDF from "./MimeIcons/PDF.vue"
 import Unknown from "./MimeIcons/Unknown.vue"
+import GeoJson from "./MimeIcons/GeoJson.vue"
 
 export default {
   name: "DriveToolBar",
@@ -191,6 +192,7 @@ export default {
     Video,
     PDF,
     Unknown,
+    GeoJson
   },
   props: {
     breadcrumbs: {
@@ -304,12 +306,19 @@ export default {
           },
         },
         {
+          label: "GeoJson",
+          icon: GeoJson,
+          onClick: () => {
+            this.$store.state.activeFilters.push("GeoJson")
+          },
+        },
+        {
           label: "Unknown",
           icon: Unknown,
           onClick: () => {
             this.$store.state.activeFilters.push("Unknown")
           },
-        },
+        }
       ].filter((item) => !this.activeFilters.includes(item.label))
     },
   },

@@ -49,6 +49,7 @@ const store = createStore({
       JSON.parse(localStorage.getItem("currentFolder")) ||
       [],
     serverTZ: null,
+    apiKeyMap: null,
     currentFolder: JSON.parse(localStorage.getItem("currentFolder")) || [],
     currentViewEntites: get("currentViewEntites") || [],
     pasteData: { entities: [], action: null },
@@ -101,6 +102,13 @@ const store = createStore({
     },
     analysisFailed: (state) => {
       return state.analysis.filter((analysis) => analysis.error)
+    },
+    completeAnalysisStatus: (state) => (analysisId) => {
+      let analysisFilter = state.analysis.filter((item) => item.uuid == analysisId)
+      if(analysisFilter != null && analysisFilter.length > 0){
+        return analysisFilter[0].completed
+      }
+      return true
     }
   },
   mutations: {
@@ -210,7 +218,7 @@ const store = createStore({
     setIsSidebarExpanded(state, payload) {
       localStorage.setItem("IsSidebarExpanded", JSON.stringify(payload))
       state.IsSidebarExpanded = payload
-    },
+    }
   },
   actions: {
     checkElementPresence({ commit }) {
@@ -250,7 +258,8 @@ const store = createStore({
     },
     clearAnalysis({ commit}) {
       commit("setAnalysis", [])
-    }
+    },
+
   },
 })
 

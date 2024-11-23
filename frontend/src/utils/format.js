@@ -81,6 +81,9 @@ export function formatMimeType(mimeType) {
       case "x-7z-compressed":
         icon = "zip"
         break
+      case "geo+json":
+        icon = "geojson"
+        break
     }
   return icon
 }

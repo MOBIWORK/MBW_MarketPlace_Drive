@@ -203,6 +203,15 @@ export default {
         this.$store.state.serverTZ = data
       },
     },
+    getApiKeyMap: {
+      url: "drive.api.api.get_setting_map",
+      auto: true,
+      method: "GET",
+      cache: "api_key_map",
+      onSuccess(data){
+        if(data != null && data.api_key_map != null) this.$store.state.apiKeyMap = data.api_key_map
+      }
+    }
   },
 }
 </script>

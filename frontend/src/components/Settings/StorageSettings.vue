@@ -110,7 +110,8 @@ export default {
         Text: "#E2E2E2",
         PDF: "#E03636",
         Book: "#E2E2E2",
-        Unknown: "#3f3f46",
+        GeoJson: "#3733EB",
+        Unknown: "#3f3f46"
       },
     }
   },
