@@ -10,7 +10,7 @@
                 <input class="ml-10" type="radio" value="Video_Velocity" v-model="typeInput" id="Video_Velocity" />
                 <label for="Video_Velocity" class="ml-2">Video + Speed</label>
             </div>
-            <div class="grid gap-5 mt-3" :class="typeInput == 'Video_GPS' ? 'grid-cols-2' : 'grid-cols-1'">
+            <div class="grid gap-5 mt-3" :class="typeInput == 'Video_GPS' && processVideo==2 ? 'grid-cols-2' : 'grid-cols-1'">
                 <div>
                     <div class="text-sm mb-1 text-gray-600">Video 1</div>
                     <div class="h-28 border-2 border-dashed rounded-lg flex cursor-pointer items-center justify-center"
@@ -27,7 +27,7 @@
                         </div>
                     </div>
                 </div>
-                <div v-if="typeInput == 'Video_GPS'">
+                <div v-if="typeInput == 'Video_GPS' && processVideo == 2">
                     <div class="text-sm mb-1 text-gray-600">Video 2</div>
                     <div class="h-28 border-2 border-dashed rounded-lg flex cursor-pointer items-center justify-center"
                         @click="onChooseVideoSecond">
@@ -47,12 +47,12 @@
                 <div class="text-sm mb-1 text-gray-600">File GPS</div>
                 <div class="h-28 border-2 border-dashed rounded-lg flex cursor-pointer items-center justify-center"
                     @click="onChooseFileGPS">
-                    <input class="hidden" type="file" id="f_gps" @change="onChangeFileGPS" />
+                    <input class="hidden" type="file" id="f_gps" accept="gpx" @change="onChangeFileGPS" />
                     <div class="flex flex-col items-center text-center">
                         <FeatherIcon name="plus" class="h-6" />
                         <div class="text-center" v-if="fGPS != null">
                             <span class="text-sm font-medium">{{ renderFileName(fGPS) }} -
-                                {{ renderFileSize(fGPS) }} MB</span>
+                                {{ renderFileSizeKB(fGPS) }} Kb</span>
                         </div>
                     </div>
                 </div>
@@ -110,7 +110,8 @@ export default {
             nameSVideo: null,
             nameGPS: null,
             label: "Tạo mới",
-            dropzone: null
+            dropzone: null,
+            processVideo: 1
         }
     },
     computed: {
@@ -149,8 +150,8 @@ export default {
                         if (file.lastModified) {
                             formData.append("last_modified", file.lastModified)
                         }
-                        if (file.parent) {
-                            formData.append("parent", file.parent)
+                        if (me.parent) {
+                            formData.append("parent", me.parent)
                         }
                         if (file.newFullPath) {
                             formData.append("fullpath", file.newFullPath)
@@ -178,11 +179,13 @@ export default {
                     if (me.typeInput == "Video_GPS") {
                         let name_entity = response["message"]["name"]
                         if (file.name == me.fFile.name) me.nameFVideo = name_entity
-                        else if (file.name == me.sFile.name) me.nameSVideo = name_entity
+                        else if (me.processVideo == 2 && file.name == me.sFile.name) me.nameSVideo = name_entity
                         else if (file.name == me.fGPS.name) me.nameGPS = name_entity
                         me.completedCount += 1
-                        console.log(me.completedCount)
-                        if (me.completedCount == 3) {
+                        if (me.processVideo == 2 && me.completedCount == 3) {
+                            me.completedUpload = true
+                            me.onAnalyticVideo()
+                        }else if(me.completedCount == 2 && me.processVideo == 1){
                             me.completedUpload = true
                             me.onAnalyticVideo()
                         }
@@ -225,12 +228,15 @@ export default {
         renderFileSize(file) {
             return (file.size / (1024 * 1024)).toFixed(2)
         },
+        renderFileSizeKB(file){
+            return (file.size / 1024).toFixed(2)
+        },
         createNewVideo() {
             if (this.fFile == null && this.typeInput == "Video_GPS") {
                 this.errorMessage = "First file video is not empty"
                 return
             }
-            if (this.sFile == null && this.typeInput == "Video_GPS") {
+            if (this.processVideo == 2 && this.sFile == null && this.typeInput == "Video_GPS") {
                 this.errorMessage = "Second file video is not empty"
                 return
             }
@@ -255,7 +261,7 @@ export default {
                 this.onAddFileToDropZone(this.fFile)
             } else {
                 this.onAddFileToDropZone(this.fFile)
-                this.onAddFileToDropZone(this.sFile)
+                if(this.processVideo == 2) this.onAddFileToDropZone(this.sFile)
                 this.onAddFileToDropZone(this.fGPS)
             }
         },
@@ -264,20 +270,30 @@ export default {
             if (this.typeInput == "Video_GPS") {
                 this.$store.commit("pushToAnalysis", {
                     uuid: this.nameFVideo,
-                    name: `${this.fFile.name}_${this.sFile.name}`,
+                    name: this.processVideo == 2? `${this.fFile.name}_${this.sFile.name}` : `${this.fFile.name}`,
                     completed: false,
                     progress: 0
                 })
-                createResource({
-                    url: "drive.api.analysis_video.analytic_with_geometry",
-                    method: "POST",
-                    auto: true,
-                    params: {
+                let urlAnalysisVideo = "drive.api.analysis_video.analytic_video_with_geometry"
+                let paramsAnalysisVideo = {
+                    name_fvideo: this.nameFVideo,
+                    name_gps: this.nameGPS,
+                    parent: this.$store.state.currentFolderID
+                }
+                if(this.processVideo == 2){
+                    urlAnalysisVideo = "drive.api.analysis_video.analytic_videos_with_geometry"
+                    paramsAnalysisVideo = {
                         name_fvideo: this.nameFVideo,
                         name_svideo: this.nameSVideo,
                         name_gps: this.nameGPS,
                         parent: this.$store.state.currentFolderID
-                    },
+                    }
+                }
+                createResource({
+                    url: urlAnalysisVideo,
+                    method: "POST",
+                    auto: true,
+                    params: paramsAnalysisVideo,
                     onSuccess(data) {
                         if (data.name != null) {
                             me.open = false

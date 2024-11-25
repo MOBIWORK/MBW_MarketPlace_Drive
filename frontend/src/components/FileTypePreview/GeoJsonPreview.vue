@@ -1,9 +1,14 @@
 <template>
     <div class="w-full h-full flex">
-        <div id="mapPreviewID" class="h-full" :class="showDetailInfoPoint? 'w-3/4' : 'w-full'">
+        <div id="mapPreviewID" class="h-full relative" :class="showDetailInfoPoint? 'w-3/4' : 'w-full'">
             <LoadingIndicator v-if="loading" class="w-10 h-full text-neutral-100 mx-auto z-50" />
         </div>
-        <div class="h-full w-1/4" v-if="showDetailInfoPoint">Kết quả tra cứu</div>
+        <div class="h-full w-1/4" v-if="showDetailInfoPoint">
+            <div class="w-full flex justify-between">
+                <div>Kết quả tra cứu</div>
+                <Button icon="x" variant="ghost" @click="onCloseDetailPoint" />
+            </div>
+        </div>
     </div>
     
 
@@ -19,30 +24,16 @@
                     width: '50px'
                 },
                 {
-                    label: 'Khung hình bắt đầu',
-                    key: 'Start_Frame',
-                    width: '150px'
-                },
-                {
-                    label: 'Khung hình kết thúc',
-                    key: 'End_Frame',
-                    width: '150px'
-                },
-                {
                     label: 'Diện tích(m)',
-                    key: 'S_Real(m)'
+                    key: 'area_real'
                 },
                 {
                     label: 'Diện tích(pixel)',
-                    key: 'S_pixel(pixel)'
-                },
-                {
-                    label: 'Tỷ lệ',
-                    key: 'Ratio'
+                    key: 'area_pixel'
                 },
                 {
                     label: 'Ảnh',
-                    key: 'Image'
+                    key: 'image '
                 }
             ]" :rows="dataProperties" :options="{
                 selectable: false,
@@ -52,14 +43,16 @@
                     title: 'Không có bản ghi'
                 }
             }" 
-            row-key="ID" />
+            row-key="ID">
+                
+            </ListView>
         </template>
     </Dialog>
 </template>
 
 <script setup>
-import { LoadingIndicator, Dialog, ListView } from "frappe-ui"
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import { LoadingIndicator, Dialog, ListView, ListRows } from "frappe-ui"
+import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useStore } from "vuex"
 
 const props = defineProps({
@@ -85,6 +78,14 @@ const detailInfoPoint = ref(null)
 watch(props.previewEntity, () => {
     loading.value = true
     fetchContent()
+})
+
+watch(showDetailInfoPoint, async () => {
+    if(mapPreview.value){
+        await nextTick()
+        mapPreview.value.resize()
+        console.log(mapPreview)
+    }
 })
 
 async function fetchContent() {
@@ -261,7 +262,6 @@ function clickInfoPoint(evt){
     }else{
         detailInfoPoint.value = null
     }
-    mapPreview.value.resize()
     console.log("Dòng 253 ", features)
 }
 
@@ -291,6 +291,7 @@ function onAddLayer() {
         let geometry = contentGeoJson.value.features[i]["geometry"]
         let properties = contentGeoJson.value.features[i]["properties"]
         arrLine.push(geometry["coordinates"])
+        properties["ID"] = i+1
         arrProperties.push(properties)
     }
     if (arrLine.length > 0) {
@@ -301,6 +302,11 @@ function onAddLayer() {
         })
     }
     dataProperties.value = arrProperties
+}
+
+function onCloseDetailPoint(){
+    detailInfoPoint.value = null
+    showDetailInfoPoint.value = false
 }
 
 onMounted(() => {

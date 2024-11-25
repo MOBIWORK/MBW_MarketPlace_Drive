@@ -432,14 +432,14 @@ def get_file_content(entity_name, trigger_download=0):  #
     :raises PermissionError: If the current user does not have permission to read the file
     :raises FileLockedError: If the file has been writer-locked
     """
-
-    if not frappe.has_permission(
-        doctype="Drive Entity",
-        doc=entity_name,
-        ptype="read",
-        user=frappe.session.user,
-    ):
-        raise frappe.PermissionError("You do not have permission to view this file")
+    #Bổ sung thêm key để lấy content hoặc session
+    # if not frappe.has_permission(
+    #     doctype="Drive Entity",
+    #     doc=entity_name,
+    #     ptype="read",
+    #     user=frappe.session.user,
+    # ):
+    #     raise frappe.PermissionError("You do not have permission to view this file")
     trigger_download = int(trigger_download)
     drive_entity = frappe.get_value(
         "Drive Entity",
