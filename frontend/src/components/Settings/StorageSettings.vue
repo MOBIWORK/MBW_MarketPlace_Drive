@@ -194,7 +194,7 @@ export default {
         },
         auto: false,
       }
-    },
+    }
   },
   methods: {
     formatMimeType,

@@ -1,9 +1,9 @@
 <template>
-    <div class="w-full h-full flex">
-        <div id="mapPreviewID" class="h-full relative" :class="showDetailInfoPoint ? 'w-3/4' : 'w-full'">
+    <div class="w-full h-full flex flex-col" :class="showDetailInfoPoint ? 'lg:flex-row' : ''">
+        <div id="mapPreviewID" class="relative w-full" :class="showDetailInfoPoint ? 'h-3/5 lg:h-full lg:w-3/4' : 'h-full'">
             <LoadingIndicator v-if="loading" class="w-10 h-full text-neutral-100 mx-auto z-50" />
         </div>
-        <div class="h-full w-1/4" v-if="showDetailInfoPoint">
+        <div class="w-full h-auto bg-white lg:h-full lg:w-1/4" v-if="showDetailInfoPoint">
             <div class="w-full h-[200px] relative">
                 <img draggable="false" class="h-full w-full" :src="detailInfoPoint.image" id-="" />
                 <div class="absolute top-2 right-2 z-50 rounded-full cursor-pointer bg-white p-1 shadow-md hover:bg-gray-200 transition" @click="onCloseDetailPoint">

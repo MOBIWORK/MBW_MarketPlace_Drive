@@ -5,7 +5,11 @@
         >Used {{ formatSize(usedSpace) }} out of
         {{ base2BlockSize(planSizeLimit) }}</span
       >
-      <slot name="control"></slot>
+      <div class="flex items-center">
+        <a class="text-base text-blue-600 cursor-pointer underline" href="javascript:;" @click="onShowServicePackages">Change package plan</a>
+        <slot name="control"></slot>
+      </div>
+      
     </div>
     <div
       v-if="usedSpace > 0"
@@ -49,10 +53,13 @@
       <span class="text-gray-800 text-sm ml-auto">{{ i.h_size }}</span>
     </div>
   </div>
+  <ServicePackagesDialog v-model="showServicePackageDialog"></ServicePackagesDialog>
 </template>
 <script setup>
 import Cloud from "@/components/EspressoIcons/Cloud.vue"
 import { formatSize, base2BlockSize } from "../../utils/format"
+import ServicePackagesDialog from "@/components/Modals/ServicePackagesDialog.vue"
+import { ref } from 'vue'
 
 const props = defineProps({
   planSizeLimit: {
@@ -68,4 +75,10 @@ const props = defineProps({
     type: Object,
   },
 })
+
+const showServicePackageDialog = ref(false)
+
+function onShowServicePackages(){
+  showServicePackageDialog.value = true
+}
 </script>
