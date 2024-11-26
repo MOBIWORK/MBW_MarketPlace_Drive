@@ -1,6 +1,6 @@
 <template>
     <div
-        class="flex flex-col items-start fixed bottom-0 right-0 w-full m-5 sm:w-96 z-10 rounded-2xl overflow-hidden shadow-2xl 500 bg-white p-4">
+        class="flex flex-col items-start fixed bottom-0 right-0 w-[300px] m-5  z-10 rounded-2xl overflow-hidden shadow-2xl 500 bg-white p-4">
         <div class="flex items-center justify-between w-full mb-4 pr-1.5" :class="[collapsed ? 'cursor-pointer' : '']"
             @click="collapsed = false">
             <div v-if="analysisInProgress.length > 0" class="font-medium truncate text-lg">

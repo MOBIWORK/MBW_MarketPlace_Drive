@@ -1,57 +1,72 @@
 <template>
     <div class="w-full h-full flex">
-        <div id="mapPreviewID" class="h-full relative" :class="showDetailInfoPoint? 'w-3/4' : 'w-full'">
+        <div id="mapPreviewID" class="h-full relative" :class="showDetailInfoPoint ? 'w-3/4' : 'w-full'">
             <LoadingIndicator v-if="loading" class="w-10 h-full text-neutral-100 mx-auto z-50" />
         </div>
         <div class="h-full w-1/4" v-if="showDetailInfoPoint">
-            <div class="w-full flex justify-between">
-                <div>Kết quả tra cứu</div>
-                <Button icon="x" variant="ghost" @click="onCloseDetailPoint" />
+            <div class="w-full h-[200px] relative">
+                <img draggable="false" class="h-full w-full" :src="detailInfoPoint.image" id-="" />
+                <div class="absolute top-2 right-2 z-50 rounded-full cursor-pointer bg-white p-1 shadow-md hover:bg-gray-200 transition" @click="onCloseDetailPoint">
+                    <FeatherIcon name="x" class="w-5 h-5 text-gray-800" />
+                </div>
+            </div>
+            <div class="w-full flex mt-3 ml-2 items-center" v-if="detailInfoPoint.longitude != null && detailInfoPoint.latitude != null">
+                <FeatherIcon name="map-pin" class="w-5 h-5 mr-2" />
+                <div class="text-base">
+                    <span>{{detailInfoPoint.longitude}}</span>
+                    <span>&nbsp;</span>
+                    <span>{{detailInfoPoint.latitude}}</span>
+                </div>
+            </div>
+            <div class="w-full flex mt-3 ml-2 items-center" v-if="detailInfoPoint.area_real != null">
+                <FeatherIcon name="hexagon" class="w-5 h-5 mr-2" />
+                <div class="text-base">
+                    <span>{{detailInfoPoint.area_real}}</span>
+                    <span>&nbsp;</span>
+                    <span>m</span><sup>2</sup>
+                </div>
             </div>
         </div>
     </div>
-    
+
 
     <Dialog v-model="showPropertiesDialog" :options="{
         size: '3xl',
         title: 'Bảng thuộc tính',
     }">
         <template #body-content>
-            <ListView class="max-h-[350px]" :columns="[
-                {
-                    label: 'ID',
-                    key: 'ID',
-                    width: '50px'
-                },
-                {
-                    label: 'Diện tích(m)',
-                    key: 'area_real'
-                },
-                {
-                    label: 'Diện tích(pixel)',
-                    key: 'area_pixel'
-                },
-                {
-                    label: 'Ảnh',
-                    key: 'image '
-                }
-            ]" :rows="dataProperties" :options="{
+            <ListView class="max-h-[350px]" :columns="columns" :rows="dataProperties" :options="{
                 selectable: false,
                 showTooltip: true,
                 resizeColumn: true,
                 emptyState: {
                     title: 'Không có bản ghi'
                 }
-            }" 
-            row-key="ID">
-                
+            }" row-key="ID">
+                <ListHeader class="mx-5" />
+                <ListRows id="list-rows">
+                    <ListRow
+                        class="mx-5"
+                        v-for="row in dataProperties"
+                        :key="row.ID"
+                        v-slot="{ idx, column, item }"
+                        :row="row"
+                    >
+                        <template v-if="column.key == 'image'">
+                            <a :href="row.image" target="_blank" style="text-decoration: underline;color: rgb(14 165 233);">Link</a>
+                        </template>
+                        <template v-else>
+                            {{row[column.key]}}
+                        </template>
+                    </ListRow>
+                </ListRows>
             </ListView>
         </template>
     </Dialog>
 </template>
 
 <script setup>
-import { LoadingIndicator, Dialog, ListView, ListRows } from "frappe-ui"
+import { LoadingIndicator, Dialog, ListView, ListRows, ListHeader, ListRow, FeatherIcon } from "frappe-ui"
 import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useStore } from "vuex"
 
@@ -69,6 +84,27 @@ const contentGeoJson = ref(null)
 //Biến Bảng thuộc tính
 const showPropertiesDialog = ref(false)
 const dataProperties = ref([])
+const columns = ref(
+    [
+        {
+            label: 'ID',
+            key: 'ID',
+            width: '50px'
+        },
+        {
+            label: 'Diện tích(m)',
+            key: 'area_real'
+        },
+        {
+            label: 'Diện tích(pixel)',
+            key: 'area_pixel'
+        },
+        {
+            label: 'Ảnh',
+            key: 'image'
+        }
+    ]
+)
 
 //Biến tra cứu một điểm trên bản đồ
 const popupQueryInfo = ref(null)
@@ -81,10 +117,9 @@ watch(props.previewEntity, () => {
 })
 
 watch(showDetailInfoPoint, async () => {
-    if(mapPreview.value){
+    if (mapPreview.value) {
         await nextTick()
         mapPreview.value.resize()
-        console.log(mapPreview)
     }
 })
 
@@ -221,21 +256,21 @@ function initMap() {
     mapPreview.value.addControl(btnQueryPoint, "bottom-right")
 }
 
-function initPopupQueryInfo(){  
-    if(popupQueryInfo.value == null){
+function initPopupQueryInfo() {
+    if (popupQueryInfo.value == null) {
         let markerHeight = 40;
         let markerRadius = 40;
         let linearOffset = 25;
         popupQueryInfo.value = new maplibregl.Popup({
             offset: {
-            'top': [0, 20],
-            'top-left': [0, 0],
-            'top-right': [0, 0],
-            'bottom': [0, -markerHeight],
-            'bottom-left': [linearOffset, (markerHeight - markerRadius + linearOffset) * -1],
-            'bottom-right': [-linearOffset, (markerHeight - markerRadius + linearOffset) * -1],
-            'left': [markerRadius, (markerHeight - markerRadius) * -1],
-            'right': [-markerRadius, (markerHeight - markerRadius) * -1]
+                'top': [0, 20],
+                'top-left': [0, 0],
+                'top-right': [0, 0],
+                'bottom': [0, -markerHeight],
+                'bottom-left': [linearOffset, (markerHeight - markerRadius + linearOffset) * -1],
+                'bottom-right': [-linearOffset, (markerHeight - markerRadius + linearOffset) * -1],
+                'left': [markerRadius, (markerHeight - markerRadius) * -1],
+                'right': [-markerRadius, (markerHeight - markerRadius) * -1]
             },
             anchor: 'left',
             closeButton: false,
@@ -244,25 +279,26 @@ function initPopupQueryInfo(){
     }
 }
 
-function showPopupControl(evt){
-    popupQueryInfo.value.setLngLat([evt.lngLat.lng, evt.lngLat.lat]).setHTML('<span>Click vào vị trí để tra cứu thông tin</span>')
+function showPopupControl(evt) {
+    popupQueryInfo.value.setLngLat([evt.lngLat.lng, evt.lngLat.lat]).setHTML('<span class="text-sm">Click vào vị trí để tra cứu thông tin</span>')
 }
 
-function clickInfoPoint(evt){
+function clickInfoPoint(evt) {
     mapPreview.value.off('mousemove', showPopupControl)
     mapPreview.value.off('click', clickInfoPoint)
     mapPreview.value.getCanvas().style.cursor = ''
-    if(popupQueryInfo.value != null){
+    if (popupQueryInfo.value != null) {
         popupQueryInfo.value.remove()
+        popupQueryInfo.value = null
     }
-    let features = mapPreview.value.queryRenderedFeatures(evt.point, {layers: ['l_object_detect']})
-    showDetailInfoPoint.value = true
-    if(features.length > 0){
+    let features = mapPreview.value.queryRenderedFeatures(evt.point, { layers: ['l_object_detect'] })
+    if (features.length > 0) {
         detailInfoPoint.value = features[0].properties
-    }else{
+        showDetailInfoPoint.value = true
+    } else {
         detailInfoPoint.value = null
+        showDetailInfoPoint.value = false
     }
-    console.log("Dòng 253 ", features)
 }
 
 function onAddLayer() {
@@ -291,7 +327,7 @@ function onAddLayer() {
         let geometry = contentGeoJson.value.features[i]["geometry"]
         let properties = contentGeoJson.value.features[i]["properties"]
         arrLine.push(geometry["coordinates"])
-        properties["ID"] = i+1
+        properties["ID"] = i + 1
         arrProperties.push(properties)
     }
     if (arrLine.length > 0) {
@@ -304,7 +340,7 @@ function onAddLayer() {
     dataProperties.value = arrProperties
 }
 
-function onCloseDetailPoint(){
+function onCloseDetailPoint() {
     detailInfoPoint.value = null
     showDetailInfoPoint.value = false
 }
@@ -328,7 +364,8 @@ onBeforeUnmount(() => {
     background-repeat: no-repeat;
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJmZWF0aGVyIGZlYXRoZXItdGFibGUiPjxwYXRoIGQ9Ik05IDNINWEyIDIgMCAwIDAtMiAydjRtNi02aDEwYTIgMiAwIDAgMSAyIDJ2NE05IDN2MThtMCAwaDEwYTIgMiAwIDAgMCAyLTJWOU05IDIxSDVhMiAyIDAgMCAxLTItMlY5bTAgMGgxOCI+PC9wYXRoPjwvc3ZnPg==")
 }
-.icon_query_point{
+
+.icon_query_point {
     background-position: center;
     background-repeat: no-repeat;
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJmZWF0aGVyIGZlYXRoZXItaW5mbyI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiPjwvY2lyY2xlPjxsaW5lIHgxPSIxMiIgeTE9IjE2IiB4Mj0iMTIiIHkyPSIxMiI+PC9saW5lPjxsaW5lIHgxPSIxMiIgeTE9IjgiIHgyPSIxMi4wMSIgeTI9IjgiPjwvbGluZT48L3N2Zz4=");

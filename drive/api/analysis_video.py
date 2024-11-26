@@ -159,7 +159,9 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key,
                 "properties": {
                     "area_pixel": item["area_pixel"],
                     "area_real": item["area_real"],
-                    "image": frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name}")
+                    "image": frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name}"),
+                    "longitude": item["gps"]["longitude"],
+                    "latitude": item["gps"]["latitude"]
                 }
             }
             spatial_datas.append(spatial_data)
@@ -175,6 +177,27 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key,
         create_drive_entity(
             name_geojson, f"results.geojson", new_folder.name, key_object_geojson, len(buffer.getvalue()), ".geojson", "application/geo+json", None
         )
+        output_video_link = result["process_result"]["output_video"]
+        if output_video_link != None:
+            video_stream = sdk.get_stream_image(output_video_link)
+            title_output_video = os.path.basename(output_video_link)
+            file_name_output_video = secure_filename(title_output_video)
+            save_path_output_video = f"{_get_user_directory_name()}/{file_name_output_video}"
+            upload_object_from_stream(connect_s3, video_stream, save_path_output_video, video_stream.headers.get('Content-Type'))
+            name_output_video = str(uuid.uuid4().hex)
+            create_drive_entity(
+                name_output_video, title_output_video, new_folder.name, save_path_output_video, image_response.headers.get('Content-Length'), ".mp4", "video/mp4", None
+            )
+            frappe.enqueue(
+                create_thumbnail_by_object,
+                queue="default",
+                timeout=None,
+                now=True,
+                at_front=True,
+                entity_name=name_output_video,
+                object_id=save_path_output_video,
+                mime_type="video/mp4"
+            )
         frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': doc_video.name, 'status': "success", 'message': new_folder.name}))
     except Exception as err:
         frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': name_fvideo, 'status': "error", 'message': str(err)}))
@@ -231,31 +254,27 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_access_key, 
         create_drive_entity(
             name_xlsx, f"results.xlsx", new_folder.name, save_path_xlsx, len(byte_xlsx.getvalue()), ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", None
         )
-        #Xử lý lưu video không khác gì xử lý image
-        # output_video = result["process_result"]["output_video"]
-        # video_response = sdk.get_stream(output_video)
-        # title_video = os.path.basename(output_video)
-        # file_name_video = secure_filename(title_video)
-        # save_path_video = f"{_get_user_directory_name()}/{file_name_video}"
-        # data_video_out_size = 0
-        # for chunk in video_response.iter_content(chunk_size=8192):
-        #     if chunk:
-        #         data_video_out_size +=len(chunk)
-        #         upload_fileobj_with_connect(connect_s3, chunk, save_path_video, video_response.headers.get('Content-Type'))
-        # name_video_output = str(uuid.uuid4().hex)
-        # create_drive_entity(
-        #     name_video_output, title_video, new_folder.name, save_path_video, data_video_out_size, ".mp4", "video/mp4", None
-        # )
-        # frappe.enqueue(
-        #     create_thumbnail_by_object,
-        #     queue="default",
-        #     timeout=None,
-        #     now=True,
-        #     at_front=True,
-        #     entity_name=name_video_output,
-        #     object_id=save_path_video,
-        #     mime_type="image/jpeg"
-        # )
+        output_video_link = result["process_result"]["output_video"]
+        if output_video_link != None:
+            video_stream = sdk.get_stream_image(output_video_link)
+            title_output_video = os.path.basename(output_video_link)
+            file_name_output_video = secure_filename(title_output_video)
+            save_path_output_video = f"{_get_user_directory_name()}/{file_name_output_video}"
+            upload_object_from_stream(connect_s3, video_stream, save_path_output_video, video_stream.headers.get('Content-Type'))
+            name_output_video = str(uuid.uuid4().hex)
+            create_drive_entity(
+                name_output_video, title_output_video, new_folder.name, save_path_output_video, image_response.headers.get('Content-Length'), ".mp4", "video/mp4", None
+            )
+            frappe.enqueue(
+                create_thumbnail_by_object,
+                queue="default",
+                timeout=None,
+                now=True,
+                at_front=True,
+                entity_name=name_output_video,
+                object_id=save_path_output_video,
+                mime_type="video/mp4"
+            )
         doc_task_queue.status = "Success"
         doc_task_queue.save(ignore_permissions=True)
         frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': name_fvideo, 'status': "success", 'message': new_folder.name}))
