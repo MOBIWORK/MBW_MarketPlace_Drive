@@ -46,7 +46,10 @@ export default defineConfig({
             type: 'image/png',
             purpose: 'maskable',
           },
-        ],
+        ]
+      },
+      workbox: {
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024 // Giới hạn tăng lên 4MB
       }
     })
   ],

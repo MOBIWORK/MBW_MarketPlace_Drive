@@ -44,7 +44,21 @@ def get_server_timezone():
     return frappe.db.get_single_value('System Settings', 'time_zone')
 
 @frappe.whitelist()
-def get_setting_map():
+def get_setting_api():
     doc_setting = frappe.get_single('Drive Instance Settings')
     api_key_map = doc_setting.api_key_map
-    return {'api_key_map': api_key_map}
+    client_id_qrcode = doc_setting.client_id
+    api_key_qrcode = doc_setting.api_key
+    code_bank = doc_setting.code_bank
+    name_bank = doc_setting.name_bank
+    account_name_banking = doc_setting.account_name_banking
+    account_number_banking = doc_setting.account_number_banking
+    return {
+        'api_key_map': api_key_map,
+        'client_id_qrcode': client_id_qrcode,
+        'api_key_qrcode': api_key_qrcode,
+        'code_bank': code_bank,
+        'name_bank': name_bank,
+        'account_name_banking': account_name_banking,
+        'account_number_banking': account_number_banking
+    }

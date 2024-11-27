@@ -203,13 +203,19 @@ export default {
         this.$store.state.serverTZ = data
       },
     },
-    getApiKeyMap: {
-      url: "drive.api.api.get_setting_map",
+    getSettingAPI: {
+      url: "drive.api.api.get_setting_api",
       auto: true,
       method: "GET",
       cache: "api_key_map",
       onSuccess(data){
         if(data != null && data.api_key_map != null) this.$store.state.apiKeyMap = data.api_key_map
+        if(data != null && data.client_id_qrcode != null) this.$store.state.clientIDQRCode = data.client_id_qrcode
+        if(data != null && data.api_key_qrcode != null) this.$store.state.apiKeyQRCode = data.api_key_qrcode
+        if(data != null && data.code_bank != null) this.$store.state.codeBank = data.code_bank
+        if(data != null && data.name_bank != null) this.$store.state.nameBank = data.name_bank
+        if(data != null && data.account_name_banking != null) this.$store.state.accountNameBanking = data.account_name_banking
+        if(data != null && data.account_number_banking != null) this.$store.state.accountNumberBanking = data.account_number_banking
       }
     }
   },

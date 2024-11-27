@@ -17,7 +17,14 @@
   "aws_access_key",
   "aws_secret_key",
   "ekmap_tab",
-  "api_key_map"
+  "api_key_map",
+  "vietqr_tab",
+  "client_id",
+  "api_key",
+  "code_bank",
+  "name_bank",
+  "account_name_banking",
+  "account_number_banking"
  ],
  "fields": [
   {
@@ -84,11 +91,46 @@
    "fieldname": "api_key_map",
    "fieldtype": "Data",
    "label": "API Key Map"
+  },
+  {
+   "fieldname": "vietqr_tab",
+   "fieldtype": "Tab Break",
+   "label": "VietQR"
+  },
+  {
+   "fieldname": "client_id",
+   "fieldtype": "Data",
+   "label": "Client ID"
+  },
+  {
+   "fieldname": "api_key",
+   "fieldtype": "Data",
+   "label": "API Key"
+  },
+  {
+   "fieldname": "code_bank",
+   "fieldtype": "Data",
+   "label": "Code Bank"
+  },
+  {
+   "fieldname": "name_bank",
+   "fieldtype": "Data",
+   "label": "Name Bank"
+  },
+  {
+   "fieldname": "account_name_banking",
+   "fieldtype": "Data",
+   "label": "Account Name Banking"
+  },
+  {
+   "fieldname": "account_number_banking",
+   "fieldtype": "Data",
+   "label": "Account Number Banking"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-11-23 11:04:42.472643",
+ "modified": "2024-11-27 11:41:38.643202",
  "modified_by": "Administrator",
  "module": "Drive",
  "name": "Drive Instance Settings",

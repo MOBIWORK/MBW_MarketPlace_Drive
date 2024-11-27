@@ -2,31 +2,64 @@
     <Dialog v-model="open" :options="{
         size: '4xl',
         title: 'Service Packages',
-    }">
+    }" @after-leave="onCleanData">
         <template #body-content>
             <div class="text-base">Set the service package you want to reserve</div>
             <div class="container">
                 <div v-for="(item, index) in list_package" :key="index" class="package-card">
-                    <div class="package-title">{{ item.title }}</div>
+                    <div class="package-content">
+                        <div class="package-title">{{ item.title }} ({{renderStorageVolume(item.storage_volume)}} {{renderUnitStorageVolume(item.storage_volume)}})</div>
+                        <div class="package-price">{{renderPrice(item.unit_price)}} đ</div>
+                        <div class="flex justify-center">
+                            <Button
+                                :variant="'outline'"
+                                :ref_for="true"
+                                theme="gray"
+                                size="md"
+                                :disabled="false"
+                                class="w-[150px] mb-4"
+                                @click="() => onRegisterPackage(item)"
+                            >
+                                Register package
+                            </Button>
+                        </div>
+                        <div class="w-full border-t border-gray-500"></div>
+                        <div class="ml-1 mt-4">
+                            <div class="flex items-start mb-1">
+                                <FeatherIcon name="check" class="h-5 w-5 mr-2" />
+                                <div class="text-base">
+                                    {{renderStorageVolume(item.storage_volume)}} {{renderUnitStorageVolume(item.storage_volume)}} storage capacity
+                                </div>
+                            </div>
+                            <div class="flex items-start mb-1">
+                                <FeatherIcon name="check" class="h-5 w-5 mr-2" />
+                                <div class="text-base">
+                                    {{item.pupv}} PUPV(Process Unit Per's Videos)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            
-        </template>
-        <template #actions>
-            <div class="flex flex-row-reverse gap-2">
-                <Button variant="solid" label="Change plan" @click="onChangePlan" />
-            </div>
+            <ErrorMessage class="mt-2" :message="errorMessage" />
         </template>
     </Dialog>
+    <CheckOutDialog v-model="showCheckOutDialog" :package="packageSelect" :qrCodeDataUrl="qrDataURL" :contentTransaction="contentTransaction"></CheckOutDialog>
 </template>
 <script>
-import { Dialog, Button } from 'frappe-ui'
+import { Dialog, Button, FeatherIcon, ErrorMessage } from 'frappe-ui'
+import { toast } from "@/utils/toasts.js"
+import { VietQR } from 'vietqr'
+import CheckOutDialog from '@/components/Modals/CheckOutDialog.vue';
 
 export default {
     name: "ServicePackagesDialog",
     components: {
         Dialog,
-        Button
+        Button,
+        FeatherIcon,
+        ErrorMessage,
+        CheckOutDialog
     },
     props: {
         modelValue: {
@@ -40,16 +73,58 @@ export default {
             return {
                 url: "drive.api.service_package.list_package",
                 method: "GET",
-                auto: true,
-                onSuccess(data){
-                    console.log("Dòng 39 ", data)
+                auto: true
+            }
+        },
+        payments(){
+            return {
+                type: 'list',
+                doctype: "Drive Payment",
+                insert: {
+                    onSuccess(data){
+                        toast({
+                            title: "Hóa đơn tạo thành công. Vui lòng thanh toán để trải nghiệm dịch vụ",
+                            position: "bottom-right",
+                            timeout: 2,
+                        })
+                        let vietQR = new VietQR({
+                            clientID: this.$store.state.clientIDQRCode,
+                            apiKey: this.$store.state.apiKeyQRCode
+                        })
+                        vietQR.genQRCodeBase64({
+                            bank: this.$store.state.codeBank,
+                            accountName: this.$store.state.accountNameBanking,
+                            accountNumber: this.$store.state.accountNumberBanking,
+                            amount: this.packageSelect.unit_price.toString(),
+                            memo: data.name,
+                            template: "compact"
+                        }).then((res) => {
+                            if (res.status == 200) {
+                                this.qrDataURL = res.data.data.qrDataURL
+                            }
+                        })
+                        this.contentTransaction = data.name
+                        this.showCheckOutDialog = true
+                        
+                    },
+                    onError(error){
+                        if (error.messages) {
+                            this.errorMessage = error.messages.join("\n")
+                        } else {
+                            this.errorMessage = error.message
+                        }
+                    }
                 }
             }
         }
     },
     data(){
         return {
-            packageSelect: null
+            packageSelect: null,
+            errorMessage: "",
+            qrDataURL: "",
+            showCheckOutDialog: false,
+            contentTransaction: ""
         }
     },
     computed: {
@@ -66,8 +141,32 @@ export default {
         }
     },
     methods: {
-        onChangePlan(){
-            console.log("Dòng 48")
+        renderStorageVolume(storage){
+            if(storage >= 1024) return storage/1024
+            return storage
+        },
+        renderUnitStorageVolume(storage){
+            if(storage >= 1024) return "TB"
+            return "GB"
+        },
+        renderPrice(price){
+            return price.toLocaleString('vi-VN')
+        },
+        onRegisterPackage(item){
+            this.packageSelect = item
+            this.$resources.payments.insert.submit({
+                'form_of_payment': "QRCode",
+                'code_package': item.code,
+                'price': item.unit_price,
+                'status': "Outstanding"
+            })
+        },
+        onCleanData(){
+            this.packageSelect = null
+            this.errorMessage =""
+            this.qrDataURL = ""
+            this.showCheckOutDialog = false
+            this.contentTransaction = ""
         }
     }
 }
@@ -92,10 +191,6 @@ export default {
 
 /* Card styling */
 .package-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 1rem;
@@ -109,12 +204,30 @@ export default {
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
 }
 
+.package-content{
+    display: flex;
+    flex-direction: column;
+}
+
 /* Title styling */
 .package-title {
-  font-size: 1.25rem;
-  font-weight: bold;
+  font-size: 1rem;
+  font-weight: 500;
   margin-bottom: 0.5rem;
   color: #333;
+  justify-content: center;
+  display: flex;
+}
+.package-price{
+    font-size: 1.5rem;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 2rem;
+    color: #1f1f1f;
+    margin-top: 8px;
+    margin-bottom: 10px;
+    justify-content: center;
+    display: flex;
 }
 
 </style>
