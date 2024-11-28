@@ -8,30 +8,43 @@ import json
 @frappe.whitelist()
 def get_max_storage():
     """
-    Retrieves the maximum storage limit for the user's plan.
+    Retrieves the maximum storage limit for the user's package used.
     The storage limit is returned in bytes, with a block size of 1024.
 
     Returns:
         int: The maximum storage limit in bytes.
     """
-    storage_quota_enabled = frappe.db.get_single_value(
-        "Drive Instance Settings", "enable_user_storage_quota"
-    )
-    plan_limit = frappe.conf.get("plan_limit")
-    if plan_limit:
-        max_storage = plan_limit["max_storage_usage"]
-        max_storage = int(max_storage)
-    if not plan_limit:
-        val = frappe.conf.get("max_storage")
-        if not val:
-            add_new_site_config_key("max_storage", 5120)
-        max_storage = frappe.conf.get("max_storage")
-        max_storage = int(max_storage)
-    max_storage = max_storage * 1024**2
-    if storage_quota_enabled and (quota := validate_quota()):
-        return {"quota": quota, "limit": max_storage}
-    return {"limit": max_storage}
+    doc_package_used = frappe.db.get("Drive Service Package Used", {"user": frappe.session.user})
+    limit_storage = 0
+    if doc_package_used:
+        service_package_name = doc_package_used.service_package
+        doc_service_package = frappe.get_doc("Drive Service Package", service_package_name)
+        limit_storage = doc_service_package.storage_volume * 1073741824
+    else:
+        name, storage_volume =  frappe.db.get_value("Drive Service Package", {"unit_price": 0}, ["name", "storage_volume"])
+        doc_service_package_used = frappe.new_doc('Drive Service Package Used')
+        doc_service_package_used.user = frappe.session.user
+        doc_service_package_used.service_package = name
+        doc_service_package_used.insert(ignore_permissions=True)
+        limit_storage = storage_volume * 1073741824
+    return {"limit": limit_storage}
 
+@frappe.whitelist()
+def get_max_pupv():
+    doc_package_used = frappe.db.get("Drive Service Package Used", {"user": frappe.session.user})
+    limit_pupv = 0
+    if doc_package_used:
+        service_package_name = doc_package_used.service_package
+        doc_service_package = frappe.get_doc("Drive Service Package", service_package_name)
+        limit_pupv = doc_service_package.pupv
+    else:
+        name, pupv =  frappe.db.get_value("Drive Service Package", {"unit_price": 0}, ["name", "pupv"])
+        doc_service_package_used = frappe.new_doc('Drive Service Package Used')
+        doc_service_package_used.user = frappe.session.user
+        doc_service_package_used.service_package = name
+        doc_service_package_used.insert(ignore_permissions=True)
+        limit_pupv = pupv
+    return {"limit": limit_pupv}
 
 def validate_quota():
     """
@@ -92,11 +105,21 @@ def total_storage_used_by_file_kind():
     query = (
         frappe.qb.from_(DriveEntity)
         .select(DriveEntity.file_kind, fn.Sum(DriveEntity.file_size).as_("total_size"))
-        .where(DriveEntity.is_group == 0)
+        .where((DriveEntity.is_group == 0) & (DriveEntity.owner == frappe.session.user))
         .groupby(DriveEntity.file_kind)
     )
     return query.run(as_dict=True)
 
+@frappe.whitelist()
+def total_pupv_used_by_user():
+    TaskQueue = frappe.qb.DocType("Drive Task Queue")
+    query = (
+        frappe.qb.from_(TaskQueue)
+        .where((TaskQueue.owner == frappe.session.user) & (TaskQueue.status=="Success"))
+        .select(fn.Sum(TaskQueue.pupv).as_("total_pupv"))
+    )
+    result = query.run(as_dict=True)
+    return result
 
 def get_storage_allowed():
     limit = get_max_storage()

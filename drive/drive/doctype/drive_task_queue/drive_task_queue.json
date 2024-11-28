@@ -6,7 +6,8 @@
  "engine": "InnoDB",
  "field_order": [
   "task_metadata",
-  "status"
+  "status",
+  "pupv"
  ],
  "fields": [
   {
@@ -17,13 +18,20 @@
   {
    "fieldname": "status",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Status",
    "options": "Processing\nSuccess\nError"
+  },
+  {
+   "fieldname": "pupv",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Process Unit Per's Video"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-25 08:39:37.899032",
+ "modified": "2024-11-28 11:17:55.773491",
  "modified_by": "Administrator",
  "module": "Drive",
  "name": "Drive Task Queue",

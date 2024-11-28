@@ -32,6 +32,7 @@ from drive.utils.s3 import delete_object_with_connect, get_object_with_connect, 
 from io import BytesIO
 from redis import Redis
 from drive.utils.const import REDIS_HOST, REDIS_PORT
+from drive.utils.using_quota import exist_storage_file
 
 #Kết nối Redis
 redis_client = Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=False)
@@ -157,6 +158,13 @@ def upload_file(fullpath=None, parent=None, last_modified=None):
         frappe.throw("Cannot upload due to insufficient permissions", frappe.PermissionError)
 
     file = frappe.request.files["file"]
+    file_content = file.stream.read()
+
+    if exist_storage_file(len(file_content)) == False:
+        frappe.throw("Insufficient storage capacity. Please upgrade the package to use")
+
+    file.stream.seek(0)
+
     upload_session = frappe.form_dict.uuid
     title = get_new_title(file.filename, parent)
 

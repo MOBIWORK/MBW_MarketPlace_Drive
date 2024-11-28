@@ -6,9 +6,8 @@
     <form class="flex flex-col" @submit.prevent="">
       <Input
         v-model="email"
-        class="mb-4"
+        class="mb-2"
         label="Email"
-        placeholder="johndoe@mail.com"
         name="email"
         autocomplete="email"
         :type="email !== 'Administrator' ? 'email' : 'text'"
@@ -63,9 +62,13 @@
         </template>
         Login via {{ provider.provider_name }}
       </Button>
-      <router-link class="text-base text-center" to="/signup">
-        Sign up for a new account
-      </router-link>
+      <div class="flex justify-center items-center">
+        <span>Don't have an account?</span>
+        <span>&nbsp;&nbsp;</span>
+        <router-link class="text-base text-blue-500" to="/signup">
+          SIGN UP
+        </router-link>
+      </div>
     </form>
   </LoginBox>
 </template>

@@ -46,7 +46,7 @@ import { formatSize, base2BlockSize } from "@/utils/format"
 const emitter = inject("emitter")
 const usedStorage = ref(0)
 const storageMax = ref(5368709120)
-const usageUrl = ref("drive.api.storage.total_storage_used")
+const usageUrl = ref("drive.api.storage.total_storage_used_by_user")
 const store = useStore()
 const isExpanded = computed(() => {
   return store.state.IsSidebarExpanded

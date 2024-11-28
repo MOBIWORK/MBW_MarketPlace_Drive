@@ -135,6 +135,12 @@ has_permission = {
 # 	}
 # }
 
+doc_events = {
+    "User": {
+        "after_insert": "drive.crud_events.after_insert_user"
+    }
+}
+
 
 fixtures = [{"dt": "Role", "filters": [["role_name", "like", "Drive %"]]}]
 

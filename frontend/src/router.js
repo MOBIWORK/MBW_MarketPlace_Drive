@@ -5,7 +5,7 @@ function redir404(to, from, next) {
   if (store.getters.isLoggedIn) {
     next()
   } else {
-    next("/login")
+    next("drive/login")
   }
 }
 
@@ -104,9 +104,12 @@ const routes = [
   {
     path: "/login",
     name: "Login",
-    redirect: () => {
-      window.location.href = "/login"
-    },
+    component: () => import("@/pages/Login.vue")
+  },
+  {
+    path: "/signup",
+    name: "SignupPage",
+    component: () => import("@/pages/Signup.vue")
   },
   {
     path: "/:pathMatch(.*)*/",
@@ -126,21 +129,26 @@ let router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  switch (true) {
-    case !store.getters.isLoggedIn && to.meta.isHybridRoute:
-      next()
-      break
-    case !store.getters.isLoggedIn:
-      next("/login")
-      break
-    case store.getters.isLoggedIn:
-      next()
-      break
-    default:
-      next("/login")
-      break
+  const isLoggedIn = store.getters.isLoggedIn;
+
+  if (!isLoggedIn && to.path !== "/login" && to.path !== "/signup") {
+    // Chưa đăng nhập, chuyển hướng đến login nếu không phải route công khai
+    next("/login");
+  } else if (isLoggedIn && (to.path === "/login" || to.path === "/signup")) {
+    // Đã đăng nhập mà truy cập login hoặc signup, chuyển hướng đến home
+    if (to.path !== "/home") {
+      next("/home");
+    } else {
+      next(); // Nếu đã ở /home thì không cần chuyển hướng
+    }
+  } else if (isLoggedIn && to.path === "/") {
+    // Nếu người dùng đã đăng nhập và truy cập root "/"
+    next("/home");
+  } else {
+    // Các route hợp lệ khác
+    next();
   }
-})
+});
 
 router.afterEach((to) => {
   sessionStorage.setItem("currentRoute", to.href)

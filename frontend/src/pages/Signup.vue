@@ -7,19 +7,24 @@
     <form class="flex flex-col" @submit.prevent="signup()">
       <Input
         v-model="fullName"
-        class="mb-4"
+        class="mb-2"
         label="Name"
         type="text"
-        placeholder="John Doe"
         autocomplete="name"
         required
       />
       <Input
         v-model="email"
+        class="mb-2"
         label="Email"
         type="email"
-        placeholder="johndoe@mail.com"
         autocomplete="email"
+        required
+      />
+      <Input
+        v-model="pwd"
+        label="Password"
+        type="password"
         required
       />
       <ErrorMessage class="mt-4" :message="errorMessage" />
@@ -39,9 +44,13 @@
           </span>
         </div>
       </div>
-      <router-link class="text-base text-center" to="/login">
-        Already have an account? Log in.
-      </router-link>
+      <div class="flex justify-center items-center">
+        <span>Already have an account?</span>
+        <span>&nbsp;&nbsp;</span>
+        <router-link class="text-base text-blue-500" to="/login">
+          LOG IN
+        </router-link>
+      </div>
     </form>
   </LoginBox>
   <div v-else class="p-5 sm:p-20">
@@ -54,7 +63,7 @@
       <h2 class="mt-4 text-lg font-medium text-center text-gray-900">
         {{ response.title }}
       </h2>
-      <p class="text-base text-center text-gray-700 mt-1.5">
+      <p class="text-base text-center text-gray-700 mt-2">
         <!-- eslint-disable-next-line vue/no-v-html -->
         <span v-html="response.message" />
       </p>
@@ -78,6 +87,7 @@ export default {
     return {
       email: null,
       fullName: null,
+      pwd: null,
       errorMessage: null,
       loading: false,
       request_status_ok: false,
@@ -113,11 +123,12 @@ export default {
       try {
         this.errorMessage = null
         this.loading = true
-        if (this.email && this.fullName) {
-          let res = await this.$call("frappe.core.doctype.user.user.sign_up", {
+        if (this.email && this.fullName && this.pwd) {
+          let res = await this.$call("drive.api.user.sign_up", {
             full_name: this.fullName,
             email: this.email,
-            redirect_to: "",
+            redirect_to: "drive",
+            pwd: this.pwd
           })
           if (res) {
             let [code] = res
@@ -126,9 +137,8 @@ export default {
               this.errorMessage = "This account already exists"
             } else if (code === 1) {
               this.response = {
-                title: "Verification Email Sent",
-                message: `We have sent an email to
-                <span class="font-semibold">${this.email}</span>. Please check your email for verification.`,
+                title: "Register Account Successfully",
+                message: `Your account was created successfully. Please <a href="/drive" class="text-base text-blue-500">LOGIN IN</a> to use the service.`,
                 color: "green",
               }
             } else {

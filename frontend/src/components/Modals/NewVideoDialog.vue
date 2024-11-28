@@ -195,7 +195,12 @@ export default {
                     }
                 })
                 this.dropzone.on('error', function (file, errorMessage) {
-                    me.errorMessage = errorMessage
+                    let server_message = JSON.parse(errorMessage["_server_messages"])
+                    if(server_message.length > 0){
+                        let item_server_message = server_message[0]
+                        let objServerMessage = JSON.parse(item_server_message)
+                        me.errorMessage = objServerMessage["message"]
+                    }
                     me.isVideoCreating = false
                 })
             }

@@ -257,7 +257,7 @@ const store = createStore({
       commit("setAuth", { loading: true })
       await call("logout")
       clear()
-      window.location.reload()
+      //window.location.reload()
     },
     clearUploads({ commit }) {
       commit("setUploads", [])

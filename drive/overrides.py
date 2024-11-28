@@ -109,3 +109,4 @@ def filter_drive_notif(user):
     return """(`tabDrive Notification`.to_user = {user} or `tabDrive Notification`.from_user = {user})""".format(
         user=frappe.db.escape(user)
     )
+

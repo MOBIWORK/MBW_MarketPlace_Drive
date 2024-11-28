@@ -14,8 +14,10 @@ import geojson
 import io
 from drive.sdk.road import RoadSDK
 import os
+from drive.utils.using_quota import exist_pupv
 
 #API trích xuất dữ liệu geojson và ảnh đối tượng từ một video
+# Với mỗi 1MB xử lý thì tương ứng với 10PPUV  
 ##Tham số đầu vào:
 ###name_fvideo: Mã bản ghi tệp video thứ nhất
 ###name_gps: Mã bản ghi tệp gps
@@ -23,6 +25,12 @@ import os
 @frappe.whitelist(methods=["POST"])
 def analytic_video_with_geometry(name_fvideo, name_gps, parent):
     doc_fvideo = frappe.get_doc('Drive Entity', name_fvideo)
+
+    ppuv_used = (doc_fvideo.file_size/1048576) * 10
+
+    if exist_pupv(ppuv_used) == False:
+        frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': name_fvideo, 'status': "error", 'message': "Insufficient Process Unit Per's Video(PUPV). Please upgrade the package to use"}))
+
     doc_task_queue = frappe.new_doc('Drive Task Queue')
     obj_task_metadata = {
         'name_fvideo': name_fvideo,
@@ -32,6 +40,7 @@ def analytic_video_with_geometry(name_fvideo, name_gps, parent):
     }
     doc_task_queue.task_metadata = json.dumps(obj_task_metadata)
     doc_task_queue.status = "Processing"
+    doc_task_queue.pupv = ppuv_used
     doc_task_queue.save(ignore_permissions=True)
 
     host = "http://10.0.1.85:8005"
@@ -44,6 +53,7 @@ def analytic_video_with_geometry(name_fvideo, name_gps, parent):
     return {"name": doc_fvideo.name, "title": f"{doc_fvideo.title}"}
 
 #API trích xuất dữ liệu phi không gian dưới dạng excel và ảnh đối tượng từ video
+# Với mỗi 1MB xử lý thì tương ứng với 10PPUV
 ##Tham số đầu vào:
 ###name_fvideo: Mã bản ghi tệp video thứ nhất
 ###velocity: Tốc độ di chuyển tính bằng km/h
@@ -51,6 +61,11 @@ def analytic_video_with_geometry(name_fvideo, name_gps, parent):
 @frappe.whitelist(methods=["POST"])
 def analytic_without_geometry(name_fvideo, velocity, parent):
     doc_fvideo = frappe.get_doc('Drive Entity', name_fvideo)
+
+    ppuv_used = (doc_fvideo.file_size/1048576) * 10
+    if exist_pupv(ppuv_used) == False:
+        frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': name_fvideo, 'status': "error", 'message': "Insufficient Process Unit Per's Video(PUPV). Please upgrade the package to use"}))
+
     doc_task_queue = frappe.new_doc('Drive Task Queue')
     obj_task_metadata = {
         'name_fvideo': name_fvideo,
@@ -60,6 +75,7 @@ def analytic_without_geometry(name_fvideo, velocity, parent):
     }
     doc_task_queue.task_metadata = json.dumps(obj_task_metadata)
     doc_task_queue.status = "Processing"
+    doc_task_queue.pupv = ppuv_used
     doc_task_queue.save(ignore_permissions=True)
     
     host = "http://10.0.1.85:8005"
