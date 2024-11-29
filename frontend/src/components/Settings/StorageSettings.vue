@@ -43,6 +43,8 @@
     :used-space="systemUsedSpace"
     :plan-size-limit="systemPlanSizeLimit"
     :entities="$resources.getDataByMimeType.data"
+    :pupvUsed="pupvUsed"
+    :pupvLimit="pupvLimit"
   >
     <template #control>
       <div
@@ -113,6 +115,8 @@ export default {
         GeoJson: "#3733EB",
         Unknown: "#3f3f46"
       },
+      pupvUsed: 0,
+      pupvLimit: 0
     }
   },
   computed: {
@@ -194,6 +198,28 @@ export default {
         },
         auto: false,
       }
+    },
+    getPUPVUsed(){
+      return {
+        url: "drive.api.storage.total_pupv_used_by_user",
+        auto: true,
+        method: "GET",
+        onSuccess(data){
+          if(data.length > 0){
+            this.pupvUsed = data[0]["total_pupv"]
+          }
+        }
+      }
+    },
+    getPUPVLimit(){
+      return {
+        url: "drive.api.storage.get_max_pupv",
+        auto: true,
+        method: "GET",
+        onSuccess(data){
+          this.pupvLimit = data["limit"]
+        }
+      }
     }
   },
   methods: {
@@ -209,5 +235,14 @@ export default {
       }).format(num / 100)
     },
   },
+  mounted(){
+    this.$realtime.on('event_reset_package_used', () => {
+      this.$resources.storageLimit.fetch()
+      this.$resources.getPUPVLimit.fetch()
+    })
+  },
+  unmounted(){
+    this.$realtime.off('event_reset_package_used')
+  }
 }
 </script>

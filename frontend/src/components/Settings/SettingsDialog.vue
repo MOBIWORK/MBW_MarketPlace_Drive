@@ -51,11 +51,13 @@ import User from "@/components/EspressoIcons/User.vue"
 import AddUser from "@/components/EspressoIcons/AddUser.vue"
 import Users from "@/components/EspressoIcons/Users.vue"
 import Cloud from "@/components/EspressoIcons/Cloud.vue"
+import CreditCard from "@/components/EspressoIcons/CreditCard.vue"
 import UserRoleSettings from "./UserRoleSettings.vue"
 import UserListSettings from "./UserListSettings.vue"
 import { useStore } from "vuex"
 import { Tag } from "lucide-vue-next"
 import TagSettings from "./TagSettings.vue"
+import HistorialPayments from "./HistorialPayments.vue"
 
 const store = useStore()
 const isDriveGuest = computed(() => {
@@ -92,6 +94,12 @@ let tabs = [
     icon: Tag,
     component: markRaw(TagSettings),
   },
+  {
+    enabled: true,
+    label: "Payments",
+    icon: CreditCard,
+    component: markRaw(HistorialPayments)
+  }
 ].filter((item) => item.enabled)
 
 const emit = defineEmits(["update:modelValue"])

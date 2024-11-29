@@ -235,9 +235,6 @@ const activityLog = createResource({
     groupAndTransform(data)
   },
   onError(error) {
-    if (error.messages) {
-      console.log(error.messages)
-    }
   },
   reset() {
     groupedActivityLog.value = []

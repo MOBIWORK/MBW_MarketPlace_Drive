@@ -56,6 +56,7 @@ const store = createStore({
     nameBank: null,
     accountNameBanking: null,
     accountNumberBanking: null,
+    packageUsed: null,
     currentFolder: JSON.parse(localStorage.getItem("currentFolder")) || [],
     currentViewEntites: get("currentViewEntites") || [],
     pasteData: { entities: [], action: null },

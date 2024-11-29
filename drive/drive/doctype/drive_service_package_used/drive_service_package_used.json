@@ -18,15 +18,14 @@
   },
   {
    "fieldname": "service_package",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Service Package",
-   "options": "Drive Service Package"
+   "label": "Service Package"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-28 11:07:17.066982",
+ "modified": "2024-11-29 10:50:15.240553",
  "modified_by": "Administrator",
  "module": "Drive",
  "name": "Drive Service Package Used",

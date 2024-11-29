@@ -439,7 +439,6 @@ let sharedWithMe = createResource({
     folderContents.value = data
   },
   onError(error) {
-    console.log(error)
   },
 })
 </script>

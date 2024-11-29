@@ -389,9 +389,6 @@ let comments = createResource({
     })
   },
   onError(error) {
-    if (error.messages) {
-      console.log(error.messages)
-    }
   },
   auto: false,
 })

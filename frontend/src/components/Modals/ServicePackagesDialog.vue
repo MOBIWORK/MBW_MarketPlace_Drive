@@ -16,7 +16,7 @@
                                 :ref_for="true"
                                 theme="gray"
                                 size="md"
-                                :disabled="false"
+                                :disabled="package_used == item.code"
                                 class="w-[150px] mb-4"
                                 @click="() => onRegisterPackage(item)"
                             >
@@ -82,29 +82,38 @@ export default {
                 doctype: "Drive Payment",
                 insert: {
                     onSuccess(data){
-                        toast({
-                            title: "Hóa đơn tạo thành công. Vui lòng thanh toán để trải nghiệm dịch vụ",
-                            position: "bottom-right",
-                            timeout: 2,
-                        })
-                        let vietQR = new VietQR({
-                            clientID: this.$store.state.clientIDQRCode,
-                            apiKey: this.$store.state.apiKeyQRCode
-                        })
-                        vietQR.genQRCodeBase64({
-                            bank: this.$store.state.codeBank,
-                            accountName: this.$store.state.accountNameBanking,
-                            accountNumber: this.$store.state.accountNumberBanking,
-                            amount: this.packageSelect.unit_price.toString(),
-                            memo: data.name,
-                            template: "compact"
-                        }).then((res) => {
-                            if (res.status == 200) {
-                                this.qrDataURL = res.data.data.qrDataURL
-                            }
-                        })
-                        this.contentTransaction = data.name
-                        this.showCheckOutDialog = true
+                        if(data.price == 0){
+                            toast({
+                                title: "Bạn đã thay đổi gói thành công",
+                                position: "bottom-right",
+                                timeout: 2,
+                            })
+                            this.open = false
+                        }else{
+                            toast({
+                                title: "Hóa đơn tạo thành công. Vui lòng thanh toán để trải nghiệm dịch vụ",
+                                position: "bottom-right",
+                                timeout: 2,
+                            })
+                            let vietQR = new VietQR({
+                                clientID: this.$store.state.clientIDQRCode,
+                                apiKey: this.$store.state.apiKeyQRCode
+                            })
+                            vietQR.genQRCodeBase64({
+                                bank: this.$store.state.codeBank,
+                                accountName: this.$store.state.accountNameBanking,
+                                accountNumber: this.$store.state.accountNumberBanking,
+                                amount: this.packageSelect.unit_price.toString(),
+                                memo: data.name,
+                                template: "compact"
+                            }).then((res) => {
+                                if (res.status == 200) {
+                                    this.qrDataURL = res.data.data.qrDataURL
+                                }
+                            })
+                            this.contentTransaction = data.name
+                            this.showCheckOutDialog = true
+                        }
                         
                     },
                     onError(error){
@@ -138,6 +147,9 @@ export default {
         },
         list_package() {
             return this.$resources.servicePackages.data || []
+        },
+        package_used(){
+            return this.$store.state.packageUsed
         }
     },
     methods: {

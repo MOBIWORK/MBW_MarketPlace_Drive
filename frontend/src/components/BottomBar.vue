@@ -116,7 +116,6 @@ export default {
   },
   methods: {
     toggleExpanded() {
-      console.log("test")
       return this.$store.commit(
         "setIsSidebarExpanded",
         this.isExpanded ? false : true
@@ -157,7 +156,6 @@ export default {
       return {
         url: "drive.api.files.get_user_directory_size",
         onError(error) {
-          console.log(error)
         },
         auto: false,
       }

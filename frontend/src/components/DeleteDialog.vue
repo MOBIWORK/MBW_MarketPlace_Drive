@@ -70,9 +70,6 @@ export default {
           me.$emit("success")
         },
         onError(error) {
-          if (error.messages) {
-            console.log(error.messages)
-          }
         },
       }
     },

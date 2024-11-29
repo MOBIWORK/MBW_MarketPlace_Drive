@@ -1,54 +1,49 @@
 <template>
   <div>
-    <div class="flex items-center w-full mb-2 justify-between">
-      <span class="text-base font-medium text-gray-900"
-        >Used {{ formatSize(usedSpace) }} out of
-        {{ base2BlockSize(planSizeLimit) }}</span
-      >
+    <div class="flex justify-end">
       <div class="flex items-center">
-        <a class="text-base text-blue-600 cursor-pointer underline" href="javascript:;" @click="onShowServicePackages">Change package plan</a>
+        <a class="text-base text-blue-600 cursor-pointer underline" href="javascript:;"
+          @click="onShowServicePackages">Change package plan</a>
         <slot name="control"></slot>
       </div>
-      
     </div>
-    <div
-      v-if="usedSpace > 0"
-      class="w-full flex justify-start items-start bg-gray-50 border rounded overflow-clip h-7 pl-0 mb-4"
-    >
-      <div
-        v-for="i in entities"
-        :key="i.file_kind"
-        class="h-7"
-        :style="{
-          backgroundColor: i.color,
-          width: i.percentageFormat,
-          paddingRight: `${5 + i.percentageRaw}px`,
-        }"
-      ></div>
+    <div class="flex w-full mt-2">
+      <div class="w-9/12">
+        <div class="flex items-center w-full mb-2 justify-between">
+          <span class="text-base font-medium text-gray-900">Used {{ formatSize(usedSpace) }} out of
+            {{ base2BlockSize(planSizeLimit) }}</span>
+        </div>
+        <div v-if="usedSpace > 0"
+          class="w-full flex justify-start items-start bg-gray-50 border rounded overflow-clip h-7 pl-0 mb-3">
+          <div v-for="i in entities" :key="i.file_kind" class="h-7" :style="{
+            backgroundColor: i.color,
+            width: i.percentageFormat,
+            paddingRight: `${5 + i.percentageRaw}px`,
+          }"></div>
+        </div>
+      </div>
+      <div class="w-3/12 border-l ml-2 pl-2">
+        <div class="w-full flex justify-center mb-1">
+          <CircularProgressBar
+            :progress="progressBar"
+          />
+        </div>
+        <div class="w-full flex justify-center">
+          <span class="text-base font-medium text-gray-900">{{pupvUsed}} of {{pupvLimit}} used</span>
+        </div>
+      </div>
     </div>
   </div>
-  <div
-    v-if="!usedSpace"
-    class="h-full w-full flex flex-col items-center justify-center my-auto"
-  >
+  <div v-if="!usedSpace" class="h-full w-full flex flex-col items-center justify-center my-auto">
     <Cloud class="h-7 stroke-1 text-gray-600" />
     <span class="text-gray-800 text-sm mt-2">No Storage Used</span>
   </div>
-  <div
-    class="flex flex-col items-start justify-start w-full rounded full px-1.5 overflow-y-auto"
-  >
-    <div
-      v-for="(i, index) in entities"
-      :key="i.file_kind"
-      class="w-full flex items-center justify-start py-3 gap-x-2"
-      :class="index > 0 ? 'border-t' : ''"
-    >
-      <div
-        class="h-2 w-2 rounded-full"
-        :style="{
-          backgroundColor: i.color,
-        }"
-      ></div>
+  <div class="flex flex-col items-start justify-start w-full rounded full px-1.5 overflow-y-auto">
+    <div v-for="(i, index) in entities" :key="i.file_kind" class="w-full flex items-center justify-start py-3 gap-x-2"
+      :class="index > 0 ? 'border-t' : ''">
+      <div class="h-2 w-2 rounded-full" :style="{
+        backgroundColor: i.color,
+      }"></div>
       <span class="text-gray-800 text-sm">{{ i.file_kind }}</span>
       <span class="text-gray-800 text-sm ml-auto">{{ i.h_size }}</span>
     </div>
@@ -59,7 +54,8 @@
 import Cloud from "@/components/EspressoIcons/Cloud.vue"
 import { formatSize, base2BlockSize } from "../../utils/format"
 import ServicePackagesDialog from "@/components/Modals/ServicePackagesDialog.vue"
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import CircularProgressBar from "@/components/frappe-ui/CircularProgressBar.vue"
 
 const props = defineProps({
   planSizeLimit: {
@@ -74,11 +70,21 @@ const props = defineProps({
   total: {
     type: Object,
   },
+  pupvUsed: {
+    type: Number
+  },
+  pupvLimit: {
+    type: Number
+  }
+})
+
+const progressBar = computed(() => {
+  return (props.pupvUsed / props.pupvLimit) * 100
 })
 
 const showServicePackageDialog = ref(false)
 
-function onShowServicePackages(){
+function onShowServicePackages() {
   showServicePackageDialog.value = true
 }
 </script>

@@ -467,7 +467,6 @@ export default {
           data.owner = "You"
         },
         onError(data) {
-          console.log(data)
         },
         auto: false,
       }

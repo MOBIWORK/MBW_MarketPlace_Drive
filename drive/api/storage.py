@@ -18,7 +18,7 @@ def get_max_storage():
     limit_storage = 0
     if doc_package_used:
         service_package_name = doc_package_used.service_package
-        doc_service_package = frappe.get_doc("Drive Service Package", service_package_name)
+        doc_service_package = frappe.get_doc("Drive Service Package", {'code': service_package_name})
         limit_storage = doc_service_package.storage_volume * 1073741824
     else:
         name, storage_volume =  frappe.db.get_value("Drive Service Package", {"unit_price": 0}, ["name", "storage_volume"])
@@ -35,7 +35,7 @@ def get_max_pupv():
     limit_pupv = 0
     if doc_package_used:
         service_package_name = doc_package_used.service_package
-        doc_service_package = frappe.get_doc("Drive Service Package", service_package_name)
+        doc_service_package = frappe.get_doc("Drive Service Package", {'code': service_package_name})
         limit_pupv = doc_service_package.pupv
     else:
         name, pupv =  frappe.db.get_value("Drive Service Package", {"unit_price": 0}, ["name", "pupv"])

@@ -100,9 +100,6 @@ export default {
           this.$emit("success", data)
         },
         onError(error) {
-          if (error.messages) {
-            console.log(error.messages)
-          }
         },
       }
     },

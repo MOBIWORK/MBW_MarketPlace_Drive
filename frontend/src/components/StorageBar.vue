@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import { ref, computed, inject } from "vue"
+import { ref, computed, inject, onMounted, onBeforeUnmount } from "vue"
 import { useStore } from "vuex"
 import { createResource } from "frappe-ui"
 import SidebarItem from "./SidebarItem.vue"
@@ -51,6 +51,7 @@ const store = useStore()
 const isExpanded = computed(() => {
   return store.state.IsSidebarExpanded
 })
+const realtime = inject("realtime")
 
 const formatedString = computed(() => {
   return (
@@ -92,6 +93,15 @@ let maxStorage = createResource({
   auto: true,
 })
 
+let packageUsed = createResource({
+  url: "drive.api.service_package.package_used",
+  method: "GET",
+  auto: true,
+  onSuccess(data){
+    store.state.packageUsed = data
+  }
+})
+
 let storageUsed = createResource({
   url: usageUrl.value,
   onSuccess(data) {
@@ -105,5 +115,17 @@ let storageUsed = createResource({
     }
   },
   auto: false,
+})
+
+onMounted(() => {
+  realtime.on('event_reset_package_used', () => {
+    maxStorage.fetch()
+    packageUsed.fetch()
+    storageUsed.fetch()
+  })
+})
+
+onBeforeUnmount(() => {
+  realtime.off('event_reset_package_used')
 })
 </script>

@@ -13,10 +13,6 @@ export function initSocket(options = {}) {
     reconnectionAttempts: 5,
     transports: ["websocket", "polling"],
   })
-
-  socket.on("connect_error", (data) => {
-    console.log(data)
-  })
   return socket
 }
 
