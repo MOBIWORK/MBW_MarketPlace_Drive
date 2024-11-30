@@ -17,7 +17,7 @@ import os
 from drive.utils.using_quota import exist_pupv
 
 #API trích xuất dữ liệu geojson và ảnh đối tượng từ một video
-# Với mỗi 1MB xử lý thì tương ứng với 10PPUV  
+# Với mỗi 1MB xử lý thì tương ứng với 1PPUV  
 ##Tham số đầu vào:
 ###name_fvideo: Mã bản ghi tệp video thứ nhất
 ###name_gps: Mã bản ghi tệp gps
@@ -26,10 +26,15 @@ from drive.utils.using_quota import exist_pupv
 def analytic_video_with_geometry(name_fvideo, name_gps, parent):
     doc_fvideo = frappe.get_doc('Drive Entity', name_fvideo)
 
-    ppuv_used = (doc_fvideo.file_size/1048576) * 10
+    convert_mb_to_pupv = frappe.db.get_single_value('Drive Instance Settings', 'convert_mb_to_pupv')
+    if convert_mb_to_pupv is None or convert_mb_to_pupv == 0:
+        convert_mb_to_pupv = 1
+
+    ppuv_used = (doc_fvideo.file_size/1048576) * convert_mb_to_pupv
 
     if exist_pupv(ppuv_used) == False:
         frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': name_fvideo, 'status': "error", 'message': "Insufficient Process Unit Per's Video(PUPV). Please upgrade the package to use"}))
+        return 
 
     doc_task_queue = frappe.new_doc('Drive Task Queue')
     obj_task_metadata = {
@@ -53,7 +58,7 @@ def analytic_video_with_geometry(name_fvideo, name_gps, parent):
     return {"name": doc_fvideo.name, "title": f"{doc_fvideo.title}"}
 
 #API trích xuất dữ liệu phi không gian dưới dạng excel và ảnh đối tượng từ video
-# Với mỗi 1MB xử lý thì tương ứng với 10PPUV
+# Với mỗi 1MB xử lý thì tương ứng với 1PPUV
 ##Tham số đầu vào:
 ###name_fvideo: Mã bản ghi tệp video thứ nhất
 ###velocity: Tốc độ di chuyển tính bằng km/h
@@ -62,9 +67,14 @@ def analytic_video_with_geometry(name_fvideo, name_gps, parent):
 def analytic_without_geometry(name_fvideo, velocity, parent):
     doc_fvideo = frappe.get_doc('Drive Entity', name_fvideo)
 
-    ppuv_used = (doc_fvideo.file_size/1048576) * 10
+    convert_mb_to_pupv = frappe.db.get_single_value('Drive Instance Settings', 'convert_mb_to_pupv')
+    if convert_mb_to_pupv is None or convert_mb_to_pupv == 0:
+        convert_mb_to_pupv = 1
+
+    ppuv_used = (doc_fvideo.file_size/1048576) * convert_mb_to_pupv
     if exist_pupv(ppuv_used) == False:
         frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': name_fvideo, 'status': "error", 'message': "Insufficient Process Unit Per's Video(PUPV). Please upgrade the package to use"}))
+        return
 
     doc_task_queue = frappe.new_doc('Drive Task Queue')
     obj_task_metadata = {
@@ -147,7 +157,7 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key,
         new_folder = create_folder(title_folder, parent)
         spatial_datas = []
         for item in metadata_result:
-            image_response = sdk.get_stream_image(item["image"])
+            image_response = sdk.get_stream_by_url(item["image"])
             title_image = os.path.basename(item["image"])
             file_name_image = secure_filename(title_image)
             save_path = f"{_get_user_directory_name()}/{file_name_image}"
@@ -195,14 +205,14 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key,
         )
         output_video_link = result["process_result"]["output_video"]
         if output_video_link != None:
-            video_stream = sdk.get_stream_image(output_video_link)
+            video_stream = sdk.get_stream_by_url(output_video_link)
             title_output_video = os.path.basename(output_video_link)
             file_name_output_video = secure_filename(title_output_video)
-            save_path_output_video = f"{_get_user_directory_name()}/{file_name_output_video}"
-            upload_object_from_stream(connect_s3, video_stream, save_path_output_video, video_stream.headers.get('Content-Type'))
+            key_object_video_output = f"{_get_user_directory_name()}/{file_name_output_video}"
+            upload_object_from_stream(connect_s3, video_stream, key_object_video_output, video_stream.headers.get('Content-Type'))
             name_output_video = str(uuid.uuid4().hex)
             create_drive_entity(
-                name_output_video, title_output_video, new_folder.name, save_path_output_video, image_response.headers.get('Content-Length'), ".mp4", "video/mp4", None
+                name_output_video, title_output_video, new_folder.name, key_object_video_output, video_stream.headers.get('Content-Length'), ".mp4", "video/mp4", None
             )
             frappe.enqueue(
                 create_thumbnail_by_object,
@@ -211,7 +221,7 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key,
                 now=True,
                 at_front=True,
                 entity_name=name_output_video,
-                object_id=save_path_output_video,
+                object_id=key_object_video_output,
                 mime_type="video/mp4"
             )
         frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': doc_video.name, 'status': "success", 'message': new_folder.name}))
@@ -237,7 +247,7 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_access_key, 
         headers = ["S_Real (m)", "S_pixel (pixel)", "Image"]
         data_xlsx.append(headers)
         for item in metadata_result:
-            image_response = sdk.get_stream_image(item["image"])
+            image_response = sdk.get_stream_by_url(item["image"])
             title_image = os.path.basename(item["image"])
             file_name_image = secure_filename(title_image)
             save_path = f"{_get_user_directory_name()}/{file_name_image}"
@@ -272,14 +282,14 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_access_key, 
         )
         output_video_link = result["process_result"]["output_video"]
         if output_video_link != None:
-            video_stream = sdk.get_stream_image(output_video_link)
+            video_stream = sdk.get_stream_by_url(output_video_link)
             title_output_video = os.path.basename(output_video_link)
             file_name_output_video = secure_filename(title_output_video)
-            save_path_output_video = f"{_get_user_directory_name()}/{file_name_output_video}"
-            upload_object_from_stream(connect_s3, video_stream, save_path_output_video, video_stream.headers.get('Content-Type'))
+            key_object_video_output = f"{_get_user_directory_name()}/{file_name_output_video}"
+            upload_object_from_stream(connect_s3, video_stream, key_object_video_output, video_stream.headers.get('Content-Type'))
             name_output_video = str(uuid.uuid4().hex)
             create_drive_entity(
-                name_output_video, title_output_video, new_folder.name, save_path_output_video, image_response.headers.get('Content-Length'), ".mp4", "video/mp4", None
+                name_output_video, title_output_video, new_folder.name, key_object_video_output, video_stream.headers.get('Content-Length'), ".mp4", "video/mp4", None
             )
             frappe.enqueue(
                 create_thumbnail_by_object,
@@ -288,7 +298,7 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_access_key, 
                 now=True,
                 at_front=True,
                 entity_name=name_output_video,
-                object_id=save_path_output_video,
+                object_id=key_object_video_output,
                 mime_type="video/mp4"
             )
         doc_task_queue.status = "Success"

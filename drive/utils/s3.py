@@ -61,8 +61,7 @@ def upload_object_from_stream(connect, stream, object_key, content_type):
     connect.upload_fileobj(
         stream.raw,
         BUCKET_NAME,
-        object_key,
-        ExtraArgs={'ContentType': content_type}
+        object_key
     )
 
 def upload_fileobj_with_connect(connect, chunk, object_key, content_type):

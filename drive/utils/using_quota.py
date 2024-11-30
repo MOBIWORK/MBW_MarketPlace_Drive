@@ -22,6 +22,9 @@ def exist_pupv(pupv):
         total_pupv_used = total_pupv_useds[0]
         total_pupv = total_pupv_used["total_pupv"]
     max_pupv = get_max_pupv()
+    print("Dòng 25 ", pupv)
+    print("Dòng 26 ", total_pupv)
+    print("Dòng 27 ", max_pupv["limit"])
     if (pupv + total_pupv) <= max_pupv["limit"]:
         exist_pupv = True
     else:

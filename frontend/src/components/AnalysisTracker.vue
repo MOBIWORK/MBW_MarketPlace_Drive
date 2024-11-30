@@ -16,9 +16,9 @@
                 {{ analysisFailed.length == 1 ? "analyzed" : "analyzed" }} failed
             </div>
             <div class="ml-auto flex items-center gap-4">
-                <button v-if="!collapsed" class="focus:outline-none" @click.stop="toggleCollapsed">
+                <!-- <button v-if="!collapsed" class="focus:outline-none" @click.stop="toggleCollapsed">
                     <FeatherIcon name="minus" class="h-4 w-4 text-gray-800" />
-                </button>
+                </button> -->
                 <button class="focus:outline-none" @click="close">
                     <FeatherIcon name="x" class="h-4 w-4 text-gray-800" />
                 </button>

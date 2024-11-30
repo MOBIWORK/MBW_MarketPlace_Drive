@@ -29,7 +29,7 @@
           />
         </div>
         <div class="w-full flex justify-center">
-          <span class="text-base font-medium text-gray-900">{{pupvUsed}} of {{pupvLimit}} used</span>
+          <span class="text-base font-medium text-gray-900">{{renderPUPVUsed(pupvUsed)}} of {{pupvLimit}} used</span>
         </div>
       </div>
     </div>
@@ -79,12 +79,15 @@ const props = defineProps({
 })
 
 const progressBar = computed(() => {
-  return (props.pupvUsed / props.pupvLimit) * 100
+  return Math.round((props.pupvUsed / props.pupvLimit) * 100)
 })
 
 const showServicePackageDialog = ref(false)
 
 function onShowServicePackages() {
   showServicePackageDialog.value = true
+}
+function renderPUPVUsed(pupv){
+  return Math.round(pupv)
 }
 </script>

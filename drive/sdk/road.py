@@ -116,15 +116,11 @@ class RoadSDK:
             for chunk in response.iter_content(chunk_size=8192):
                 f.write(chunk)
     
-    def get_stream_image(self, image_url: str):
-        response = requests.get(image_url, stream=True)
-        response.raise_for_status()
-        return response
-
-    def get_stream(self, url: str):
+    def get_stream_by_url(self, url: str):
         response = requests.get(url, stream=True)
         response.raise_for_status()
         return response
+
 
 # sdk = RoadSDK()
 # print(sdk.process_video_gpx('1', "http://10.0.1.247:8083/images/input/Data_potholes.mp4", "http://10.0.1.247:8083/images/input/111.gpx"))
