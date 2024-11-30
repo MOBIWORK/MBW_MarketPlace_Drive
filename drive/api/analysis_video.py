@@ -1,6 +1,6 @@
 import frappe
 import json
-from drive.utils.s3 import upload_image_with_connect_byte, get_connect_s3, upload_object_from_stream
+from drive.utils.s3 import upload_image_with_connect_byte, get_connect_s3, upload_object_from_stream, upload_file_with_connect
 from drive.utils.files import _get_user_directory_name, create_thumbnail_by_object
 from drive.api.files import (
     create_folder,
@@ -15,6 +15,8 @@ import io
 from drive.sdk.road import RoadSDK
 import os
 from drive.utils.using_quota import exist_pupv
+from pathlib import Path
+from drive.api.files import get_user_uploads_directory
 
 #API trích xuất dữ liệu geojson và ảnh đối tượng từ một video
 # Với mỗi 1MB xử lý thì tương ứng với 1PPUV  
@@ -209,7 +211,17 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key,
             title_output_video = os.path.basename(output_video_link)
             file_name_output_video = secure_filename(title_output_video)
             key_object_video_output = f"{_get_user_directory_name()}/{file_name_output_video}"
-            upload_object_from_stream(connect_s3, video_stream, key_object_video_output, video_stream.headers.get('Content-Type'))
+            
+            temp_path = (
+                Path(get_user_uploads_directory(user=frappe.session.user))
+                / f"{int(timestamp)}_{file_name_output_video}"
+            )
+            with open(temp_path, 'wb') as file:
+                for chunk in video_stream.iter_content(chunk_size=8192):
+                    if chunk:
+                        file.write(chunk)
+            upload_file_with_connect(connect_s3, temp_path, key_object_video_output)
+            #upload_object_from_stream(connect_s3, video_stream, key_object_video_output, video_stream.headers.get('Content-Type'))
             name_output_video = str(uuid.uuid4().hex)
             create_drive_entity(
                 name_output_video, title_output_video, new_folder.name, key_object_video_output, video_stream.headers.get('Content-Length'), ".mp4", "video/mp4", None

@@ -9,8 +9,14 @@
                 <div class="absolute top-2 right-2 z-50 rounded-full cursor-pointer bg-white p-1 shadow-md hover:bg-gray-200 transition" @click="onCloseDetailPoint">
                     <FeatherIcon name="x" class="w-5 h-5 text-gray-800" />
                 </div>
+                <div class="absolute -bottom-3 left-2/4 transform -translate-x-2/4 rounded-md bg-white p-1 shadow-md w-16 h-7 flex">
+                    <div class="flex justify-between items-center w-full">
+                        <FeatherIcon name="chevron-left" class="w-5 h-5 text-gray-800 cursor-pointer" @click="onNextItem"/>
+                        <FeatherIcon name="chevron-right" class="w-5 h-5 text-gray-800 cursor-pointer" @click="onPreItem"/>
+                    </div>
+                </div>
             </div>
-            <div class="w-full flex mt-3 ml-2 items-center" v-if="detailInfoPoint.longitude != null && detailInfoPoint.latitude != null">
+            <div class="w-full flex mt-5 ml-2 items-center" v-if="detailInfoPoint.longitude != null && detailInfoPoint.latitude != null">
                 <FeatherIcon name="map-pin" class="w-5 h-5 mr-2" />
                 <div class="text-base">
                     <span>{{detailInfoPoint.longitude}}</span>
@@ -80,6 +86,7 @@ const store = useStore()
 const loading = ref(true)
 const mapPreview = ref(true)
 const contentGeoJson = ref(null)
+const indexFeatureActivate = ref(0)
 
 //Biến Bảng thuộc tính
 const showPropertiesDialog = ref(false)
@@ -293,11 +300,123 @@ function clickInfoPoint(evt) {
     }
     let features = mapPreview.value.queryRenderedFeatures(evt.point, { layers: ['l_object_detect'] })
     if (features.length > 0) {
+        for(let i = 0; i < dataProperties.value.length; i++){
+            let item = dataProperties.value[i]
+            if(item["longitude"] == features[0].properties["longitude"] && item["latitude"] == features[0].properties["latitude"]){
+                indexFeatureActivate.value = i
+                break
+            }
+        }
+        const sizeAnimateCircle = 100
+        const pulsingDot= {
+            width: sizeAnimateCircle,
+            height: sizeAnimateCircle,
+            data: new Uint8Array(sizeAnimateCircle*sizeAnimateCircle*4),
+            onAdd(){
+                const canvas = document.createElement('canvas')
+                canvas.width = this.width
+                canvas.height = this.height
+                this.context = canvas.getContext('2d')
+            },
+            render() {
+                const duration = 1000
+                const t = (performance.now() % duration) / duration
+                const radius = (sizeAnimateCircle / 2) * 0.3
+                const outerRadius = (sizeAnimateCircle / 2) * 0.7 * t + radius
+                const context = this.context
+                // draw outer circle
+                context.clearRect(0, 0, this.width, this.height)
+                context.beginPath()
+                context.arc(
+                    this.width / 2,
+                    this.height / 2,
+                    outerRadius,
+                    0,
+                    Math.PI * 2
+                )
+                context.fillStyle = `rgba(153, 196, 219,${1 - t})`
+                context.fill()
+                // draw inner circle
+                context.beginPath()
+                context.arc(
+                    this.width / 2,
+                    this.height / 2,
+                    radius,
+                    0,
+                    Math.PI * 2
+                )
+                context.fillStyle = 'rgba(0, 124, 191, 1)'
+                context.strokeStyle = 'white'
+                context.lineWidth = 2 + 4 * (1 - t)
+                context.fill()
+                context.stroke()
+                this.data = context.getImageData(
+                    0,
+                    0,
+                    this.width,
+                    this.height
+                ).data
+                // continuously repaint the map, resulting in the smooth animation of the dot
+                mapPreview.value.triggerRepaint()
+                // return `true` to let the map know that the image was updated
+                return true
+            }
+        }
+        if(mapPreview.value.getSource("s_object_detect_activate")){
+            mapPreview.value.getSource("s_object_detect_activate").setData(features[0])
+        }else{
+            if(!mapPreview.value.getImage("pulsing-dot")) mapPreview.value.addImage('pulsing-dot', pulsingDot, {pixelRatio: 2})
+            mapPreview.value.addSource("s_object_detect_activate", {
+                'type': "geojson",
+                'data': features[0]
+            })
+            mapPreview.value.addLayer({
+                'id': "l_object_detect_activate",
+                'type': "symbol",
+                'source': "s_object_detect_activate",
+                'layout': {
+                    'icon-image': "pulsing-dot"
+                }
+            })
+        }
         detailInfoPoint.value = features[0].properties
         showDetailInfoPoint.value = true
     } else {
         detailInfoPoint.value = null
         showDetailInfoPoint.value = false
+    }
+}
+
+function onNextItem(){
+    if(indexFeatureActivate.value + 1 < dataProperties.value.length){
+        indexFeatureActivate.value += 1
+        onShowDetailAndLayerItemNextAndPre()
+    }
+}
+
+function onPreItem(){
+    if(indexFeatureActivate.value -1 >= 0){
+        indexFeatureActivate.value -= 1
+        onShowDetailAndLayerItemNextAndPre()
+    }
+}
+
+function onShowDetailAndLayerItemNextAndPre(){
+    let item = dataProperties.value[indexFeatureActivate.value]
+    if(item != null){
+        let featureData = {
+            'type': "Feature",
+            'geometry': {
+                'type': "Point",
+                'coordinates': [item["longitude"], item["latitude"]]
+            },
+            'properties': item
+        }
+        mapPreview.value.getSource("s_object_detect_activate").setData(featureData)
+        detailInfoPoint.value = item
+        mapPreview.value.flyTo({
+            'center': [item["longitude"], item["latitude"]]
+        })
     }
 }
 
@@ -343,6 +462,11 @@ function onAddLayer() {
 function onCloseDetailPoint() {
     detailInfoPoint.value = null
     showDetailInfoPoint.value = false
+    if(mapPreview.value.getSource("s_object_detect_activate")){
+        mapPreview.value.removeLayer("l_object_detect_activate")
+        mapPreview.value.removeSource("s_object_detect_activate")
+    }
+    indexFeatureActivate.value = 0
 }
 
 onMounted(() => {
