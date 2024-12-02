@@ -16,7 +16,6 @@
         v-model="password"
         label="Password"
         type="password"
-        placeholder="••••••••"
         name="password"
         autocomplete="current-password"
       />

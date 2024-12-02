@@ -4,7 +4,7 @@
         showTooltip: true,
         resizeColumn: true,
         emptyState: {
-            title: 'Không có bản ghi'
+            title: 'There are no records'
         }
     }" row-key="name">
         <template #cell="{ item, row, column }">

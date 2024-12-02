@@ -84,14 +84,14 @@ export default {
                     onSuccess(data){
                         if(data.price == 0){
                             toast({
-                                title: "Bạn đã thay đổi gói thành công",
+                                title: "You have successfully changed the package",
                                 position: "bottom-right",
                                 timeout: 2,
                             })
                             this.open = false
                         }else{
                             toast({
-                                title: "Hóa đơn tạo thành công. Vui lòng thanh toán để trải nghiệm dịch vụ",
+                                title: "Invoice created successfully. Please pay to experience the service",
                                 position: "bottom-right",
                                 timeout: 2,
                             })

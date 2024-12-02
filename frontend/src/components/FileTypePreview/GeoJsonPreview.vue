@@ -38,7 +38,7 @@
 
     <Dialog v-model="showPropertiesDialog" :options="{
         size: '3xl',
-        title: 'Bảng thuộc tính',
+        title: 'Attributes',
     }">
         <template #body-content>
             <ListView class="max-h-[350px]" :columns="columns" :rows="dataProperties" :options="{
@@ -46,7 +46,7 @@
                 showTooltip: true,
                 resizeColumn: true,
                 emptyState: {
-                    title: 'Không có bản ghi'
+                    title: 'There are no records'
                 }
             }" row-key="ID">
                 <ListHeader class="mx-5" />
@@ -99,15 +99,15 @@ const columns = ref(
             width: '50px'
         },
         {
-            label: 'Diện tích(m)',
+            label: 'Acreage(m)',
             key: 'area_real'
         },
         {
-            label: 'Diện tích(pixel)',
+            label: 'Acreage(pixel)',
             key: 'area_pixel'
         },
         {
-            label: 'Ảnh',
+            label: 'Image',
             key: 'image'
         }
     ]
@@ -171,21 +171,21 @@ function initMap() {
         baseLayers: [
             {
                 id: "OSM:Night",
-                title: "Bản đồ nền Đêm",
+                title: "Night basemap",
                 thumbnail: "https://docs.ekgis.vn/assets/dem-map.png",
                 width: "50px",
                 height: "50px",
             },
             {
                 id: "OSM:Bright",
-                title: "Bản đồ nền Sáng",
+                title: "Bright basemap",
                 thumbnail: "https://docs.ekgis.vn/assets/map-sang.png",
                 width: "50px",
                 height: "50px",
             },
             {
                 id: "OSM:Standard",
-                title: "Bản đồ nền Tiêu chuẩn",
+                title: "Basemap Standard",
                 thumbnail: "https://docs.ekgis.vn/assets/map-chuan.png",
                 width: "50px",
                 height: "50px",
@@ -204,10 +204,10 @@ function initMap() {
     if (mapPreview.value.getPitch() > 0) is3DMap = true;
     else is3DMap = false;
     var cl = "maplibregl-terrain2d-control";
-    var tl = "Hiển thị 2D";
+    var tl = "2D display";
     if (!is3DMap) {
         cl = "maplibregl-terrain3d-control";
-        tl = "Bản đồ 3D";
+        tl = "3D map";
     }
     let btn3D = new ekmapplf.control.Button({
         className: "btn-ctl-group " + cl,
@@ -221,13 +221,13 @@ function initMap() {
                 "maplibregl-terrain3d-control",
                 "maplibregl-terrain2d-control"
             );
-            btn._div.title = "Hiển thị 2D";
+            btn._div.title = "2D display";
         } else {
             btn._div.className = btn._div.className.replaceAll(
                 "maplibregl-terrain2d-control",
                 "maplibregl-terrain3d-control"
             );
-            btn._div.title = "Hiển thị 3D";
+            btn._div.title = "3D display";
         }
         if (is3DMap) {
             mapPreview.value.easeTo({ pitch: 60 });
@@ -242,7 +242,7 @@ function initMap() {
     let btnProperties = new ekmapplf.control.Button({
         className: "btn-ctl-group icon_properties",
         icon: "",
-        tooltip: "Bảng thuộc tính"
+        tooltip: "Attributes"
     })
     btnProperties.on("click", (btn) => {
         showPropertiesDialog.value = true
@@ -252,7 +252,7 @@ function initMap() {
     let btnQueryPoint = new ekmapplf.control.Button({
         className: "btn-ctl-group icon_query_point",
         icon: "",
-        tooltip: "Tra cứu thông tin một điểm"
+        tooltip: "Look up one-point information"
     })
     btnQueryPoint.on('click', (btn) => {
         initPopupQueryInfo()
@@ -287,7 +287,7 @@ function initPopupQueryInfo() {
 }
 
 function showPopupControl(evt) {
-    popupQueryInfo.value.setLngLat([evt.lngLat.lng, evt.lngLat.lat]).setHTML('<span class="text-sm">Click vào vị trí để tra cứu thông tin</span>')
+    popupQueryInfo.value.setLngLat([evt.lngLat.lng, evt.lngLat.lat]).setHTML('<span class="text-sm">Click on the location to look up information</span>')
 }
 
 function clickInfoPoint(evt) {

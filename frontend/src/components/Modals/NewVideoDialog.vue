@@ -109,7 +109,7 @@ export default {
             nameFVideo: null,
             nameSVideo: null,
             nameGPS: null,
-            label: "Tạo mới",
+            label: "Create new",
             dropzone: null,
             processVideo: 1
         }
@@ -303,7 +303,7 @@ export default {
                         if (data.name != null) {
                             me.open = false
                             toast({
-                                title: "Tải video lên thành công. Quá trình phân tích mất khoảng thời gian, xin vui lòng đợi",
+                                title: "Video uploaded successfully. The analysis process takes some time, please wait",
                                 position: "bottom-right",
                                 timeout: 2,
                             })
@@ -331,7 +331,7 @@ export default {
                         if (data.name != null) {
                             me.open = false
                             toast({
-                                title: "Tải video lên thành công. Quá trình phân tích mất khoảng thời gian, xin vui lòng đợi",
+                                title: "Video uploaded successfully. The analysis process takes some time, please wait",
                                 position: "bottom-right",
                                 timeout: 2,
                             })
@@ -355,7 +355,7 @@ export default {
             this.nameFVideo = null
             this.nameSVideo = null
             this.nameGPS = null
-            this.label = "Tạo mới"
+            this.label = "Create new"
         }
     }
 }
