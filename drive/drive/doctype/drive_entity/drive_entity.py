@@ -58,14 +58,14 @@ class DriveEntity(Document):
         if self.document:
             frappe.delete_doc("Drive Document", self.document)
         """Remove file once document is deleted"""
-        if self.path:
-            max_attempts = 3
-            for attempt in range(max_attempts):
-                try:
-                    Path(self.path).unlink()
-                    break
-                except Exception as e:
-                    print(f"Attempt {attempt + 1}: Failed to delete file - {e}")
+        # if self.path:
+        #     max_attempts = 3
+        #     for attempt in range(max_attempts):
+        #         try:
+        #             Path(self.path).unlink()
+        #             break
+        #         except Exception as e:
+        #             print(f"Attempt {attempt + 1}: Failed to delete file - {e}")
         if self.mime_type:
             if self.mime_type.startswith("image") or self.mime_type.startswith("video"):
                 max_attempts = 3

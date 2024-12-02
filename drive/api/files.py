@@ -974,19 +974,35 @@ def delete_entities(entity_names=None, clear_all=None):
             doctype="Drive Entity", doc=entity, ptype="write", user=frappe.session.user
         )
         ignore_permissions = owns_root_entity or has_write_access
-        frappe.db.set_value("Drive Entity", entity, "is_active", -1)
         doc_setting = frappe.get_single('Drive Instance Settings')
         aws_access_key = doc_setting.aws_access_key
         aws_secret_access_key = doc_setting.get_password('aws_secret_key')
+        delete_entity_recursive(entity, aws_access_key, aws_secret_access_key, ignore_permissions)
+
+def delete_entity_recursive(entity_name, aws_access_key, aws_secret_access_key, ignore_permissions):
+    doc_entity = frappe.get_doc("Drive Entity", entity_name)
+    if doc_entity.is_group == 1 or doc_entity.is_group == True:
+        doc_entity_childs = frappe.db.get_list("Drive Entity",
+            filters={
+                'parent_drive_entity': entity_name
+            },
+            fields=['name']
+        )
+        frappe.db.set_value("Drive Entity", entity_name, "is_active", -1)
+        for doc_entity_child in doc_entity_childs:
+            delete_entity_recursive(doc_entity_child.name, aws_access_key, aws_secret_access_key, ignore_permissions)
+    else:
+        frappe.db.set_value("Drive Entity", entity_name, "is_active", -1)
         frappe.enqueue(
             delete_background_job,
             queue="default",
             timeout=None,
-            entity=entity,
+            entity=entity_name,
             ignore_permissions=ignore_permissions,
             aws_access_key=aws_access_key,
             aws_secret_access_key=aws_secret_access_key
         )
+        return
 
 
 @frappe.whitelist()

@@ -14,3 +14,7 @@ frappe.ui.form.on("Drive Instance Settings", {
     }
   },
 });
+
+frappe.ui.form.on("Drive Instance Settings", "create_aws_bucket", function(frm){
+  frm.call('create_bucket')
+})

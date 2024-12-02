@@ -16,6 +16,12 @@ def get_connect_s3(aws_access_id, aws_secret_access_key):
         )
     return connect_s3
 
+def create_bucket_with_connect(connect):
+    try:
+        connect.head_bucket(Bucket=BUCKET_NAME)
+    except ClientError as e:
+        connect.create_bucket(Bucket=BUCKET_NAME)
+
 def upload_file_with_connect(connect, file_path, object_key):
     try:
         connect.head_bucket(Bucket=BUCKET_NAME)

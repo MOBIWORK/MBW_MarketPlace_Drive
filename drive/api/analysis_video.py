@@ -109,6 +109,7 @@ def send_result_detect(result):
     doc_task_queue = frappe.get_doc('Drive Task Queue', task_id)
     task_metadata = json.loads(doc_task_queue.task_metadata)
     frappe.set_user(doc_setting.owner)
+    print("Dòng 112 ", result)
     try:
         if task_metadata["type"] == "Video_GPS":
             #Tạo dữ liệu không gian và ảnh

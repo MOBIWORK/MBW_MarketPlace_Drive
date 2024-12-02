@@ -29,7 +29,7 @@
           />
         </div>
         <div class="w-full flex justify-center">
-          <span class="text-base font-medium text-gray-900">{{renderPUPVUsed(pupvUsed)}} of {{pupvLimit}} used</span>
+          <span class="text-base font-medium text-gray-900">{{renderPUPVUsed(pupvUsed)}} of {{pupvLimit}} PUPV used</span>
         </div>
       </div>
     </div>

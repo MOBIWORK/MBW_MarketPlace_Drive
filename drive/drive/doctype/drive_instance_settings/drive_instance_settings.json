@@ -16,6 +16,8 @@
   "aws_s3_tab",
   "aws_access_key",
   "aws_secret_key",
+  "aws_bucket",
+  "create_aws_bucket",
   "ekmap_tab",
   "api_key_map",
   "vietqr_tab",
@@ -138,11 +140,21 @@
    "fieldname": "convert_mb_to_pupv",
    "fieldtype": "Float",
    "label": "Convert MB To PUPV"
+  },
+  {
+   "fieldname": "aws_bucket",
+   "fieldtype": "Data",
+   "label": "AWS Bucket"
+  },
+  {
+   "fieldname": "create_aws_bucket",
+   "fieldtype": "Button",
+   "label": "Create AWS Bucket"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-11-30 09:13:22.718498",
+ "modified": "2024-12-02 09:16:16.740028",
  "modified_by": "Administrator",
  "module": "Drive",
  "name": "Drive Instance Settings",
