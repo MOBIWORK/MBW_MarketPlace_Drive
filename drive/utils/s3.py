@@ -2,7 +2,6 @@ import frappe
 import boto3
 from botocore.exceptions import ClientError
 import os
-from drive.utils.const import BUCKET_NAME
 
 connect_s3 = None
 
@@ -18,32 +17,25 @@ def get_connect_s3(aws_access_id, aws_secret_access_key):
 
 def create_bucket_with_connect(connect):
     try:
-        connect.head_bucket(Bucket=BUCKET_NAME)
+        bucket_name = frappe.db.get_single_value("Drive Instance Settings", "aws_bucket")
+        connect.head_bucket(Bucket=bucket_name)
     except ClientError as e:
-        connect.create_bucket(Bucket=BUCKET_NAME)
+        connect.create_bucket(Bucket=bucket_name)
 
 def upload_file_with_connect(connect, file_path, object_key):
+    bucket_name = frappe.db.get_single_value("Drive Instance Settings", "aws_bucket")
     try:
-        connect.head_bucket(Bucket=BUCKET_NAME)
-    except ClientError as e:
-        connect.create_bucket(Bucket=BUCKET_NAME)
-    
-    try:
-        connect.upload_file(file_path, BUCKET_NAME, object_key)
+        connect.upload_file(file_path, bucket_name, object_key)
         #Xóa tệp trên ổ đĩa đi
         os.remove(file_path)
     except Exception as e:
         print(f"Lỗi khi tải lên s3: {e}")
 
 def upload_image_with_connect_byte(connect, content, object_key):
-    try:
-        connect.head_bucket(Bucket=BUCKET_NAME)
-    except ClientError as e:
-        connect.create_bucket(Bucket=BUCKET_NAME)
-    
+    bucket_name = frappe.db.get_single_value("Drive Instance Settings", "aws_bucket")
     try:
         connect.put_object(
-            Bucket=BUCKET_NAME,
+            Bucket=bucket_name,
             Key=object_key,
             Body=content,
             ContentType="image/png"
@@ -52,28 +44,32 @@ def upload_image_with_connect_byte(connect, content, object_key):
         print(f"Lỗi khi tải lên s3: {e}")
 
 def get_object_with_connect(connect, object_key):
+    bucket_name = frappe.db.get_single_value("Drive Instance Settings", "aws_bucket")
     return connect.get_object(
-        Bucket = BUCKET_NAME,
+        Bucket = bucket_name,
         Key = object_key
     )
 
 def delete_object_with_connect(connect, object_key):
+    bucket_name = frappe.db.get_single_value("Drive Instance Settings", "aws_bucket")
     connect.delete_object(
-        Bucket=BUCKET_NAME,
+        Bucket=bucket_name,
         Key=object_key
     )
 
 def upload_object_from_stream(connect, stream, object_key, content_type):
+    bucket_name = frappe.db.get_single_value("Drive Instance Settings", "aws_bucket")
     connect.upload_fileobj(
         stream.raw,
-        BUCKET_NAME,
+        bucket_name,
         object_key
     )
 
 def upload_fileobj_with_connect(connect, chunk, object_key, content_type):
+    bucket_name = frappe.db.get_single_value("Drive Instance Settings", "aws_bucket")
     connect.upload_fileobj(
         chunk,
-        BUCKET_NAME,
+        bucket_name,
         object_key,
         ExtraArgs={'ContentType': content_type}
     )

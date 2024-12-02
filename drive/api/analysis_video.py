@@ -50,11 +50,11 @@ def analytic_video_with_geometry(name_fvideo, name_gps, parent):
     doc_task_queue.pupv = ppuv_used
     doc_task_queue.save(ignore_permissions=True)
 
-    host = "http://10.0.1.85:8005"
-    #video_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}")
-    #gps_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_gps}")
-    video_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}"
-    gps_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_gps}"
+    #host = "http://10.0.1.85:8005"
+    video_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}")
+    gps_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_gps}")
+    #video_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}"
+    #gps_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_gps}"
     sdk = RoadSDK()
     response = sdk.process_video_gpx(doc_task_queue.name, video_url, gps_url)
     return {"name": doc_fvideo.name, "title": f"{doc_fvideo.title}"}
@@ -90,9 +90,9 @@ def analytic_without_geometry(name_fvideo, velocity, parent):
     doc_task_queue.pupv = ppuv_used
     doc_task_queue.save(ignore_permissions=True)
     
-    host = "http://10.0.1.85:8005"
-    #video_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}")
-    video_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}"
+    #host = "http://10.0.1.85:8005"
+    video_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}")
+    #video_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}"
     sdk = RoadSDK()
     response = sdk.process_single_video_velocity(doc_task_queue.name, video_url, velocity)
     return {"name": doc_fvideo.name, "title": doc_fvideo.title}
@@ -109,7 +109,6 @@ def send_result_detect(result):
     doc_task_queue = frappe.get_doc('Drive Task Queue', task_id)
     task_metadata = json.loads(doc_task_queue.task_metadata)
     frappe.set_user(doc_setting.owner)
-    print("Dòng 112 ", result)
     try:
         if task_metadata["type"] == "Video_GPS":
             #Tạo dữ liệu không gian và ảnh

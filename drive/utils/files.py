@@ -8,7 +8,6 @@ from drive.locks.distributed_lock import DistributedLock
 import cv2
 from tempfile import NamedTemporaryFile
 from drive.utils.s3 import get_connect_s3
-from drive.utils.const import BUCKET_NAME
 
 
 def create_user_directory():
@@ -207,7 +206,8 @@ def create_thumbnail_by_object(entity_name, object_id, mime_type):
     connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
     with NamedTemporaryFile(delete=True) as temp_file:
         try:
-            connect_s3.download_fileobj(BUCKET_NAME, object_id, temp_file)
+            bucket_name = frappe.db.get_single_value("Drive Instance Settings", "aws_bucket")
+            connect_s3.download_fileobj(bucket_name, object_id, temp_file)
             temp_file.flush()
             temp_path = temp_file.name
 
