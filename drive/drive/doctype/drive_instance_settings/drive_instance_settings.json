@@ -31,6 +31,7 @@
   "client_id_payos",
   "api_key_payos",
   "checksum_key_payos",
+  "create_confirm_webhook_payos",
   "minio_s3_tab",
   "host_minio_s3",
   "access_key_minio_s3",
@@ -198,11 +199,16 @@
    "fieldname": "secret_key_minio_s3",
    "fieldtype": "Data",
    "label": "Secret Key"
+  },
+  {
+   "fieldname": "create_confirm_webhook_payos",
+   "fieldtype": "Button",
+   "label": "Create Confirm WebHook"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-12-03 11:50:05.457336",
+ "modified": "2024-12-03 15:56:45.142783",
  "modified_by": "Administrator",
  "module": "Drive",
  "name": "Drive Instance Settings",

@@ -40,7 +40,6 @@ def create_paypment(name_package):
     order_code = len(frappe.db.get_list('Drive Payment', pluck='name')) + 1
     doc_payment.order_code = order_code
     doc_payment.insert(ignore_permissions=True)
-    payOS.confirmWebhook(frappe.utils.get_url("/api/method/drive.api.payment.callback_complete_payment"))
     paymentData = PaymentData(orderCode=order_code, amount=int(doc_service_package.unit_price), description=name_package,
      cancelUrl=cancelUrl, returnUrl=returnUrl)
     paymentLinkData = payOS.createPaymentLink(paymentData = paymentData)
