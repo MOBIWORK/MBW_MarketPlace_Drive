@@ -10,7 +10,8 @@
   "code_package",
   "price",
   "status",
-  "payment_time"
+  "payment_time",
+  "order_code"
  ],
  "fields": [
   {
@@ -50,11 +51,17 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Code Package"
+  },
+  {
+   "fieldname": "order_code",
+   "fieldtype": "Long Text",
+   "in_list_view": 1,
+   "label": "Order Code"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-27 09:44:51.667275",
+ "modified": "2024-12-03 15:02:12.500031",
  "modified_by": "Administrator",
  "module": "Drive",
  "name": "Drive Payment",
@@ -69,6 +76,30 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Drive Admin",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Drive User",
    "share": 1,
    "write": 1
   }

@@ -2,3 +2,5 @@ black
 Pillow
 opencv-python
 geojson
+payos
+minio

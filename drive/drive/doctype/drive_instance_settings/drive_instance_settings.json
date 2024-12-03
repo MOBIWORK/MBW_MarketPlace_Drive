@@ -27,6 +27,14 @@
   "name_bank",
   "account_name_banking",
   "account_number_banking",
+  "payos_tab",
+  "client_id_payos",
+  "api_key_payos",
+  "checksum_key_payos",
+  "minio_s3_tab",
+  "host_minio_s3",
+  "access_key_minio_s3",
+  "secret_key_minio_s3",
   "other_tab",
   "convert_mb_to_pupv"
  ],
@@ -150,11 +158,51 @@
    "fieldname": "create_aws_bucket",
    "fieldtype": "Button",
    "label": "Create AWS Bucket"
+  },
+  {
+   "fieldname": "payos_tab",
+   "fieldtype": "Tab Break",
+   "label": "PayOS"
+  },
+  {
+   "fieldname": "client_id_payos",
+   "fieldtype": "Data",
+   "label": "Client ID"
+  },
+  {
+   "fieldname": "api_key_payos",
+   "fieldtype": "Data",
+   "label": "API Key"
+  },
+  {
+   "fieldname": "checksum_key_payos",
+   "fieldtype": "Data",
+   "label": "Checksum Key"
+  },
+  {
+   "fieldname": "minio_s3_tab",
+   "fieldtype": "Tab Break",
+   "label": "MinIO S3"
+  },
+  {
+   "fieldname": "host_minio_s3",
+   "fieldtype": "Data",
+   "label": "Host"
+  },
+  {
+   "fieldname": "access_key_minio_s3",
+   "fieldtype": "Data",
+   "label": "Access Key"
+  },
+  {
+   "fieldname": "secret_key_minio_s3",
+   "fieldtype": "Data",
+   "label": "Secret Key"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-12-02 09:16:16.740028",
+ "modified": "2024-12-03 11:50:05.457336",
  "modified_by": "Administrator",
  "module": "Drive",
  "name": "Drive Instance Settings",

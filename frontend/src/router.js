@@ -120,7 +120,7 @@ const routes = [
       errorPage: true,
     },
     props: true,
-  },
+  }
 ]
 
 let router = createRouter({

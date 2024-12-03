@@ -16,7 +16,8 @@
                                 :ref_for="true"
                                 theme="gray"
                                 size="md"
-                                :disabled="package_used == item.code"
+                                :loading="loadingCreatePayment"
+                                :disabled="package_used == item.name"
                                 class="w-[150px] mb-4"
                                 @click="() => onRegisterPackage(item)"
                             >
@@ -114,7 +115,7 @@ export default {
                             this.contentTransaction = data.name
                             this.showCheckOutDialog = true
                         }
-                        
+
                     },
                     onError(error){
                         if (error.messages) {
@@ -125,6 +126,17 @@ export default {
                     }
                 }
             }
+        },
+        createPayment(){
+            return {
+                url: "drive.api.payment.create_paypment",
+                method: "POST",
+                auto: false,
+                onSuccess(data){
+                    window.location.href = data
+                    this.loadingCreatePayment = false
+                }
+            }
         }
     },
     data(){
@@ -133,7 +145,8 @@ export default {
             errorMessage: "",
             qrDataURL: "",
             showCheckOutDialog: false,
-            contentTransaction: ""
+            contentTransaction: "",
+            loadingCreatePayment: false
         }
     },
     computed: {
@@ -165,13 +178,15 @@ export default {
             return price.toLocaleString('vi-VN')
         },
         onRegisterPackage(item){
+            this.loadingCreatePayment = true
             this.packageSelect = item
-            this.$resources.payments.insert.submit({
-                'form_of_payment': "QRCode",
-                'code_package': item.code,
-                'price': item.unit_price,
-                'status': "Outstanding"
-            })
+            this.$resources.createPayment.submit({'name_package': item.name})
+            // this.$resources.payments.insert.submit({
+            //     'form_of_payment': "QRCode",
+            //     'code_package': item.name,
+            //     'price': item.unit_price,
+            //     'status': "Outstanding"
+            // })
         },
         onCleanData(){
             this.packageSelect = null

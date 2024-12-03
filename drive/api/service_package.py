@@ -6,7 +6,7 @@ def list_package():
         filters={
             'show': True
         },
-        fields=['title', 'code', 'storage_volume', 'pupv', 'unit_price'],
+        fields=['title', 'code', 'storage_volume', 'pupv', 'unit_price', 'name'],
         order_by='creation asc'
     )
     return docs_package
@@ -23,5 +23,5 @@ def package_used():
         doc_service_package_used.user = frappe.session.user
         doc_service_package_used.service_package = name
         doc_service_package_used.insert(ignore_permissions=True)
-        package_code_used = code
+        package_code_used = name
     return package_code_used
