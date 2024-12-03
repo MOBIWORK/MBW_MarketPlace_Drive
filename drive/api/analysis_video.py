@@ -53,8 +53,8 @@ def analytic_video_with_geometry(name_fvideo, name_gps, parent):
     #host = "http://10.0.1.85:8005"
     video_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}")
     gps_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_gps}")
-    video_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}"
-    gps_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_gps}"
+    #video_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}"
+    #gps_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_gps}"
     sdk = RoadSDK()
     response = sdk.process_video_gpx(doc_task_queue.name, video_url, gps_url)
     return {"name": doc_fvideo.name, "title": f"{doc_fvideo.title}"}
