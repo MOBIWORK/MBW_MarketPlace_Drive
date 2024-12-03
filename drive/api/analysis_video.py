@@ -35,7 +35,7 @@ def analytic_video_with_geometry(name_fvideo, name_gps, parent):
     ppuv_used = (doc_fvideo.file_size/1048576) * convert_mb_to_pupv
 
     if exist_pupv(ppuv_used) == False:
-        frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': name_fvideo, 'status': "error", 'message': "Insufficient Process Unit Per's Video(PUPV). Please upgrade the package to use"}))
+        frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': name_fvideo, 'status': "error", 'message': "Insufficient Process Unit Per's Video(PUPV). Please upgrade the package to use"}), user=frappe.session.user)
         return 
 
     doc_task_queue = frappe.new_doc('Drive Task Queue')
@@ -50,11 +50,11 @@ def analytic_video_with_geometry(name_fvideo, name_gps, parent):
     doc_task_queue.pupv = ppuv_used
     doc_task_queue.save(ignore_permissions=True)
 
-    #host = "http://10.0.1.85:8005"
-    video_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}")
-    gps_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_gps}")
-    #video_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}"
-    #gps_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_gps}"
+    host = "http://10.0.1.85:8005"
+    #video_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}")
+    #gps_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_gps}")
+    video_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}"
+    gps_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_gps}"
     sdk = RoadSDK()
     response = sdk.process_video_gpx(doc_task_queue.name, video_url, gps_url)
     return {"name": doc_fvideo.name, "title": f"{doc_fvideo.title}"}
@@ -75,7 +75,7 @@ def analytic_without_geometry(name_fvideo, velocity, parent):
 
     ppuv_used = (doc_fvideo.file_size/1048576) * convert_mb_to_pupv
     if exist_pupv(ppuv_used) == False:
-        frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': name_fvideo, 'status': "error", 'message': "Insufficient Process Unit Per's Video(PUPV). Please upgrade the package to use"}))
+        frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': name_fvideo, 'status': "error", 'message': "Insufficient Process Unit Per's Video(PUPV). Please upgrade the package to use"}), user=frappe.session.user)
         return
 
     doc_task_queue = frappe.new_doc('Drive Task Queue')
@@ -90,9 +90,9 @@ def analytic_without_geometry(name_fvideo, velocity, parent):
     doc_task_queue.pupv = ppuv_used
     doc_task_queue.save(ignore_permissions=True)
     
-    #host = "http://10.0.1.85:8005"
-    video_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}")
-    #video_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}"
+    host = "http://10.0.1.85:8005"
+    #video_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}")
+    video_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}"
     sdk = RoadSDK()
     response = sdk.process_single_video_velocity(doc_task_queue.name, video_url, velocity)
     return {"name": doc_fvideo.name, "title": doc_fvideo.title}
@@ -140,7 +140,7 @@ def send_result_detect(result):
         doc_task_queue = frappe.get_doc('Drive Task Queue', task_id)
         doc_task_queue.status = "Error"
         doc_task_queue.save(ignore_permissions=True)
-        frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': task_metadata["name_fvideo"], 'status': "error", 'message': str(e)}))
+        frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': task_metadata["name_fvideo"], 'status': "error", 'message': str(e)}), user=frappe.session.user)
 
 def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key, aws_secret_access_key, result):
     try:
@@ -150,7 +150,7 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key,
         if result["status"]["process_status"] != "SUCCESS":
             doc_task_queue.status = "Error"
             doc_task_queue.save(ignore_permissions=True)
-            frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': name_fvideo, 'status': "error", 'message': "Error AI Server"}))
+            frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': name_fvideo, 'status': "error", 'message': "Error AI Server"}), user=frappe.session.user)
             return
         metadata_result = result["process_result"]["metadata"]
         connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
@@ -236,9 +236,9 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key,
                 object_id=key_object_video_output,
                 mime_type="video/mp4"
             )
-        frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': doc_video.name, 'status': "success", 'message': new_folder.name}))
+        frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': doc_video.name, 'status': "success", 'message': new_folder.name}), user=frappe.session.user)
     except Exception as err:
-        frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': name_fvideo, 'status': "error", 'message': str(err)}))
+        frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': name_fvideo, 'status': "error", 'message': str(err)}), user=frappe.session.user)
 
 def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_access_key, aws_secret_access_key, result):
     try:
@@ -248,7 +248,7 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_access_key, 
         if result["status"]["process_status"] != "SUCCESS":
             doc_task_queue.status = "Error"
             doc_task_queue.save(ignore_permissions=True)
-            frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': name_fvideo, 'status': "error", 'message': "Error AI Server"}))
+            frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': name_fvideo, 'status': "error", 'message': "Error AI Server"}), user=frappe.session.user)
             return
         metadata_result = result["process_result"]["metadata"]
         connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
@@ -315,6 +315,6 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_access_key, 
             )
         doc_task_queue.status = "Success"
         doc_task_queue.save(ignore_permissions=True)
-        frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': name_fvideo, 'status': "success", 'message': new_folder.name}))
+        frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': name_fvideo, 'status': "success", 'message': new_folder.name}), user=frappe.session.user)
     except Exception as err:
-        frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': name_fvideo, 'status': "error", 'message': str(err)}))
+        frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': name_fvideo, 'status': "error", 'message': str(err)}), user=frappe.session.user)
