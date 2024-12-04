@@ -84,6 +84,10 @@ def list_objects(bucket_name):
 
 @frappe.whitelist()
 def list_bucket():
+    doc_setting = frappe.get_single('Drive Instance Settings')
+    aws_access_key = doc_setting.aws_access_key
+    aws_secret_access_key = doc_setting.get_password('aws_secret_key')
+    connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
     return connect_s3.list_buckets()
 
 @frappe.whitelist()

@@ -142,6 +142,18 @@ def send_result_detect(result):
         doc_task_queue.save(ignore_permissions=True)
         frappe.publish_realtime('event_analytic_video_job', message=json.dumps({'name': task_metadata["name_fvideo"], 'status': "error", 'message': str(e)}), user=frappe.session.user)
 
+@frappe.whitelist(methods=["POST"])
+def test_analysis_with_out_geometry(name_video):
+    try:
+        video_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_video}")
+        sdk = RoadSDK()
+        response = sdk.process_single_video_velocity("123dsdsf", video_url, 7)
+        return "ok"
+    except Exception as err:
+        return str(err)
+
+
+
 def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key, aws_secret_access_key, result):
     try:
         sdk = RoadSDK()
