@@ -137,7 +137,7 @@ export default {
                     timeout: 240000, // 4 minutes
                     chunkSize: 20 * 1024 * 1024, // 20MB
                     headers: {
-                        "X-CSRF-Token": window.csrf_token
+                        "X-Frappe-Csrf-Token": window.csrf_token
                     },
                     accept: function (file, done) {
                         if (file.size == 0) {
