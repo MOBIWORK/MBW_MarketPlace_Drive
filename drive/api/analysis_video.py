@@ -17,6 +17,7 @@ import os
 from drive.utils.using_quota import exist_pupv
 from pathlib import Path
 from drive.api.files import get_user_uploads_directory
+from drive.utils.const import BASE_URL_AI
 
 #API trích xuất dữ liệu geojson và ảnh đối tượng từ một video
 # Với mỗi 1MB xử lý thì tương ứng với 1PPUV  
@@ -55,7 +56,7 @@ def analytic_video_with_geometry(name_fvideo, name_gps, parent):
     gps_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_gps}")
     #video_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}"
     #gps_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_gps}"
-    sdk = RoadSDK()
+    sdk = RoadSDK(BASE_URL_AI)
     response = sdk.process_video_gpx(doc_task_queue.name, video_url, gps_url)
     return {"name": doc_fvideo.name, "title": f"{doc_fvideo.title}"}
 
@@ -93,7 +94,7 @@ def analytic_without_geometry(name_fvideo, velocity, parent):
     #host = "http://10.0.1.85:8005"
     video_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}")
     #video_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}"
-    sdk = RoadSDK()
+    sdk = RoadSDK(BASE_URL_AI)
     response = sdk.process_single_video_velocity(doc_task_queue.name, video_url, velocity)
     return {"name": doc_fvideo.name, "title": doc_fvideo.title}
 
@@ -146,7 +147,7 @@ def send_result_detect(result):
 def test_analysis_with_out_geometry(name_video):
     try:
         video_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_video}")
-        sdk = RoadSDK()
+        sdk = RoadSDK(BASE_URL_AI)
         response = sdk.process_single_video_velocity("123dsdsf", video_url, 7)
         return "ok"
     except Exception as err:
@@ -156,7 +157,7 @@ def test_analysis_with_out_geometry(name_video):
 
 def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key, aws_secret_access_key, result):
     try:
-        sdk = RoadSDK()
+        sdk = RoadSDK(BASE_URL_AI)
         doc_video = frappe.get_doc('Drive Entity', name_fvideo)
         doc_task_queue = frappe.get_doc('Drive Task Queue', result["task_id"])
         if result["status"]["process_status"] != "SUCCESS":
@@ -257,7 +258,7 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key,
 
 def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_access_key, aws_secret_access_key, result):
     try:
-        sdk = RoadSDK()
+        sdk = RoadSDK(BASE_URL_AI)
         doc_video = frappe.get_doc('Drive Entity', name_fvideo)
         doc_task_queue = frappe.get_doc('Drive Task Queue', result["task_id"])
         if result["status"]["process_status"] != "SUCCESS":

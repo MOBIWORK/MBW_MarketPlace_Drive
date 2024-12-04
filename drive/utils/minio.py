@@ -134,5 +134,5 @@ def upload_image_with_connect_byte_minio(object_key):
     access_key = frappe.db.get_single_value("Drive Instance Settings", "access_key_minio_s3")
     secret_key = frappe.db.get_single_value("Drive Instance Settings", "secret_key_minio_s3")
     connect_minio = get_connect_minio(host_url, access_key, secret_key)
-    upload_image_with_connect_byte(connect_minio, buffer, object_key)
+    upload_image_with_connect_byte(connect_minio, buffer.getvalue(), object_key)
     return "ok"
