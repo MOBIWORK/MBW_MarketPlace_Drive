@@ -30,13 +30,7 @@ from drive.api.notifications import notify_mentions
 from drive.api.storage import get_storage_allowed
 from drive.utils.s3 import delete_object_with_connect, get_object_with_connect, get_connect_s3, upload_file_with_connect
 from io import BytesIO
-from redis import Redis
-from drive.utils.const import REDIS_HOST, REDIS_PORT
 from drive.utils.using_quota import exist_storage_file
-
-#Kết nối Redis
-redis_client = Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=False)
-
 
 def if_folder_exists(folder_name, parent):
     values = {
@@ -472,7 +466,8 @@ def get_file_content(entity_name, trigger_download=0):  #
 
     #Tạo key cache dựa trên đường dẫn file
     cache_key = f"file_cache:{drive_entity.path}"
-    cached_content = redis_client.get(cache_key)
+
+    cached_content = frappe.cache.get_value(cache_key)
     if cached_content:
         byte_stream = BytesIO(cached_content)
         byte_stream.seek(0)
@@ -486,7 +481,7 @@ def get_file_content(entity_name, trigger_download=0):  #
         content = response["Body"].read()
 
         #Lưu nội dung vào Redis cache trong 1 giờ
-        redis_client.setex(cache_key, 3600, content)
+        frappe.cache.set_value(cache_key, cached_content)
 
         #Chuẩn bị stream dữ liệu
         byte_stream = BytesIO(content)
