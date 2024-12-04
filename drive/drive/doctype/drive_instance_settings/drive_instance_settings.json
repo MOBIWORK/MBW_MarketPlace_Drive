@@ -36,6 +36,7 @@
   "host_minio_s3",
   "access_key_minio_s3",
   "secret_key_minio_s3",
+  "bucket_name_minio",
   "other_tab",
   "convert_mb_to_pupv"
  ],
@@ -204,11 +205,16 @@
    "fieldname": "create_confirm_webhook_payos",
    "fieldtype": "Button",
    "label": "Create Confirm WebHook"
+  },
+  {
+   "fieldname": "bucket_name_minio",
+   "fieldtype": "Data",
+   "label": "Bucket Name"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-12-03 15:56:45.142783",
+ "modified": "2024-12-03 16:08:48.159045",
  "modified_by": "Administrator",
  "module": "Drive",
  "name": "Drive Instance Settings",

@@ -178,6 +178,9 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key,
                 object_id=save_path,
                 mime_type="image/jpeg"
             )
+            #host = "http://10.0.1.85:8005"
+            image_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name}")
+            #image_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name}"
             spatial_data = {
                 "type": "Feature",
                 "geometry": {
@@ -187,7 +190,7 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key,
                 "properties": {
                     "area_pixel": item["area_pixel"],
                     "area_real": item["area_real"],
-                    "image": frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name}"),
+                    "image": image_url,
                     "longitude": item["gps"]["longitude"],
                     "latitude": item["gps"]["latitude"]
                 }
@@ -278,10 +281,13 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_access_key, 
                 object_id=save_path,
                 mime_type="image/jpeg"
             )
+            #host = "http://10.0.1.85:8005"
+            image_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name}")
+            #image_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name}"
             item_xlsx = [
                 item["area_real"],
                 item["area_pixel"],
-                frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name}")
+                image_url
             ]
             data_xlsx.append(item_xlsx)
         byte_xlsx = make_xlsx(data_xlsx, "Data Export")
