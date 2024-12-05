@@ -257,7 +257,7 @@ export default {
                 this.errorMessage = "Field velocity is not empty"
                 return
             }
-            this.label = "Tải lên"
+            this.label = "Upload"
             this.isVideoCreating = true
             this.completedUpload = false
             this.completedCount = 0

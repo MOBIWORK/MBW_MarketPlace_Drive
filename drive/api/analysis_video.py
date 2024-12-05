@@ -54,11 +54,12 @@ def analytic_video_with_geometry(name_fvideo, name_gps, parent):
     #host = "http://10.0.1.85:8005"
     video_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}")
     gps_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_gps}")
+    hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_result_detect")
     #video_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}"
     #gps_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_gps}"
     #BASE_URL_AI
     sdk = RoadSDK(BASE_URL_AI)
-    response = sdk.process_video_gpx(doc_task_queue.name, video_url, gps_url)
+    response = sdk.process_video_gpx(doc_task_queue.name, video_url, gps_url, hook_url)
     return {"name": doc_fvideo.name, "title": f"{doc_fvideo.title}"}
 
 #API trích xuất dữ liệu phi không gian dưới dạng excel và ảnh đối tượng từ video
@@ -95,9 +96,10 @@ def analytic_without_geometry(name_fvideo, velocity, parent):
     #host = "http://10.0.1.85:8005"
     video_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}")
     #video_url = f"{host}/api/method/drive.api.files.get_file_content?entity_name={name_fvideo}"
+    hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_result_detect")
     #BASE_URL_AI
     sdk = RoadSDK(BASE_URL_AI)
-    response = sdk.process_single_video_velocity(doc_task_queue.name, video_url, velocity)
+    response = sdk.process_single_video_velocity(doc_task_queue.name, video_url, velocity, hook_url)
     return {"name": doc_fvideo.name, "title": doc_fvideo.title}
 
 #API nhận kết quả phân tích video từ server AI trả về
@@ -115,30 +117,30 @@ def send_result_detect(result):
     try:
         if task_metadata["type"] == "Video_GPS":
             #Tạo dữ liệu không gian và ảnh
-            #save_result_analysis_video_with_gps_job(task_metadata["name_fvideo"], task_metadata["parent"], aws_access_key, aws_secret_access_key, result)
-            frappe.enqueue(
-                save_result_analysis_video_with_gps_job,
-                queue="default",
-                timeout=None,
-                name_fvideo=task_metadata["name_fvideo"],
-                parent=task_metadata["parent"],
-                aws_access_key=aws_access_key,
-                aws_secret_access_key=aws_secret_access_key,
-                result=result
-            )
+            save_result_analysis_video_with_gps_job(task_metadata["name_fvideo"], task_metadata["parent"], aws_access_key, aws_secret_access_key, result)
+            # frappe.enqueue(
+            #     save_result_analysis_video_with_gps_job,
+            #     queue="default",
+            #     timeout=None,
+            #     name_fvideo=task_metadata["name_fvideo"],
+            #     parent=task_metadata["parent"],
+            #     aws_access_key=aws_access_key,
+            #     aws_secret_access_key=aws_secret_access_key,
+            #     result=result
+            # )
         else:
             #Tạo dữ liệu phi không gian excel và ảnh
-            #save_result_analysis_with_velocity_job(task_metadata["name_fvideo"], task_metadata["parent"], aws_access_key, aws_secret_access_key, result)
-            frappe.enqueue(
-                save_result_analysis_with_velocity_job,
-                queue="default",
-                timeout=None,
-                name_fvideo=task_metadata["name_fvideo"],
-                parent=task_metadata["parent"],
-                aws_access_key=aws_access_key,
-                aws_secret_access_key=aws_secret_access_key,
-                result=result
-            )
+            save_result_analysis_with_velocity_job(task_metadata["name_fvideo"], task_metadata["parent"], aws_access_key, aws_secret_access_key, result)
+            # frappe.enqueue(
+            #     save_result_analysis_with_velocity_job,
+            #     queue="default",
+            #     timeout=None,
+            #     name_fvideo=task_metadata["name_fvideo"],
+            #     parent=task_metadata["parent"],
+            #     aws_access_key=aws_access_key,
+            #     aws_secret_access_key=aws_secret_access_key,
+            #     result=result
+            # )
     except Exception as e:
         doc_task_queue = frappe.get_doc('Drive Task Queue', task_id)
         doc_task_queue.status = "Error"

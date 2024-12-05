@@ -19,6 +19,6 @@ frappe.ui.form.on("Drive Instance Settings", "create_aws_bucket", function(frm){
   frm.call('create_bucket')
 })
 
-frappe.ui.form.on("Drive Instance Settings", "create_confirm_webhook", function(frm){
+frappe.ui.form.on("Drive Instance Settings", "create_confirm_webhook_payos", function(frm){
   frm.call('create_confirm_webhook_payos')
 })
