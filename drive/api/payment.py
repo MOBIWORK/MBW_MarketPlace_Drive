@@ -37,7 +37,7 @@ def create_paypment(name_package):
     doc_payment.code_package = name_package
     doc_payment.price = doc_service_package.unit_price
     doc_payment.status = "Outstanding"
-    order_code = len(frappe.db.get_list('Drive Payment', pluck='name')) + 1
+    order_code = len(frappe.db.get_list('Drive Payment', pluck='name')) + 1000
     doc_payment.order_code = order_code
     doc_payment.insert(ignore_permissions=True)
     paymentData = PaymentData(orderCode=order_code, amount=int(doc_service_package.unit_price), description=name_package,
