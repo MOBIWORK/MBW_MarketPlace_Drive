@@ -557,7 +557,7 @@ def get_file_content_preview(entity_name, trigger_download=0):
             "ContentLength": response["ContentLength"],
             "ContentType": response["ContentType"],
         }
-        frappe.cache.set_value(cache_key, metadata_cache, timeout=3600)
+        frappe.cache.set_value(cache_key, metadata_cache)
 
     # Stream file content
     def stream_file():
