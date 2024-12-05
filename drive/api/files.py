@@ -31,6 +31,7 @@ from drive.api.storage import get_storage_allowed
 from drive.utils.s3 import delete_object_with_connect, get_object_with_connect, get_connect_s3, upload_file_with_connect
 from io import BytesIO
 from drive.utils.using_quota import exist_storage_file
+import boto3
 
 def if_folder_exists(folder_name, parent):
     values = {
@@ -499,6 +500,93 @@ def get_file_content(entity_name, trigger_download=0):  #
             environ=frappe.request.environ,
         )
 
+@frappe.whitelist(allow_guest=True)
+def get_file_content_preview(entity_name, trigger_download=0):
+    """
+    Stream file content and optionally trigger download.
+
+    :param entity_name: Document-name of the file whose content is to be streamed.
+    :param trigger_download: 1 to trigger the "Save As" dialog. Defaults to 0.
+    :type trigger_download: int
+    """
+    trigger_download = int(trigger_download)
+    drive_entity = frappe.get_value(
+        "Drive Entity",
+        entity_name,
+        [
+            "is_group",
+            "path",
+            "title",
+            "mime_type",
+            "file_size",
+            "allow_download",
+            "is_active",
+            "owner",
+        ],
+        as_dict=1,
+    )
+
+    if not drive_entity or drive_entity.is_group:
+        raise ValueError("Invalid file entity")
+    if drive_entity.is_active != 1:
+        raise FileNotFoundError("File is not active")
+
+    # Cache metadata instead of full content for large files
+    cache_key = f"file_metadata:{drive_entity.path}"
+    metadata_cache = frappe.cache.get_value(cache_key)
+
+    if not metadata_cache:
+        # Fetch file metadata from S3
+        doc_setting = frappe.get_single("Drive Instance Settings")
+        aws_access_key = doc_setting.aws_access_key
+        aws_secret_access_key = doc_setting.get_password("aws_secret_key")
+        bucket_name = doc_setting.aws_bucket
+        s3_client = boto3.client(
+            "s3",
+            aws_access_key_id=aws_access_key,
+            aws_secret_access_key=aws_secret_access_key,
+        )
+        try:
+            response = s3_client.head_object(Bucket=bucket_name, Key=drive_entity.path)
+        except Exception as e:
+            frappe.log_error(f"Error accessing S3: {e}")
+            raise FileNotFoundError("File not found on S3")
+
+        # Cache metadata
+        metadata_cache = {
+            "ContentLength": response["ContentLength"],
+            "ContentType": response["ContentType"],
+        }
+        frappe.cache.set_value(cache_key, metadata_cache, timeout=3600)
+
+    # Stream file content
+    def stream_file():
+        doc_setting = frappe.get_single("Drive Instance Settings")
+        bucket_name = doc_setting.aws_bucket
+        s3_client = boto3.client(
+            "s3",
+            aws_access_key_id=doc_setting.aws_access_key,
+            aws_secret_access_key=doc_setting.get_password("aws_secret_key"),
+        )
+        with DistributedLock(drive_entity.path, exclusive=False):
+            s3_response = s3_client.get_object(Bucket=bucket_name, Key=drive_entity.path)
+            for chunk in s3_response["Body"].iter_chunks(chunk_size=1024 * 1024):  # Stream in chunks (1MB)
+                yield chunk
+
+    # Return streamed response
+    return Response(
+        stream_file(),
+        mimetype=drive_entity.mime_type,
+        headers={
+            "Content-Disposition": (
+                f"attachment; filename={drive_entity.title}"
+                if trigger_download
+                else f"inline; filename={drive_entity.title}"
+            ),
+            "Content-Length": str(metadata_cache["ContentLength"]),
+        },
+        direct_passthrough=True,
+    )
 
 def stream_file_content(drive_entity, range_header):
     """
