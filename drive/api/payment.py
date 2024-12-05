@@ -46,12 +46,12 @@ def create_paypment(name_package):
     return paymentLinkData.checkoutUrl
 
 @frappe.whitelist(methods=["POST"], allow_guest=True)
-def callback_complete_payment(dataPost):
+def callback_complete_payment(data):
     doc_test_ospayment = frappe.new_doc("Drive Test OSPayment")
-    doc_test_ospayment.data_response = str(dataPost)
+    doc_test_ospayment.data_response = str(data)
     doc_test_ospayment.insert(ignore_permissions=True)
-    if dataPost.desc == "success":
-        orderCode = dataPost.orderCode
+    if data.desc == "success" or data.desc == "Thành công":
+        orderCode = data.orderCode
         doc_payment = frappe.get_doc("Drive Payment", {'order_code': orderCode})
         doc_payment.status = "Paid"
         doc_payment.save(ignore_permissions=True)
