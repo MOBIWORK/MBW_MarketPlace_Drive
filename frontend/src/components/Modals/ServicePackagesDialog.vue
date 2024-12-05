@@ -16,7 +16,6 @@
                                 :ref_for="true"
                                 theme="gray"
                                 size="md"
-                                :loading="loadingCreatePayment"
                                 :disabled="package_used == item.name"
                                 class="w-[150px] mb-4"
                                 @click="() => onRegisterPackage(item)"
@@ -134,7 +133,6 @@ export default {
                 auto: false,
                 onSuccess(data){
                     window.location.href = data
-                    this.loadingCreatePayment = false
                 }
             }
         }
@@ -146,7 +144,6 @@ export default {
             qrDataURL: "",
             showCheckOutDialog: false,
             contentTransaction: "",
-            loadingCreatePayment: false
         }
     },
     computed: {
@@ -178,7 +175,6 @@ export default {
             return price.toLocaleString('vi-VN')
         },
         onRegisterPackage(item){
-            this.loadingCreatePayment = true
             this.packageSelect = item
             this.$resources.createPayment.submit({'name_package': item.name})
             // this.$resources.payments.insert.submit({
