@@ -45,9 +45,10 @@ def create_paypment(name_package):
     paymentLinkData = payOS.createPaymentLink(paymentData = paymentData)
     return paymentLinkData.checkoutUrl
 
-@frappe.whitelist(methods=["POST"], allow_guest=True)
-def callback_complete_payment(data):
+@frappe.whitelist(allow_guest=True, methods=['POST'])
+def callback_complete_payment(**webhookBody):
     doc_test_ospayment = frappe.new_doc("Drive Test OSPayment")
+    data = webhookBody.get('data')
     doc_test_ospayment.data_response = str(data)
     doc_test_ospayment.insert(ignore_permissions=True)
     if data.desc == "success" or data.desc == "Thành công":
