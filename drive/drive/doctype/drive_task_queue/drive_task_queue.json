@@ -7,7 +7,8 @@
  "field_order": [
   "task_metadata",
   "status",
-  "pupv"
+  "pupv",
+  "error_message"
  ],
  "fields": [
   {
@@ -27,11 +28,16 @@
    "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Process Unit Per's Video"
+  },
+  {
+   "fieldname": "error_message",
+   "fieldtype": "Text",
+   "label": "ErrorMessage"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-03 14:58:32.893111",
+ "modified": "2024-12-06 11:09:44.247823",
  "modified_by": "Administrator",
  "module": "Drive",
  "name": "Drive Task Queue",

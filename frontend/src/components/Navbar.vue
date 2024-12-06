@@ -94,26 +94,32 @@
             </template>
             Empty Trash
           </Button>
-
-          <Dropdown
-            v-else
-            :options="newEntityOptions"
-            placement="left"
-            class="basis-5/12 lg:basis-auto"
-          >
-            <Button
-              variant="solid"
-              :disabled="canUpload || $store.state.elementExists"
-            >
-              <template #prefix>
-                <FeatherIcon name="upload" class="w-4" />
-              </template>
-              New
-              <template #suffix>
-                <FeatherIcon name="chevron-down" class="w-4" />
-              </template>
+          <template v-else>
+            <Button v-if="$route.name === 'Home'" :variant="'outline'" theme="gray" size="sm" class="mr-3" @click="showMonitorTaskingDialog=true">
+                <template #prefix>
+                  <FeatherIcon name="monitor" class="w-4" />
+                </template>
+                Tasking
             </Button>
-          </Dropdown>
+            <Dropdown
+              :options="newEntityOptions"
+              placement="left"
+              class="basis-5/12 lg:basis-auto"
+            >
+              <Button
+                variant="solid"
+                :disabled="canUpload || $store.state.elementExists"
+              >
+                <template #prefix>
+                  <FeatherIcon name="upload" class="w-4" />
+                </template>
+                New
+                <template #suffix>
+                  <FeatherIcon name="chevron-down" class="w-4" />
+                </template>
+              </Button>
+            </Dropdown>
+          </template>
         </div>
         <div
           v-if="!isLoggedIn && $store.state.user.fullName === 'Guest'"
@@ -126,7 +132,15 @@
       </div>
     </div>
   </nav>
-  <NewVideoDialog
+  <!-- <NewVideoDialog
+    v-model="showNewVideoDialog"
+    :parent="$route.params.entityName"
+  /> -->
+  <MonitorTaskingDialog
+    v-model="showMonitorTaskingDialog"
+    :arrTask="arrTassking"
+  />
+  <UploadVideoDialog 
     v-model="showNewVideoDialog"
     :parent="$route.params.entityName"
   />
@@ -157,6 +171,8 @@ import UsersBar from "./UsersBar.vue"
 import { Dropdown, FeatherIcon, Button } from "frappe-ui"
 import NewFolderDialog from "@/components/NewFolderDialog.vue"
 import NewVideoDialog from "@/components/Modals/NewVideoDialog.vue"
+import UploadVideoDialog from "@/components/Modals/UploadVideoDialog.vue"
+import MonitorTaskingDialog from "@/components/Modals/MonitorTaskingDialog.vue"
 import RenameDialog from "@/components/RenameDialog.vue"
 import Breadcrumbs from "@/components/Breadcrumbs.vue"
 import { formatDate } from "@/utils/format"
@@ -183,6 +199,8 @@ export default {
     RenameDialog,
     NewFolderDialog,
     NewVideoDialog,
+    UploadVideoDialog,
+    MonitorTaskingDialog,
     Dropdown,
     FeatherIcon,
     Button,
@@ -206,6 +224,7 @@ export default {
       previewEntity: null,
       showPreview: false,
       showNewVideoDialog: false,
+      showMonitorTaskingDialog: false,
       showNewFolderDialog: false,
       showRenameDialog: false,
       newEntityOptions: [
@@ -264,6 +283,7 @@ export default {
           ],
         },
       ],
+      arrTassking: []
     }
   },
   computed: {

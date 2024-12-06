@@ -61,11 +61,16 @@
       :entity-context="entityContext"
       :close="closeContextMenu"
     />
-    <NewVideoDialog 
+    <!-- <NewVideoDialog 
       v-if="showNewVideoDialog"
       v-model="showNewVideoDialog"
       :parent="$route.params.entityName"
       @success="() => handleListMutation()"
+    /> -->
+    <UploadVideoDialog
+      v-if="showNewVideoDialog"
+      v-model="showNewVideoDialog"
+      :parent="$route.params.entityName"
     />
     <NewFolderDialog
       v-if="showNewFolderDialog"
@@ -193,6 +198,7 @@ import DriveToolBar from "@/components/DriveToolBar.vue"
 import NoFilesSection from "@/components/NoFilesSection.vue"
 import NewFolderDialog from "@/components/NewFolderDialog.vue"
 import NewVideoDialog from "@/components/Modals/NewVideoDialog.vue"
+import UploadVideoDialog from "@/components/Modals/UploadVideoDialog.vue"
 import RenameDialog from "@/components/RenameDialog.vue"
 import ShareDialog from "@/components/ShareDialog/ShareDialog.vue"
 import GeneralDialog from "@/components/GeneralDialog.vue"
@@ -244,7 +250,8 @@ export default {
     FolderContentsError,
     EntityContextMenu,
     EmptyEntityContextMenu,
-    CTADeleteDialog
+    CTADeleteDialog,
+    UploadVideoDialog
   },
   props: {
     url: {
@@ -817,24 +824,8 @@ export default {
     if (this.isEmpty) return
     this.updateContainerRect()
     visualViewport.addEventListener("resize", this.updateContainerRect)
-    this.$realtime.on('event_analytic_video_job', (data) => {
-      let objData = JSON.parse(data)
-      if(objData["status"] == "success"){
-        me.$store.commit("updateAnalysis", {
-          uuid: objData["name"],
-          completed: true,
-          progress: 100,
-          folder_name: objData["message"]
-        })
-        me.handleListMutation()
-      }else{
-        me.$store.commit("updateAnalysis", {
-          uuid: objData["name"],
-          completed: true,
-          progress: 100,
-          error: objData["message"]
-        })
-      }
+    this.$realtime.on('event_load_entities', () => {
+      me.handleListMutation()
     })
   },
   unmounted() {
@@ -848,7 +839,7 @@ export default {
     document.removeEventListener("keydown", this.selectAllListener)
     document.removeEventListener("keydown", this.copyListener)
     document.removeEventListener("keydown", this.cutListener)
-    this.$realtime.off("event_analytic_video_job")
+    this.$realtime.off("event_load_entities")
   },
   methods: {
     dragSelectStart(event) {

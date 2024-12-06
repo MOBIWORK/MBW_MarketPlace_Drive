@@ -31,7 +31,7 @@ const store = createStore({
       secondaryMessage: "The resource you're looking for does not exist",
     },
     uploads: [],
-    analysis: [],
+    uploadFiles: [],
     connectedUsers: [],
     sortOrder: JSON.parse(localStorage.getItem("sortOrder")) || {
       label: "Name",
@@ -101,20 +101,20 @@ const store = createStore({
     uploadsCompleted: (state) => {
       return state.uploads.filter((upload) => upload.completed && !upload.error)
     },
-    analysisInProgress: (state) => {
-      return state.analysis.filter((analysis) => !analysis.completed)
+    uploadFilesInProgress: (state) => {
+      return state.uploadFiles.filter((uploadFile) => !uploadFile.completed)
     },
-    analysisCompleted: (state) => {
-      return state.analysis.filter((analysis) => analysis.completed && !analysis.error)
+    uploadFilesCompleted: (state) => {
+      return state.uploadFiles.filter((uploadFile) => uploadFile.completed && !uploadFile.error)
     },
-    analysisFailed: (state) => {
-      return state.analysis.filter((analysis) => analysis.error)
+    uploadFilesFailed: (state) => {
+      return state.uploadFiles.filter((uploadFile) => uploadFile.error)
     },
     completeAnalysisStatus: (state) => (analysisId) => {
-      let analysisFilter = state.analysis.filter((item) => item.uuid == analysisId)
-      if(analysisFilter != null && analysisFilter.length > 0){
-        return analysisFilter[0].completed
-      }
+      // let analysisFilter = state.analysis.filter((item) => item.uuid == analysisId)
+      // if(analysisFilter != null && analysisFilter.length > 0){
+      //   return analysisFilter[0].completed
+      // }
       return true
     }
   },
@@ -146,17 +146,20 @@ const store = createStore({
     setUploads(state, uploads) {
       state.uploads = uploads
     },
-    setAnalysis(state, analysis){
-      state.analysis = analysis
+    setUploadFiles(state, uploadFiles){
+      state.uploadFiles = uploadFiles
     },
-    pushToAnalysis(state, item){
-      state.analysis.push(item)
+    pushToFileUploaded(state, item){
+      console.log("Dòng 153 ", item)
+      state.uploadFiles.push(item)
     },
-    updateAnalysis(state, payload){
-      let index = state.analysis.findIndex(
-        (item) => item.uuid == payload.uuid
+    updateFileUploaded(state, payload){
+      console.log("Dòng 157 ", payload)
+      console.log("Dòng 158 ", state.uploadFiles)
+      let index = state.uploadFiles.findIndex(
+        (item) => item.title == payload.title
       )
-      Object.assign(state.analysis[index], payload)
+      Object.assign(state.uploadFiles[index], payload)
     },
     setConnectedUsers(state, connectedUsers) {
       state.connectedUsers = connectedUsers
@@ -263,8 +266,8 @@ const store = createStore({
     clearUploads({ commit }) {
       commit("setUploads", [])
     },
-    clearAnalysis({ commit}) {
-      commit("setAnalysis", [])
+    clearUploadFile({ commit}) {
+      commit("setUploadFiles", [])
     },
 
   },
