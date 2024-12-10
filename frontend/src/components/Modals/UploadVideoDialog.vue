@@ -132,6 +132,7 @@ export default {
         initDropzone(){
             var me = this
             if (!this.dropzone){
+                let chunkSize = 1024*1024 // 1MB
                 this.dropzone = new Dropzone("#dropzone-area", {
                     url: "/api/method/drive.api.files.upload_file",
                     autoProcessQueue: true,
@@ -139,7 +140,7 @@ export default {
                     chunking: true,
                     maxFilesize: 10 * 1024, // 10GB
                     timeout: 240000, // 4 minutes
-                    chunkSize: 10 * 1024 * 1024, // 10MB
+                    chunkSize: chunkSize, // 1MB
                     headers: {
                         "X-Frappe-Csrf-Token": window.csrf_token
                     },
@@ -171,14 +172,15 @@ export default {
                                 uuid: chunk.file.upload.uuid,
                                 chunk_index: chunk.index,
                                 total_file_size: chunk.file.size,
-                                chunk_size: me.dropzone.options.chunkSize,
+                                chunk_size: chunkSize,
                                 total_chunk_count: chunk.file.upload.totalChunkCount,
-                                chunk_byte_offset: chunk.index * me.dropzone.options.chunkSize,
+                                chunk_byte_offset: chunk.index * chunkSize,
                             }
                         }
                     }
                 })
                 this.dropzone.on('success', function (file, response) {
+                    console.log("Dòng 183 ")
                     let indexFile = me.arrFile.findIndex(x => x.name == file.name)
                     me.$store.commit("updateFileUploaded", {
                         title: `${response["message"]["title"]}_${indexFile}`,
@@ -188,6 +190,7 @@ export default {
                         folder_name: response["message"]["name"]
                     })
                     me.$emit("success")
+                    console.log(me.$emit)
                     me.onAnalysisFile(response["message"]["name"])
                 })
                 this.dropzone.on('error', function (file, errorMessage) {

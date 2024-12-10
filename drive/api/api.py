@@ -2,6 +2,7 @@ import frappe
 from frappe.utils import validate_email_address, split_emails
 
 
+
 @frappe.whitelist(allow_guest=True)
 def oauth_providers():
     from frappe.utils.html_utils import get_icon_html

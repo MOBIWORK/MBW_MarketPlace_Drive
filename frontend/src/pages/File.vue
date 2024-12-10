@@ -5,7 +5,7 @@
     <div
       id="renderContainer"
       :draggable="false"
-      class="flex items-center justify-center h-full w-full" :class="isGeoJson? '' : 'min-h-[85vh] max-h-[85vh] mt-3'"
+      class="flex h-full w-full" :class="isGeoJson? '' : isDashcam? 'min-h-[85vh] max-h-[85vh] mt-3' : 'items-center justify-center min-h-[85vh] max-h-[85vh] mt-3'"
     >
       <FileRender v-if="file.data" :preview-entity="file.data" />
     </div>
@@ -112,6 +112,11 @@ function fetchFile(currentEntity) {
 
 const isGeoJson = computed(()=> {
   if(file.data != null && file.data.mime_type == "application/geo+json") return true
+  return false
+})
+const isDashcam = computed(() => {
+  if(file.data != null && (file.data.mime_type === "video/mp4" || file.data.mime_type === "video/webm" 
+  || file.data.mime_type === "video/quicktime" || file.data.mime_type === "video/x-m4v" )) return true
   return false
 })
 

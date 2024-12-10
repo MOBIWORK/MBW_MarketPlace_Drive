@@ -190,7 +190,6 @@ def create_thumbnail(entity_name, path, mime_type):
                 print("Failed to create thumbnail after maximum retries.")
 
 def create_thumbnail_by_object(entity_name, object_id, mime_type):
-
     # Tạo thư mục lưu thumbnail
     user_thumbnails_directory = None
     try:

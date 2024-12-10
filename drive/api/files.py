@@ -32,6 +32,7 @@ from drive.utils.s3 import delete_object_with_connect, get_object_with_connect, 
 from io import BytesIO
 from drive.utils.using_quota import exist_storage_file
 import boto3
+import gpxpy
 
 def if_folder_exists(folder_name, parent):
     values = {
@@ -224,41 +225,39 @@ def _finalize_upload(temp_path, save_path, form_dict, title, parent, last_modifi
     save_path.rename(path)
 
     #Save file in S3
-    doc_setting = frappe.get_single('Drive Instance Settings')
-    aws_access_key = doc_setting.aws_access_key
-    aws_secret_access_key = doc_setting.get_password('aws_secret_key')
-    key_object = f"{_get_user_directory_name()}/{secure_filename(file_name)}"
-    connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
-    upload_file_with_connect(connect_s3, path, key_object)
+    # doc_setting = frappe.get_single('Drive Instance Settings')
+    # aws_access_key = doc_setting.aws_access_key
+    # aws_secret_access_key = doc_setting.get_password('aws_secret_key')
+    # key_object = f"{_get_user_directory_name()}/{secure_filename(file_name)}"
+    # connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
+    # upload_file_with_connect(connect_s3, path, key_object)
 
-    # Create DriveEntity
+    # Create DriveEntity thay path với key_object
     drive_entity = create_drive_entity(
-        name, title, parent, key_object, file_size, file_ext, mime_type, last_modified
+        name, title, parent, path, file_size, file_ext, mime_type, last_modified
     )
-
     # Generate thumbnail for images and videos
     if mime_type.startswith(("image", "video")):
-        frappe.enqueue(
-            create_thumbnail_by_object,
-            queue="default",
-            timeout=None,
-            now=True,
-            at_front=True,
-            entity_name=name,
-            object_id=key_object,
-            mime_type=mime_type
-        )
         # frappe.enqueue(
-        #     create_thumbnail,
+        #     create_thumbnail_by_object,
         #     queue="default",
         #     timeout=None,
         #     now=True,
         #     at_front=True,
         #     entity_name=name,
-        #     path=path,
-        #     mime_type=mime_type,
+        #     object_id=key_object,
+        #     mime_type=mime_type
         # )
-
+        frappe.enqueue(
+            create_thumbnail,
+            queue="default",
+            timeout=None,
+            now=True,
+            at_front=True,
+            entity_name=name,
+            path=path,
+            mime_type=mime_type,
+        )
     return drive_entity
 
 def create_drive_entity(name, title, parent, path, file_size, file_ext, mime_type, last_modified):
@@ -424,7 +423,7 @@ def preview_doc_version(version_name):
 
 
 @frappe.whitelist(allow_guest=True)
-def get_file_content(entity_name, trigger_download=0):  #
+def get_file_content_with_s3(entity_name, trigger_download=0):  #
     """
     Stream file content and optionally trigger download
 
@@ -499,6 +498,60 @@ def get_file_content(entity_name, trigger_download=0):  #
             download_name=drive_entity.title,
             environ=frappe.request.environ,
         )
+
+@frappe.whitelist(allow_guest=True)
+def get_file_content(entity_name, trigger_download=0):  #
+    """
+    Stream file content and optionally trigger download
+
+    :param entity_name: Document-name of the file whose content is to be streamed
+    :param trigger_download: 1 to trigger the "Save As" dialog. Defaults to 0
+    :type trigger_download: int
+    :raises ValueError: If the DriveEntity doc does not exist or is not a file
+    :raises PermissionError: If the current user does not have permission to read the file
+    :raises FileLockedError: If the file has been writer-locked
+    """
+
+    # if not frappe.has_permission(
+    #     doctype="Drive Entity",
+    #     doc=entity_name,
+    #     ptype="read",
+    #     user=frappe.session.user,
+    # ):
+    #     raise frappe.PermissionError("You do not have permission to view this file")
+    trigger_download = int(trigger_download)
+    drive_entity = frappe.get_value(
+        "Drive Entity",
+        entity_name,
+        [
+            "is_group",
+            "path",
+            "title",
+            "mime_type",
+            "file_size",
+            "allow_download",
+            "is_active",
+            "owner",
+        ],
+        as_dict=1,
+    )
+
+    if not drive_entity or drive_entity.is_group:
+        raise ValueError
+    if drive_entity.is_active != 1:
+        raise FileNotFoundError
+
+    with DistributedLock(drive_entity.path, exclusive=False):
+        return send_file(
+            drive_entity.path,
+            mimetype=drive_entity.mime_type,
+            as_attachment=trigger_download,
+            conditional=True,
+            max_age=3600,
+            download_name=drive_entity.title,
+            environ=frappe.request.environ,
+        )
+
 
 @frappe.whitelist(allow_guest=True)
 def get_file_content_preview(entity_name, trigger_download=0):
@@ -587,6 +640,35 @@ def get_file_content_preview(entity_name, trigger_download=0):
         },
         direct_passthrough=True,
     )
+
+@frappe.whitelist()
+def get_file_gps(entity_name):
+    arr_gps = []
+    doc_file_video = frappe.get_doc("Drive Entity", entity_name)
+    title_video = doc_file_video.title
+    title_without_extension = os.path.splitext(title_video)[0]
+    lst_gps_doc = frappe.db.get_list("Drive Entity",
+        filters={
+            'title': ['like', f'{title_without_extension}%'],
+            'file_ext': ".gpx"
+        },
+        fields=['name', 'title']
+    )
+    if len(lst_gps_doc) > 0:
+        doc_gps = frappe.get_doc("Drive Entity", lst_gps_doc[0].name)
+        with open(doc_gps.path, 'r') as gpx_file:
+            gpx = gpxpy.parse(gpx_file)
+        for track in gpx.tracks:
+            for segment in track.segments:
+                for point in segment.points:
+                    if point.longitude != 0 and point.latitude != 0:
+                        arr_gps.append({
+                            'lon': point.longitude,
+                            'lat': point.latitude,
+                            'time': point.time,
+                            'el': point.elevation
+                        })
+    return arr_gps
 
 def stream_file_content(drive_entity, range_header):
     """
@@ -1018,9 +1100,10 @@ def unshare_entities(entity_names, move=False):
 
 
 def delete_background_job(entity, ignore_permissions, aws_access_key, aws_secret_access_key):
-    connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
+    #Xóa dữ liệu trong S3
+    #connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
     doc_entity = frappe.get_doc('Drive Entity', entity)
-    delete_object_with_connect(connect_s3, doc_entity.path)
+    #delete_object_with_connect(connect_s3, doc_entity.path)
     frappe.delete_doc("Drive Entity", entity, ignore_permissions=ignore_permissions)
 
 

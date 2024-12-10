@@ -28,7 +28,7 @@
     </Button>
   </div>
   <template v-else>
-    <VideoPreview v-if="isVideo" :preview-entity="previewEntity" />
+    <DashCamPreview v-if="isVideo" :preview-entity="previewEntity" />
     <AudioPreview v-if="isAudio" :preview-entity="previewEntity" />
     <TextPreview v-if="isTxt" :preview-entity="previewEntity" />
     <SheetPreview v-if="isXlsx" :preview-entity="previewEntity" />
@@ -48,6 +48,7 @@ import VideoPreview from "./FileTypePreview/VideoPreview.vue"
 import TextPreview from "./FileTypePreview/TextPreview.vue"
 import AudioPreview from "@/components/FileTypePreview/AudioPreview.vue"
 import GeoJsonPreview from "@/components/FileTypePreview/GeoJsonPreview.vue"
+import DashCamPreview from "@/components/FileTypePreview/DashCamPreview.vue"
 
 export default {
   name: "FileRender",
@@ -61,7 +62,8 @@ export default {
     TextPreview,
     AudioPreview,
     FeatherIcon,
-    GeoJsonPreview
+    GeoJsonPreview,
+    DashCamPreview
   },
   props: {
     previewEntity: {

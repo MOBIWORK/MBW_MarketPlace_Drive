@@ -13,7 +13,8 @@ dependencies = [
     "python-magic==0.4.27",
     "geojson",
     "payos",
-    "minio"
+    "minio",
+    "gpxpy"
 ]
 
 [build-system]
