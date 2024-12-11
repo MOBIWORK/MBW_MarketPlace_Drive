@@ -26,7 +26,8 @@
     "file_ext",
     "tags",
     "document",
-    "is_analysis"
+    "is_analysis",
+    "name_gpx"
   ],
   "fields": [
     {
@@ -158,6 +159,11 @@
       "fieldtype": "Check",
       "label": "Is Analysis",
       "default": "0"
+    },
+    {
+      "fieldname": "name_gpx",
+      "fieldtype": "Data",
+      "label": "Name GPX"
     }
   ],
   "is_tree": 0,

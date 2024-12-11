@@ -22,7 +22,7 @@
                         <Badge v-if="row['status'] == 'Success'" :variant="'subtle'" :ref_for="true" theme="green" size="sm">
                             Success
                         </Badge>
-                        <Badge v-if="row['status'] == 'Error'" :variant="'subtle'" :ref_for="true" theme="red" size="sm">
+                        <Badge v-else-if="row['status'] == 'Error'" :variant="'subtle'" :ref_for="true" theme="red" size="sm">
                             Error
                         </Badge>
                         <Badge v-else :variant="'subtle'" :ref_for="true" theme="blue" size="sm">

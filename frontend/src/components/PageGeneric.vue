@@ -232,6 +232,7 @@ import NewFile from "./EspressoIcons/NewFile.vue"
 import { toast } from "../utils/toasts.js"
 import { capture } from "@/telemetry"
 import { calculateRectangle, handleDragSelect } from "@/utils/dragSelect"
+import { mapState } from "vuex"
 
 export default {
   name: "PageGeneric",
@@ -739,6 +740,7 @@ export default {
     foldersBefore() {
       return this.$store.state.foldersBefore
     },
+    ...mapState(["idFolderUpload"])
   },
   watch: {
     filters: {
@@ -766,6 +768,11 @@ export default {
         this.resetAndFetch()
       },
     },
+    idFolderUpload(newValue){
+      if(newValue){
+        this.handleListMutation()
+      }
+    }
   },
   mounted() {
     var me = this
@@ -1092,7 +1099,7 @@ export default {
         }
       })
       return grouped
-    },
+    }
   },
   resources: {
     pasteEntity() {

@@ -260,7 +260,7 @@ def _finalize_upload(temp_path, save_path, form_dict, title, parent, last_modifi
         )
     return drive_entity
 
-def create_drive_entity(name, title, parent, path, file_size, file_ext, mime_type, last_modified):
+def create_drive_entity(name, title, parent, path, file_size, file_ext, mime_type, last_modified, name_gpx = None):
     drive_entity = frappe.get_doc(
         {
             "doctype": "Drive Entity",
@@ -271,6 +271,7 @@ def create_drive_entity(name, title, parent, path, file_size, file_ext, mime_typ
             "file_size": file_size,
             "file_ext": file_ext,
             "mime_type": mime_type,
+            "name_gpx": name_gpx
         }
     )
     drive_entity.flags.file_created = True
@@ -645,17 +646,23 @@ def get_file_content_preview(entity_name, trigger_download=0):
 def get_file_gps(entity_name):
     arr_gps = []
     doc_file_video = frappe.get_doc("Drive Entity", entity_name)
-    title_video = doc_file_video.title
-    title_without_extension = os.path.splitext(title_video)[0]
-    lst_gps_doc = frappe.db.get_list("Drive Entity",
-        filters={
-            'title': ['like', f'{title_without_extension}%'],
-            'file_ext': ".gpx"
-        },
-        fields=['name', 'title']
-    )
-    if len(lst_gps_doc) > 0:
-        doc_gps = frappe.get_doc("Drive Entity", lst_gps_doc[0].name)
+    name_gpx = None
+    if doc_file_video.name_gpx is not None and doc_file_video.name_gpx != "":
+        name_gpx = doc_file_video.name_gpx
+    else:
+        title_video = doc_file_video.title
+        title_without_extension = os.path.splitext(title_video)[0]
+        lst_gps_doc = frappe.db.get_list("Drive Entity",
+            filters={
+                'title': ['like', f'{title_without_extension}%'],
+                'file_ext': ".gpx"
+            },
+            fields=['name', 'title']
+        )
+        if len(lst_gps_doc) > 0:
+            name_gpx = lst_gps_doc[0].name
+    if name_gpx is not None and name_gpx != "":
+        doc_gps = frappe.get_doc("Drive Entity", name_gpx)
         with open(doc_gps.path, 'r') as gpx_file:
             gpx = gpxpy.parse(gpx_file)
         for track in gpx.tracks:

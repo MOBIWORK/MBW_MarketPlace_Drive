@@ -1,80 +1,58 @@
 <template>
-    <div class="w-full h-full flex flex-col" :class="showDetailInfoPoint ? 'lg:flex-row' : ''">
-        <div id="mapPreviewID" class="relative w-full" :class="showDetailInfoPoint ? 'h-3/5 lg:h-full lg:w-3/4' : 'h-full'">
+    <div class="w-full h-full flex flex-col lg:flex-row">
+        <div id="mapPreviewID" class="relative w-full h-3/5 lg:h-full lg:w-8/12">
             <LoadingIndicator v-if="loading" class="w-10 h-full text-neutral-100 mx-auto z-50" />
         </div>
-        <div class="w-full h-auto bg-white lg:h-full lg:w-1/4" v-if="showDetailInfoPoint">
-            <div class="w-full h-[200px] relative">
-                <img draggable="false" class="h-full w-full" :src="detailInfoPoint.image" id-="" />
-                <div class="absolute top-2 right-2 z-50 rounded-full cursor-pointer bg-white p-1 shadow-md hover:bg-gray-200 transition" @click="onCloseDetailPoint">
-                    <FeatherIcon name="x" class="w-5 h-5 text-gray-800" />
-                </div>
-                <div class="absolute -bottom-3 left-2/4 transform -translate-x-2/4 rounded-md bg-white p-1 shadow-md w-16 h-7 flex">
-                    <div class="flex justify-between items-center w-full">
-                        <FeatherIcon name="chevron-left" class="w-5 h-5 text-gray-800 cursor-pointer" @click="onNextItem"/>
-                        <FeatherIcon name="chevron-right" class="w-5 h-5 text-gray-800 cursor-pointer" @click="onPreItem"/>
+        <div class="w-full h-auto bg-white lg:h-full lg:w-4/12">
+            <Tabs v-model="tabIndex" :tabs="tabsContent" class="w-full h-full">
+                <template #default="{ tab }">
+                    <div class="p-0 w-full h-full" v-if="tab.name == 'json'">
+                        <div class="w-full h-full relative">
+                            <Textarea :variant="'outline'" :ref_for="true" size="md" :disabled="true"
+                                :modelValue="geojsonStringfyRef" class="w-full h-full" />
+                            <div class="absolute top-0 right-3 p-2">
+                                <Button :variant="'outline'" theme="gray" size="sm" @click="onCopyData">
+                                    <FeatherIcon name="copy" class="w-4" />
+                                </Button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="w-full flex mt-5 ml-2 items-center" v-if="detailInfoPoint.longitude != null && detailInfoPoint.latitude != null">
-                <FeatherIcon name="map-pin" class="w-5 h-5 mr-2" />
-                <div class="text-base">
-                    <span>{{detailInfoPoint.longitude}}</span>
-                    <span>&nbsp;</span>
-                    <span>{{detailInfoPoint.latitude}}</span>
-                </div>
-            </div>
-            <div class="w-full flex mt-3 ml-2 items-center" v-if="detailInfoPoint.area_real != null">
-                <FeatherIcon name="hexagon" class="w-5 h-5 mr-2" />
-                <div class="text-base">
-                    <span>{{detailInfoPoint.area_real}}</span>
-                    <span>&nbsp;</span>
-                    <span>m</span><sup>2</sup>
-                </div>
-            </div>
+                    <div class="p-1 h-full" v-if="tab.name == 'table'">
+                        <ListView class="h-full" :columns="columns" :rows="dataProperties" :options="{
+                            selectable: false,
+                            showTooltip: true,
+                            resizeColumn: true,
+                            emptyState: {
+                                title: 'There are no records'
+                            },
+                            onRowClick: (row) => onActiveRow(row)
+                        }" row-key="ID">
+                            <ListHeader class="mx-0" />
+                            <ListRows id="list-rows">
+                                <ListRow class="mx-0" v-for="row in dataProperties" :key="row.ID"
+                                    v-slot="{ idx, column, item }" :row="row">
+                                    <template v-if="column.key == 'image'">
+                                        <a :href="row.image" target="_blank"
+                                            style="text-decoration: underline;color: rgb(14 165 233);">Link</a>
+                                    </template>
+                                    <template v-else>
+                                        {{ row[column.key] }}
+                                    </template>
+                                </ListRow>
+                            </ListRows>
+                        </ListView>
+                    </div>
+                </template>
+            </Tabs>
         </div>
     </div>
-
-
-    <Dialog v-model="showPropertiesDialog" :options="{
-        size: '3xl',
-        title: 'Attributes',
-    }">
-        <template #body-content>
-            <ListView class="max-h-[350px]" :columns="columns" :rows="dataProperties" :options="{
-                selectable: false,
-                showTooltip: true,
-                resizeColumn: true,
-                emptyState: {
-                    title: 'There are no records'
-                }
-            }" row-key="ID">
-                <ListHeader class="mx-5" />
-                <ListRows id="list-rows">
-                    <ListRow
-                        class="mx-5"
-                        v-for="row in dataProperties"
-                        :key="row.ID"
-                        v-slot="{ idx, column, item }"
-                        :row="row"
-                    >
-                        <template v-if="column.key == 'image'">
-                            <a :href="row.image" target="_blank" style="text-decoration: underline;color: rgb(14 165 233);">Link</a>
-                        </template>
-                        <template v-else>
-                            {{row[column.key]}}
-                        </template>
-                    </ListRow>
-                </ListRows>
-            </ListView>
-        </template>
-    </Dialog>
 </template>
 
 <script setup>
-import { LoadingIndicator, Dialog, ListView, ListRows, ListHeader, ListRow, FeatherIcon } from "frappe-ui"
-import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { LoadingIndicator, Dialog, ListView, ListRows, ListHeader, ListRow, FeatherIcon, Tabs, Textarea, Button } from "frappe-ui"
+import { ref, watch, onMounted, onBeforeUnmount, nextTick, h } from 'vue'
 import { useStore } from "vuex"
+import { toast } from "@/utils/toasts.js"
 
 const props = defineProps({
     previewEntity: {
@@ -86,7 +64,26 @@ const store = useStore()
 const loading = ref(true)
 const mapPreview = ref(true)
 const contentGeoJson = ref(null)
-const indexFeatureActivate = ref(0)
+const tabIndex = ref(0)
+const tabsContent = ref([
+    {
+        name: "json",
+        label: 'JSON',
+        icon: h(FeatherIcon, {
+            name: "code",
+            class: "h-4 w-4"
+        })
+    },
+    {
+        name: "table",
+        label: 'Table',
+        icon: h(FeatherIcon, {
+            name: "table",
+            class: "h-4 w-4"
+        })
+
+    }
+])
 
 //Biến Bảng thuộc tính
 const showPropertiesDialog = ref(false)
@@ -113,21 +110,14 @@ const columns = ref(
     ]
 )
 
+const geojsonStringfyRef = ref("")
+
 //Biến tra cứu một điểm trên bản đồ
 const popupQueryInfo = ref(null)
-const showDetailInfoPoint = ref(false)
-const detailInfoPoint = ref(null)
 
 watch(props.previewEntity, () => {
     loading.value = true
     fetchContent()
-})
-
-watch(showDetailInfoPoint, async () => {
-    if (mapPreview.value) {
-        await nextTick()
-        mapPreview.value.resize()
-    }
 })
 
 async function fetchContent() {
@@ -147,6 +137,8 @@ async function fetchContent() {
     let objRes = await res.json()
     if (res.ok) {
         contentGeoJson.value = objRes
+        geojsonStringfyRef.value = JSON.stringify(objRes, null, 4)
+        console.log(objRes)
         if (mapPreview.value.isStyleLoaded()) {
             if (contentGeoJson.value != null) onAddLayer()
         } else {
@@ -238,184 +230,118 @@ function initMap() {
         }
     });
     mapPreview.value.addControl(btn3D, "bottom-right");
-
-    let btnProperties = new ekmapplf.control.Button({
-        className: "btn-ctl-group icon_properties",
-        icon: "",
-        tooltip: "Attributes"
-    })
-    btnProperties.on("click", (btn) => {
-        showPropertiesDialog.value = true
-    })
-    mapPreview.value.addControl(btnProperties, "bottom-right")
-
-    let btnQueryPoint = new ekmapplf.control.Button({
-        className: "btn-ctl-group icon_query_point",
-        icon: "",
-        tooltip: "Look up one-point information"
-    })
-    btnQueryPoint.on('click', (btn) => {
-        initPopupQueryInfo()
-        mapPreview.value.on('mousemove', showPopupControl)
-        mapPreview.value.on('click', clickInfoPoint)
-        mapPreview.value.getCanvas().style.cursor = 'pointer'
-    })
-    mapPreview.value.addControl(btnQueryPoint, "bottom-right")
+    mapPreview.value.getCanvas().style.cursor = 'pointer'
+    mapPreview.value.on('click', 'l_object_detect', clickInfoPointPopup)
 }
 
-function initPopupQueryInfo() {
-    if (popupQueryInfo.value == null) {
-        let markerHeight = 40;
-        let markerRadius = 40;
-        let linearOffset = 25;
-        popupQueryInfo.value = new maplibregl.Popup({
-            offset: {
-                'top': [0, 20],
-                'top-left': [0, 0],
-                'top-right': [0, 0],
-                'bottom': [0, -markerHeight],
-                'bottom-left': [linearOffset, (markerHeight - markerRadius + linearOffset) * -1],
-                'bottom-right': [-linearOffset, (markerHeight - markerRadius + linearOffset) * -1],
-                'left': [markerRadius, (markerHeight - markerRadius) * -1],
-                'right': [-markerRadius, (markerHeight - markerRadius) * -1]
-            },
-            anchor: 'left',
-            closeButton: false,
-            closeOnClick: false
-        }).addTo(mapPreview.value)
-    }
-}
-
-function showPopupControl(evt) {
-    popupQueryInfo.value.setLngLat([evt.lngLat.lng, evt.lngLat.lat]).setHTML('<span class="text-sm">Click on the location to look up information</span>')
-}
-
-function clickInfoPoint(evt) {
-    mapPreview.value.off('mousemove', showPopupControl)
-    mapPreview.value.off('click', clickInfoPoint)
-    mapPreview.value.getCanvas().style.cursor = ''
+function clickInfoPointPopup(evt) {
     if (popupQueryInfo.value != null) {
         popupQueryInfo.value.remove()
-        popupQueryInfo.value = null
     }
-    let features = mapPreview.value.queryRenderedFeatures(evt.point, { layers: ['l_object_detect'] })
-    if (features.length > 0) {
-        for(let i = 0; i < dataProperties.value.length; i++){
-            let item = dataProperties.value[i]
-            if(item["longitude"] == features[0].properties["longitude"] && item["latitude"] == features[0].properties["latitude"]){
-                indexFeatureActivate.value = i
-                break
-            }
+    // let features = mapPreview.value.queryRenderedFeatures(evt.point, { layers: ['l_object_detect'] })
+    // if (features.length > 0) {
+    //     const coordinates = evt.features[0].geometry.coordinates.slice()
+    //     const properties = evt.features[0].properties
+    //     const description = `
+    //         <div class="w-52 h-36">
+    //             <img draggable="false" class="h-full w-full" src=${properties.image} id-="" />
+    //         </div>
+    //     `
+    //     while (Math.abs(evt.lngLat.lng - coordinates[0]) > 180) {
+    //         coordinates[0] += evt.lngLat.lng > coordinates[0] ? 360 : -360;
+    //     }
+    //     new maplibregl.Popup({closeButton: false})
+    //         .setLngLat(coordinates)
+    //         .setHTML(description)
+    //         .addTo(mapPreview.value);
+    // }
+}
+
+function onActiveRow(row){
+    let feature = {
+        type: "Feature",
+        geometry: {
+            type: "Point",
+            coordinates: [row.longitude, row.latitude]
         }
-        const sizeAnimateCircle = 100
-        const pulsingDot= {
-            width: sizeAnimateCircle,
-            height: sizeAnimateCircle,
-            data: new Uint8Array(sizeAnimateCircle*sizeAnimateCircle*4),
-            onAdd(){
-                const canvas = document.createElement('canvas')
-                canvas.width = this.width
-                canvas.height = this.height
-                this.context = canvas.getContext('2d')
-            },
-            render() {
-                const duration = 1000
-                const t = (performance.now() % duration) / duration
-                const radius = (sizeAnimateCircle / 2) * 0.3
-                const outerRadius = (sizeAnimateCircle / 2) * 0.7 * t + radius
-                const context = this.context
-                // draw outer circle
-                context.clearRect(0, 0, this.width, this.height)
-                context.beginPath()
-                context.arc(
-                    this.width / 2,
-                    this.height / 2,
-                    outerRadius,
-                    0,
-                    Math.PI * 2
-                )
-                context.fillStyle = `rgba(153, 196, 219,${1 - t})`
-                context.fill()
-                // draw inner circle
-                context.beginPath()
-                context.arc(
-                    this.width / 2,
-                    this.height / 2,
-                    radius,
-                    0,
-                    Math.PI * 2
-                )
-                context.fillStyle = 'rgba(0, 124, 191, 1)'
-                context.strokeStyle = 'white'
-                context.lineWidth = 2 + 4 * (1 - t)
-                context.fill()
-                context.stroke()
-                this.data = context.getImageData(
-                    0,
-                    0,
-                    this.width,
-                    this.height
-                ).data
-                // continuously repaint the map, resulting in the smooth animation of the dot
-                mapPreview.value.triggerRepaint()
-                // return `true` to let the map know that the image was updated
-                return true
-            }
+    }
+    onAddLayerActivateRow(feature)
+    mapPreview.value.flyTo({
+        center: [row.longitude, row.latitude]
+    })
+}
+
+function onAddLayerActivateRow(feature) {
+    const sizeAnimateCircle = 100
+    const pulsingDot = {
+        width: sizeAnimateCircle,
+        height: sizeAnimateCircle,
+        data: new Uint8Array(sizeAnimateCircle * sizeAnimateCircle * 4),
+        onAdd() {
+            const canvas = document.createElement('canvas')
+            canvas.width = this.width
+            canvas.height = this.height
+            this.context = canvas.getContext('2d')
+        },
+        render() {
+            const duration = 1000
+            const t = (performance.now() % duration) / duration
+            const radius = (sizeAnimateCircle / 2) * 0.3
+            const outerRadius = (sizeAnimateCircle / 2) * 0.7 * t + radius
+            const context = this.context
+            // draw outer circle
+            context.clearRect(0, 0, this.width, this.height)
+            context.beginPath()
+            context.arc(
+                this.width / 2,
+                this.height / 2,
+                outerRadius,
+                0,
+                Math.PI * 2
+            )
+            context.fillStyle = `rgba(153, 196, 219,${1 - t})`
+            context.fill()
+            // draw inner circle
+            context.beginPath()
+            context.arc(
+                this.width / 2,
+                this.height / 2,
+                radius,
+                0,
+                Math.PI * 2
+            )
+            context.fillStyle = 'rgba(0, 124, 191, 1)'
+            context.strokeStyle = 'white'
+            context.lineWidth = 2 + 4 * (1 - t)
+            context.fill()
+            context.stroke()
+            this.data = context.getImageData(
+                0,
+                0,
+                this.width,
+                this.height
+            ).data
+            // continuously repaint the map, resulting in the smooth animation of the dot
+            mapPreview.value.triggerRepaint()
+            // return `true` to let the map know that the image was updated
+            return true
         }
-        if(mapPreview.value.getSource("s_object_detect_activate")){
-            mapPreview.value.getSource("s_object_detect_activate").setData(features[0])
-        }else{
-            if(!mapPreview.value.getImage("pulsing-dot")) mapPreview.value.addImage('pulsing-dot', pulsingDot, {pixelRatio: 2})
-            mapPreview.value.addSource("s_object_detect_activate", {
-                'type': "geojson",
-                'data': features[0]
-            })
-            mapPreview.value.addLayer({
-                'id': "l_object_detect_activate",
-                'type': "symbol",
-                'source': "s_object_detect_activate",
-                'layout': {
-                    'icon-image': "pulsing-dot"
-                }
-            })
-        }
-        detailInfoPoint.value = features[0].properties
-        showDetailInfoPoint.value = true
+    }
+    if (mapPreview.value.getSource("s_object_detect_activate")) {
+        mapPreview.value.getSource("s_object_detect_activate").setData(feature)
     } else {
-        detailInfoPoint.value = null
-        showDetailInfoPoint.value = false
-    }
-}
-
-function onNextItem(){
-    if(indexFeatureActivate.value + 1 < dataProperties.value.length){
-        indexFeatureActivate.value += 1
-        onShowDetailAndLayerItemNextAndPre()
-    }
-}
-
-function onPreItem(){
-    if(indexFeatureActivate.value -1 >= 0){
-        indexFeatureActivate.value -= 1
-        onShowDetailAndLayerItemNextAndPre()
-    }
-}
-
-function onShowDetailAndLayerItemNextAndPre(){
-    let item = dataProperties.value[indexFeatureActivate.value]
-    if(item != null){
-        let featureData = {
-            'type': "Feature",
-            'geometry': {
-                'type': "Point",
-                'coordinates': [item["longitude"], item["latitude"]]
-            },
-            'properties': item
-        }
-        mapPreview.value.getSource("s_object_detect_activate").setData(featureData)
-        detailInfoPoint.value = item
-        mapPreview.value.flyTo({
-            'center': [item["longitude"], item["latitude"]]
+        if (!mapPreview.value.getImage("pulsing-dot")) mapPreview.value.addImage('pulsing-dot', pulsingDot, { pixelRatio: 2 })
+        mapPreview.value.addSource("s_object_detect_activate", {
+            'type': "geojson",
+            'data': feature
+        })
+        mapPreview.value.addLayer({
+            'id': "l_object_detect_activate",
+            'type': "symbol",
+            'source': "s_object_detect_activate",
+            'layout': {
+                'icon-image': "pulsing-dot"
+            }
         })
     }
 }
@@ -459,14 +385,23 @@ function onAddLayer() {
     dataProperties.value = arrProperties
 }
 
-function onCloseDetailPoint() {
-    detailInfoPoint.value = null
-    showDetailInfoPoint.value = false
-    if(mapPreview.value.getSource("s_object_detect_activate")){
-        mapPreview.value.removeLayer("l_object_detect_activate")
-        mapPreview.value.removeSource("s_object_detect_activate")
-    }
-    indexFeatureActivate.value = 0
+function onCopyData() {
+    const textarea = document.createElement('textarea')
+    textarea.value = geojsonStringfyRef.value
+    document.body.appendChild(textarea)
+
+    // Chọn nội dung và sao chép
+    textarea.select()
+    textarea.setSelectionRange(0, geojsonStringfyRef.value.length) // Đảm bảo chọn hết nội dung
+    document.execCommand('copy')
+
+    // Loại bỏ textarea khỏi DOM
+    document.body.removeChild(textarea)
+    toast({
+        title: "Copy successfully",
+        position: "bottom-right",
+        timeout: 2,
+    })
 }
 
 onMounted(() => {
@@ -475,23 +410,9 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-    mapPreview.value.off('mousemove', showPopupControl)
+    mapPreview.value.off('click', 'l_object_detect', clickInfoPointPopup)
     loading.value = true
     contentGeoJson.value = true
     showPropertiesDialog.value = false
 })
 </script>
-
-<style>
-.icon_properties {
-    background-position: center;
-    background-repeat: no-repeat;
-    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJmZWF0aGVyIGZlYXRoZXItdGFibGUiPjxwYXRoIGQ9Ik05IDNINWEyIDIgMCAwIDAtMiAydjRtNi02aDEwYTIgMiAwIDAgMSAyIDJ2NE05IDN2MThtMCAwaDEwYTIgMiAwIDAgMCAyLTJWOU05IDIxSDVhMiAyIDAgMCAxLTItMlY5bTAgMGgxOCI+PC9wYXRoPjwvc3ZnPg==")
-}
-
-.icon_query_point {
-    background-position: center;
-    background-repeat: no-repeat;
-    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJmZWF0aGVyIGZlYXRoZXItaW5mbyI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiPjwvY2lyY2xlPjxsaW5lIHgxPSIxMiIgeTE9IjE2IiB4Mj0iMTIiIHkyPSIxMiI+PC9saW5lPjxsaW5lIHgxPSIxMiIgeTE9IjgiIHgyPSIxMi4wMSIgeTI9IjgiPjwvbGluZT48L3N2Zz4=");
-}
-</style>

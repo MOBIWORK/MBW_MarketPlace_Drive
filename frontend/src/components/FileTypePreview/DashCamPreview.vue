@@ -1,11 +1,12 @@
 <template>
-    <div class="flex">
-        <video :key="src" ref="mediaRef" class="w-2/3 max-h-full" autoplay muted preload="none"
+    <LoadingIndicator v-show="loading" class="w-10 h-full text-neutral-100 mx-auto" />
+    <div class="flex" v-show="!loading">
+        <video :key="src" ref="mediaRef" class="max-h-full" :class="isDashcam? 'w-2/3' : 'w-full'" autoplay muted preload="none"
             controlslist="nodownload noremoteplayback noplaybackrate disablepictureinpicture" controls draggable="false"
             @loadedmetadata="handleMediaReady" @timeupdate="onTimeUpdate">
             <source :src="src" :type="type" />
         </video>
-        <div class="w-1/3 max-h-full" id="map"></div>
+        <div class="w-1/3 max-h-full" id="map" v-show="isDashcam"></div>
     </div>
 </template>
 
@@ -39,6 +40,8 @@ const mediaRef = ref("")
 const mapRef = ref(null)
 const geojsonRef = ref(null)
 const dataGPSRef = ref(null)
+const alongPath = ref([])
+const isDashcam = ref(true)
 
 const handleMediaReady = (event) => {
     mediaRef.value = event.target
@@ -51,7 +54,7 @@ watch(
     () => props.previewEntity,
     (newValue) => {
         loading.value = true
-        src.value = `/api/method/drive.api.files.get_file_content?entity_name=${newValue.name}`
+        onCallDataGPS()
         type.value = newValue.mime_type
     }
 )
@@ -59,43 +62,50 @@ watch(
 onMounted(() => {
     initMap()
     if (props.previewEntity.name != null) {
-        let resourceMetaData = createResource({
-            url: "drive.api.files.get_file_gps",
-            method: "GET",
-            params: {
-                entity_name: props.previewEntity.name
-            },
-            onSuccess(data) {
-                console.log(data)
-                dataGPSRef.value = data
-                let geojson = {
-                    'type': "Feature",
-                    'geometry': {
-                        'type': "LineString",
-                        'coordinates': []
-                    }
-                }
-                for (let i = 0; i < data.length; i++) {
-                    geojson.geometry.coordinates.push([data[i].lon, data[i].lat])
-                }
-                console.log(geojson)
-                console.log("Dòng 80: ", mapRef.value.isStyleLoaded())
-                if (mapRef.value.isStyleLoaded()) {
-                    onAddLayerLine(geojson)
-                    onAddLayerCar()
-                } else {
-                    mapRef.value.on("load", () => {
-                        onAddLayerLine(geojson)
-                        onAddLayerCar()
-                    })
-                }
-                src.value = `/api/method/drive.api.files.get_file_content?entity_name=${props.previewEntity.name}`
-                geojsonRef.value = geojson
-            }
-        })
-        resourceMetaData.fetch()
+        onCallDataGPS()
     }
 })
+
+function onCallDataGPS() {
+    let resourceMetaData = createResource({
+        url: "drive.api.files.get_file_gps",
+        method: "GET",
+        params: {
+            entity_name: props.previewEntity.name
+        },
+        onSuccess(data) {
+            if(data.length == 0) isDashcam.value = false
+            dataGPSRef.value = data
+            let geojson = {
+                'type': "Feature",
+                'geometry': {
+                    'type': "LineString",
+                    'coordinates': []
+                }
+            }
+            for (let i = 0; i < data.length; i++) {
+                geojson.geometry.coordinates.push([data[i].lon, data[i].lat])
+            }
+            if (mapRef.value.isStyleLoaded()) {
+                onAddLayerLine(geojson)
+                onAddLayerCar()
+                onAddLayerHistorialPath()
+            } else {
+                mapRef.value.on("load", () => {
+                    onAddLayerLine(geojson)
+                    onAddLayerCar()
+                    onAddLayerHistorialPath()
+                })
+            }
+            geojsonRef.value = geojson
+            setTimeout(()=>{
+                src.value = `/api/method/drive.api.files.get_file_content?entity_name=${props.previewEntity.name}`
+            }, 300)
+            
+        }
+    })
+    resourceMetaData.fetch()
+}
 
 function onTimeUpdate(evt) {
     const fps = 30
@@ -107,22 +117,32 @@ function onTimeUpdate(evt) {
             'geometry': {
                 'type': "Point",
                 'coordinates': [dataGPSRef.value[currentFrame].lon, dataGPSRef.value[currentFrame].lat]
-            }
+            },
+            'properties': {}
         }
-        console.log(feature)
         let coordinateActive = feature.geometry.coordinates
-        if(dataGPSRef.value[currentFrame-1] != null){
-            let coordinate_last = [dataGPSRef.value[currentFrame-1].lon, dataGPSRef.value[currentFrame-1].lat]
+        alongPath.value = alongPath.value.concat([coordinateActive])
+        if (dataGPSRef.value[currentFrame - 1] != null) {
+            let coordinate_last = [dataGPSRef.value[currentFrame - 1].lon, dataGPSRef.value[currentFrame - 1].lat]
             var bearing = turf.bearing(
                 turf.point(coordinate_last),
                 turf.point(coordinateActive)
             )
-            mapRef.value.panTo(coordinateActive, { animate: true, essential: true, curve: 1.42, duration: 100, pitch: 60, bearing: bearing })
-            if(mapRef.value.getSource('locationMarker')){
+            feature.properties["bearing"] = bearing
+            mapRef.value.panTo(coordinateActive, { animate: true, essential: true, curve: 1.42, duration: 100, pitch: 60, bearing: bearing, zoom: 17 })
+            if (mapRef.value.getSource('locationMarker')) {
                 mapRef.value.getSource('locationMarker').setData(feature)
             }
+            if (alongPath.value.length > 1) {
+                if (mapRef.value.getSource("LocationHistory")) {
+                    mapRef.value.getSource("LocationHistory").setData({
+                        type: "FeatureCollection",
+                        features: [turf.lineString(alongPath.value)]
+                    })
+                }
+            }
         }
-        
+
     }
 
 }
@@ -166,6 +186,8 @@ function initMap() {
         await new ekmapplf.VectorBaseMap(response.layer, apiKey).addTo(mapRef.value)
         mapRef.value.once('load', () => {
             onAddLayerLine(geojsonRef.value)
+            onAddLayerCar()
+            onAddLayerHistorialPath()
         })
     })
     mapRef.value.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "bottom-right")
@@ -257,7 +279,7 @@ function onAddLayerCar() {
         type: "FeatureCollection",
         features: []
     }
-    if(!mapRef.value.getSource("locationMarker")){
+    if (!mapRef.value.getSource("locationMarker")) {
         mapRef.value.addSource("locationMarker", {
             type: "geojson",
             data: locationMarker,
@@ -267,93 +289,48 @@ function onAddLayerCar() {
             source: "locationMarker",
             type: "symbol",
             layout: {
-              "icon-size": 0.7,
-              "icon-offset": [0, -10],
-              "icon-allow-overlap": true,
-              "icon-image": "marker_navigation",
-              "icon-rotate": ["get", "bearing"],
-              "icon-rotation-alignment": "map",
-              "icon-overlap": "always",
-              "icon-ignore-placement": true,
+                "icon-size": 0.7,
+                "icon-offset": [0, -10],
+                "icon-allow-overlap": true,
+                "icon-image": "marker_navigation",
+                "icon-rotate": ["get", "bearing"],
+                "icon-rotation-alignment": "map",
+                "icon-overlap": "always",
+                "icon-ignore-placement": true,
             },
         })
-    }else{
+    } else {
         mapRef.value.getSource("locationMarker").setData(locationMarker)
     }
 }
 
-function onAddLayerActive(feature) {
-    const sizeAnimateCircle = 100
-    const pulsingDot = {
-        width: sizeAnimateCircle,
-        height: sizeAnimateCircle,
-        data: new Uint8Array(sizeAnimateCircle * sizeAnimateCircle * 4),
-        onAdd() {
-            const canvas = document.createElement('canvas')
-            canvas.width = this.width
-            canvas.height = this.height
-            this.context = canvas.getContext('2d')
-        },
-        render() {
-            const duration = 1000
-            const t = (performance.now() % duration) / duration
-            const radius = (sizeAnimateCircle / 2) * 0.3
-            const outerRadius = (sizeAnimateCircle / 2) * 0.7 * t + radius
-            const context = this.context
-            // draw outer circle
-            context.clearRect(0, 0, this.width, this.height)
-            context.beginPath()
-            context.arc(
-                this.width / 2,
-                this.height / 2,
-                outerRadius,
-                0,
-                Math.PI * 2
-            )
-            context.fillStyle = `rgba(153, 196, 219,${1 - t})`
-            context.fill()
-            // draw inner circle
-            context.beginPath()
-            context.arc(
-                this.width / 2,
-                this.height / 2,
-                radius,
-                0,
-                Math.PI * 2
-            )
-            context.fillStyle = 'rgba(0, 124, 191, 1)'
-            context.strokeStyle = 'white'
-            context.lineWidth = 2 + 4 * (1 - t)
-            context.fill()
-            context.stroke()
-            this.data = context.getImageData(
-                0,
-                0,
-                this.width,
-                this.height
-            ).data
-            // continuously repaint the map, resulting in the smooth animation of the dot
-            mapRef.value.triggerRepaint()
-            // return `true` to let the map know that the image was updated
-            return true
-        }
+function onAddLayerHistorialPath() {
+    let fHistorialPath = {
+        type: "FeatureCollection",
+        features: []
     }
-    if (mapRef.value.getSource("s_object_detect_activate")) {
-        mapRef.value.getSource("s_object_detect_activate").setData(feature)
-    } else {
-        if (!mapRef.value.getImage("pulsing-dot")) mapRef.value.addImage('pulsing-dot', pulsingDot, { pixelRatio: 2 })
-        mapRef.value.addSource("s_object_detect_activate", {
-            'type': "geojson",
-            'data': feature
+    if (!mapRef.value.getSource("LocationHistory")) {
+        mapRef.value.addSource("LocationHistory", {
+            type: "geojson",
+            data: fHistorialPath
         })
         mapRef.value.addLayer({
-            'id': "l_object_detect_activate",
-            'type': "symbol",
-            'source': "s_object_detect_activate",
-            'layout': {
-                'icon-image': "pulsing-dot"
-            }
+            id: "LocationHistory",
+            type: "line",
+            source: "LocationHistory",
+            layout: {
+                "line-cap": "round",
+                "line-join": "round",
+            },
+            paint: {
+                "line-color": "#29b55c",
+                "line-width": 6.5,
+                "line-opacity": 0.85,
+            },
+            filter: ["==", "$type", "LineString"]
         })
+    } else {
+        mapRef.value.getSource("LocationHistory").setData(fHistorialPath)
     }
 }
 

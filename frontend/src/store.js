@@ -57,6 +57,7 @@ const store = createStore({
     accountNameBanking: null,
     accountNumberBanking: null,
     packageUsed: null,
+    idFolderUpload: null,
     currentFolder: JSON.parse(localStorage.getItem("currentFolder")) || [],
     currentViewEntites: get("currentViewEntites") || [],
     pasteData: { entities: [], action: null },
@@ -150,12 +151,9 @@ const store = createStore({
       state.uploadFiles = uploadFiles
     },
     pushToFileUploaded(state, item){
-      console.log("Dòng 153 ", item)
       state.uploadFiles.push(item)
     },
     updateFileUploaded(state, payload){
-      console.log("Dòng 157 ", payload)
-      console.log("Dòng 158 ", state.uploadFiles)
       let index = state.uploadFiles.findIndex(
         (item) => item.title == payload.title
       )
@@ -228,6 +226,9 @@ const store = createStore({
     setIsSidebarExpanded(state, payload) {
       localStorage.setItem("IsSidebarExpanded", JSON.stringify(payload))
       state.IsSidebarExpanded = payload
+    },
+    updateIdFolderUpload(state, payload){
+      state.idFolderUpload = payload
     }
   },
   actions: {

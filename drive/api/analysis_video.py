@@ -27,69 +27,79 @@ from drive.utils.const import BASE_URL_AI
 @frappe.whitelist(methods=["POST"])
 def analytic_with_geometry(name_file, parent):
     doc_task_queue = frappe.new_doc('Drive Task Queue')
+    doc_task_queue.name = uuid.uuid4().hex
     try:
-        doc_file = frappe.get_doc('Drive Entity', name_file)
-        title_without_extension = os.path.splitext(doc_file.title)[0]
-        files_analysis = frappe.db.get_list("Drive Entity",
-            filters={
-                'title': ['like', f'{title_without_extension}%'],
-                'is_analysis': 0
-            },
-            fields=['name', 'file_kind', 'file_size']
-        )
-        if len(files_analysis) == 2:
-            url_file_video = ""
-            url_file_gps = ""
-            for file_analysis in files_analysis:
-                doc_analysis = frappe.get_doc("Drive Entity", file_analysis.name)
-                doc_analysis.is_analysis = True
-                doc_analysis.save(ignore_permissions=True)
-                if file_analysis.file_kind == "Video":
-                    obj_task_metadata = {
-                        'name_file': file_analysis.name,
-                        'parent': parent,
-                        'type': "video_with_gps"
-                    }
-                    convert_mb_to_pupv = frappe.db.get_single_value('Drive Instance Settings', 'convert_mb_to_pupv')
-                    if convert_mb_to_pupv is None or convert_mb_to_pupv == 0:
-                        convert_mb_to_pupv = 1
-                    ppuv_used = (file_analysis.file_size/1048576) * convert_mb_to_pupv
-                    doc_task_queue.pupv = ppuv_used
-                    doc_task_queue.task_metadata = json.dumps(obj_task_metadata)
-                    if exist_pupv(ppuv_used) == False:
-                        doc_task_queue.status = "Error"
-                        doc_task_queue.error_message = "Insufficient Process Unit Per's Video(PUPV). Please upgrade the package to use"
-                        doc_task_queue.save(ignore_permissions=True)
-                        frappe.publish_realtime('event_analytic_video_job', message=doc_task_queue.name, user=frappe.session.user)
-                        return
-                    #Triển khai code
-                    #url_file_video = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={file_analysis.name}")
-                    #Trên local
-                    url_file_video = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={file_analysis.name}"
-                else:
-                    extension_file = os.path.splitext(file_analysis.title)[1]
-                    if extension_file == ".gpx":
-                        #Triển khai code
-                        #url_file_gps = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={file_analysis.name}")
-                        
-                        #Trên local
-                        url_file_gps = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={file_analysis.name}"
-            if url_file_video != "" and url_file_gps != "":
-                #Triển khai code
-                #hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_result_detect")
-
-                #Trên local
-                hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_result_detect"
-                sdk = RoadSDK(BASE_URL_AI)
-                response = sdk.process_video_gpx(doc_task_queue.name, url_file_video, url_file_gps, hook_url)
-                doc_task_queue.status = "Processing"
+        result_process = process_input_file_same_name(name_file)
+        if result_process.get("name_video") is not None and result_process.get("name_gpx") is not None:
+            doc_video = frappe.get_doc("Drive Entity", result_process.get("name_video"))
+            doc_video.is_analysis = True
+            doc_video.save(ignore_permissions=True)
+            doc_gpx = frappe.get_doc("Drive Entity", result_process.get("name_gpx"))
+            doc_gpx.is_analysis = True
+            doc_gpx.save(ignore_permissions=True)
+            obj_task_metadata = {
+                'name_file': doc_video.name,
+                'parent': parent,
+                'type': "video_with_gps",
+                'title_file': doc_video.title,
+                'name_gpx': doc_gpx.name
+            }
+            convert_mb_to_pupv = frappe.db.get_single_value('Drive Instance Settings', 'convert_mb_to_pupv')
+            if convert_mb_to_pupv is None or convert_mb_to_pupv == 0:
+                convert_mb_to_pupv = 1
+            ppuv_used = (doc_video.file_size/1048576) * convert_mb_to_pupv
+            doc_task_queue.pupv = ppuv_used
+            doc_task_queue.task_metadata = json.dumps(obj_task_metadata)
+            if exist_pupv(ppuv_used) == False:
+                doc_task_queue.status = "Error"
+                doc_task_queue.error_message = "Insufficient Process Unit Per's Video(PUPV). Please upgrade the package to use"
                 doc_task_queue.save(ignore_permissions=True)
+                frappe.publish_realtime('event_analytic_video_job', message=doc_task_queue.name, user=frappe.session.user)
+                return
+            #Triển khai code
+            #url_file_video = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={doc_video.name}")
+            #Trên local
+            url_file_video = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={doc_video.name}"
+            #Triển khai code
+            #url_file_gps = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={doc_gpx.name}")
+            #Trên local
+            url_file_gps = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={doc_gpx.name}"
+            #Triển khai code
+            #hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_result_detect")
+            #Trên local
+            hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_result_detect"
+            sdk = RoadSDK(BASE_URL_AI)
+            response = sdk.process_video_gpx(doc_task_queue.name, url_file_video, url_file_gps, hook_url)
+            doc_task_queue.status = "Processing"
+            doc_task_queue.save(ignore_permissions=True)
     except Exception as e:
         doc_task_queue.status = "Error"
         doc_task_queue.pupv = 0
         doc_task_queue.error_message = str(e)
         doc_task_queue.save(ignore_permissions=True)
         frappe.publish_realtime('event_analytic_video_job', message=doc_task_queue.name, user=frappe.session.user)
+
+def process_input_file_same_name(name_file):
+    doc_file = frappe.get_doc('Drive Entity', name_file)
+    name_video = None
+    name_gpx = None
+    title_without_extension = os.path.splitext(doc_file.title)[0]
+    files_analysis = frappe.db.get_list("Drive Entity",
+        filters={
+            'title': ['like', f'{title_without_extension}%'],
+            'is_analysis': 0
+        },
+        fields=['name', 'file_kind', 'file_size', 'title']
+    )
+    if len(files_analysis) == 2:
+        for file_analysis in files_analysis:
+            if file_analysis.file_kind == "Video":
+                name_video = file_analysis.name
+            else:
+                extension_file = os.path.splitext(file_analysis.title)[1]
+                if extension_file == ".gpx":
+                    name_gpx = file_analysis.name
+    return {'name_video': name_video, 'name_gpx': name_gpx}
 
 #API trích xuất dữ liệu phi không gian dưới dạng excel và ảnh đối tượng từ video
 # Với mỗi 1MB xử lý thì tương ứng với 1PPUV
@@ -99,13 +109,15 @@ def analytic_with_geometry(name_file, parent):
 @frappe.whitelist(methods=["POST"])
 def analytic_without_geometry(name_file, parent):
     doc_task_queue = frappe.new_doc('Drive Task Queue')
+    doc_task_queue.name = uuid.uuid4().hex
+    doc_file = frappe.get_doc('Drive Entity', name_file)
     obj_task_metadata = {
         'name_file': name_file,
         'parent': parent,
-        'type': "video_without_gps"
+        'type': "video_without_gps",
+        'title_file': doc_file.title
     }
     try:
-        doc_file = frappe.get_doc('Drive Entity', name_file)
         doc_file.is_analysis = True
         doc_file.save(ignore_permissions=True)
 
@@ -158,30 +170,31 @@ def send_result_detect(result):
     try:
         if task_metadata["type"] == "video_with_gps":
             #Tạo dữ liệu không gian và ảnh
-            save_result_analysis_video_with_gps_job(task_metadata["name_file"], task_metadata["parent"], aws_access_key, aws_secret_access_key, result)
-            # frappe.enqueue(
-            #     save_result_analysis_video_with_gps_job,
-            #     queue="default",
-            #     timeout=None,
-            #     name_fvideo=task_metadata["name_fvideo"],
-            #     parent=task_metadata["parent"],
-            #     aws_access_key=aws_access_key,
-            #     aws_secret_access_key=aws_secret_access_key,
-            #     result=result
-            # )
+            #save_result_analysis_video_with_gps_job(task_metadata["name_file"], task_metadata["parent"], aws_access_key, aws_secret_access_key, result)
+            frappe.enqueue(
+                save_result_analysis_video_with_gps_job,
+                queue="default",
+                timeout=None,
+                name_fvideo=task_metadata["name_file"],
+                parent=task_metadata["parent"],
+                aws_access_key=aws_access_key,
+                aws_secret_access_key=aws_secret_access_key,
+                result=result,
+                name_gpx=task_metadata["name_gpx"]
+            )
         else:
             #Tạo dữ liệu phi không gian excel và ảnh
-            save_result_analysis_with_velocity_job(task_metadata["name_file"], task_metadata["parent"], aws_access_key, aws_secret_access_key, result)
-            # frappe.enqueue(
-            #     save_result_analysis_with_velocity_job,
-            #     queue="default",
-            #     timeout=None,
-            #     name_fvideo=task_metadata["name_fvideo"],
-            #     parent=task_metadata["parent"],
-            #     aws_access_key=aws_access_key,
-            #     aws_secret_access_key=aws_secret_access_key,
-            #     result=result
-            # )
+            #save_result_analysis_with_velocity_job(task_metadata["name_file"], task_metadata["parent"], aws_access_key, aws_secret_access_key, result)
+            frappe.enqueue(
+                save_result_analysis_with_velocity_job,
+                queue="default",
+                timeout=None,
+                name_fvideo=task_metadata["name_file"],
+                parent=task_metadata["parent"],
+                aws_access_key=aws_access_key,
+                aws_secret_access_key=aws_secret_access_key,
+                result=result
+            )
     except Exception as e:
         doc_task_queue = frappe.get_doc('Drive Task Queue', task_id)
         doc_task_queue.pupv = 0
@@ -201,10 +214,9 @@ def list_tasks():
     )
     for doc_task in doc_tasks:
         task_metadata = json.loads(doc_task.task_metadata)
-        doc_file = frappe.get_doc('Drive Entity', task_metadata["name_file"])
         task_response = {
             'name': doc_task.name,
-            'title': doc_file.title,
+            'title': task_metadata["title_file"],
             'type_analysis': task_metadata["type"],
             'status': doc_task.status,
             'pupv': doc_task.pupv,
@@ -214,7 +226,7 @@ def list_tasks():
     return tasks_response
 
 
-def save_result_analysis_video_with_gps_job(task_id, name_fvideo, parent, aws_access_key, aws_secret_access_key, result):
+def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key, aws_secret_access_key, result, name_gpx):
     try:
         #BASE_URL_AI
         sdk = RoadSDK(BASE_URL_AI)
@@ -231,23 +243,28 @@ def save_result_analysis_video_with_gps_job(task_id, name_fvideo, parent, aws_ac
         timestamp = datetime.timestamp(datetime.now())
         title_folder = f"Result_{int(timestamp)}_{doc_video.title}"
         new_folder = create_folder(title_folder, parent)
+        new_folder_image = create_folder(f"Images_{int(timestamp)}", new_folder.name)
         spatial_datas = []
         for item in metadata_result:
             image_response = sdk.get_stream_by_url(item["image"])
             title_image = os.path.basename(item["image"])
-            file_name_image = secure_filename(f"{new_folder.name}_{title_image}")
-            save_path = f"{_get_user_directory_name()}/{file_name_image}"
+            file_name_image = secure_filename(f"{title_image}")
+            save_path = f"{_get_user_directory_name()}/{new_folder.name}/{file_name_image}"
             #Dữ liệu lưu trên S3
             #upload_object_from_stream(connect_s3, image_response, save_path, image_response.headers.get('Content-Type'))
 
             #Dữ liệu lưu trên disk
+            directory = os.path.dirname(save_path)
+            # Tạo thư mục nếu chưa tồn tại
+            if not os.path.exists(directory):
+                os.makedirs(directory)
             with open(save_path, "wb") as file:
                 for chunk in image_response.iter_content(chunk_size=8192):
                     file.write(chunk)
             
             name = str(uuid.uuid4().hex)
             create_drive_entity(
-                name, title_image, new_folder.name, save_path, image_response.headers.get('Content-Length'), ".jpg", "image/jpeg", None
+                name, title_image, new_folder_image.name, save_path, image_response.headers.get('Content-Length'), ".jpg", "image/jpeg", None
             )
             #Tạo thumbnail dựa theo S3
             # frappe.enqueue(
@@ -293,8 +310,8 @@ def save_result_analysis_video_with_gps_job(task_id, name_fvideo, parent, aws_ac
                 }
             }
             spatial_datas.append(spatial_data)
-        file_name_geojson = secure_filename(f"{new_folder.name}_{doc_video.name}_object.geojson")
-        key_object_geojson = f"{_get_user_directory_name()}/{file_name_geojson}"
+        file_name_geojson = secure_filename(f"{doc_video.name}_object.geojson")
+        key_object_geojson = f"{_get_user_directory_name()}/{new_folder.name}/{file_name_geojson}"
         # Tạo đối tượng GeoJSON FeatureCollection
         geojson_data = geojson.FeatureCollection(spatial_datas)
         # Sử dụng BytesIO để lưu GeoJSON
@@ -305,6 +322,10 @@ def save_result_analysis_video_with_gps_job(task_id, name_fvideo, parent, aws_ac
         #upload_image_with_connect_byte(connect_s3, buffer.getvalue(), key_object_geojson)
         
         #Lưu dữ liệu trên disk
+        directory = os.path.dirname(key_object_geojson)
+        # Tạo thư mục nếu chưa tồn tại
+        if not os.path.exists(directory):
+            os.makedirs(directory)
         buffer.seek(0)
         with open(key_object_geojson, "wb") as f:
             f.write(buffer.getvalue())
@@ -317,13 +338,14 @@ def save_result_analysis_video_with_gps_job(task_id, name_fvideo, parent, aws_ac
         if output_video_link != None:
             video_stream = sdk.get_stream_by_url(output_video_link)
             title_output_video = os.path.basename(output_video_link)
-            file_name_output_video = secure_filename(f"{new_folder.name}_{title_output_video}")
+            file_name_output_video = secure_filename(f"{title_output_video}")
             key_object_video_output = f"{_get_user_directory_name()}/{file_name_output_video}"
             
-            temp_path = (
-                Path(get_user_uploads_directory(user=frappe.session.user))
-                / f"{int(timestamp)}_{file_name_output_video}"
-            )
+            temp_path = f"{Path(get_user_uploads_directory(user=frappe.session.user))}/{new_folder.name}/{file_name_output_video}"
+            directory = os.path.dirname(temp_path)
+            # Tạo thư mục nếu chưa tồn tại
+            if not os.path.exists(directory):
+                os.makedirs(directory)
             with open(temp_path, 'wb') as file:
                 for chunk in video_stream.iter_content(chunk_size=8192):
                     if chunk:
@@ -335,7 +357,7 @@ def save_result_analysis_video_with_gps_job(task_id, name_fvideo, parent, aws_ac
             name_output_video = str(uuid.uuid4().hex)
             #thay temp_path bằng key_object_video_output nếu thay S3
             create_drive_entity(
-                name_output_video, title_output_video, new_folder.name, temp_path, video_stream.headers.get('Content-Length'), ".mp4", "video/mp4", None
+                name_output_video, title_output_video, new_folder.name, temp_path, video_stream.headers.get('Content-Length'), ".mp4", "video/mp4", None, name_gpx
             )
             #Tạo thumb bằng S3
             # frappe.enqueue(
@@ -385,26 +407,31 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_access_key, 
         timestamp = datetime.timestamp(datetime.now())
         title_folder = f"Result_{int(timestamp)}_{doc_video.title}"
         new_folder = create_folder(title_folder, parent)
+        new_folder_image = create_folder(f"Images_{int(timestamp)}", new_folder.name)
         data_xlsx = []
         headers = ["S_Real (m)", "S_pixel (pixel)", "Image"]
         data_xlsx.append(headers)
         for item in metadata_result:
             image_response = sdk.get_stream_by_url(item["image"])
             title_image = os.path.basename(item["image"])
-            file_name_image = secure_filename(f"{new_folder.name}_{title_image}")
-            save_path = f"{_get_user_directory_name()}/{file_name_image}"
+            file_name_image = secure_filename(f"{title_image}")
+            save_path = f"{_get_user_directory_name()}/{new_folder.name}/{file_name_image}"
 
             #Upload dữ liệu lên S3
             #upload_object_from_stream(connect_s3, image_response, save_path, image_response.headers.get('Content-Type'))
             
             #Lưu dữ liệu trên ổ đĩa disk
+            directory = os.path.dirname(save_path)
+            # Tạo thư mục nếu chưa tồn tại
+            if not os.path.exists(directory):
+                os.makedirs(directory)
             with open(save_path, "wb") as file:
                 for chunk in image_response.iter_content(chunk_size=8192):
                     file.write(chunk)
 
             name = str(uuid.uuid4().hex)
             create_drive_entity(
-                name, title_image, new_folder.name, save_path, image_response.headers.get('Content-Length'), ".jpg", "image/jpeg", None
+                name, title_image, new_folder_image.name, save_path, image_response.headers.get('Content-Length'), ".jpg", "image/jpeg", None
             )
             #Tạo thumb với object S3
             # frappe.enqueue(
@@ -442,12 +469,16 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_access_key, 
             ]
             data_xlsx.append(item_xlsx)
         byte_xlsx = make_xlsx(data_xlsx, "Data Export")
-        file_name_xlsx = secure_filename(f"{new_folder.name}_{doc_video.name}_object.xlsx")
-        save_path_xlsx = f"{_get_user_directory_name()}/{file_name_xlsx}"
+        file_name_xlsx = secure_filename(f"{doc_video.name}_object.xlsx")
+        save_path_xlsx = f"{_get_user_directory_name()}/{new_folder.name}/{file_name_xlsx}"
         #Lưu dữ liệu trên S3
         #upload_image_with_connect_byte(connect_s3, byte_xlsx.getvalue(), save_path_xlsx)
 
         #Lưu dữ liệu trực tiếp trên disk
+        directory = os.path.dirname(save_path_xlsx)
+        # Tạo thư mục nếu chưa tồn tại
+        if not os.path.exists(directory):
+            os.makedirs(directory)
         with open(save_path_xlsx, "wb") as file:
             file.write(byte_xlsx.getvalue())
         
@@ -459,12 +490,16 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_access_key, 
         if output_video_link != None:
             video_stream = sdk.get_stream_by_url(output_video_link)
             title_output_video = os.path.basename(output_video_link)
-            file_name_output_video = secure_filename(f"{new_folder.name}_{title_output_video}")
-            key_object_video_output = f"{_get_user_directory_name()}/{file_name_output_video}"
+            file_name_output_video = secure_filename(f"{title_output_video}")
+            key_object_video_output = f"{_get_user_directory_name()}/{new_folder.name}/{file_name_output_video}"
             #Lưu dữ liệu lên S3
             #upload_object_from_stream(connect_s3, video_stream, key_object_video_output, video_stream.headers.get('Content-Type'))
 
             #Lưu dữ liệu trên disk
+            directory = os.path.dirname(key_object_video_output)
+            # Tạo thư mục nếu chưa tồn tại
+            if not os.path.exists(directory):
+                os.makedirs(directory)
             with open(key_object_video_output, 'wb') as file:
                 for chunk in video_stream.iter_content(chunk_size=8192):
                     if chunk:

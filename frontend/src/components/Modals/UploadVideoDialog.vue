@@ -72,7 +72,7 @@ export default {
             default: "",
         },
     },
-    emits: ["update:modelValue", "success"],
+    emits: ["update:modelValue"],
     data() {
         return {
             typeInput: "video_gps",
@@ -180,7 +180,6 @@ export default {
                     }
                 })
                 this.dropzone.on('success', function (file, response) {
-                    console.log("Dòng 183 ")
                     let indexFile = me.arrFile.findIndex(x => x.name == file.name)
                     me.$store.commit("updateFileUploaded", {
                         title: `${response["message"]["title"]}_${indexFile}`,
@@ -189,8 +188,9 @@ export default {
                         progress: 100,
                         folder_name: response["message"]["name"]
                     })
-                    me.$emit("success")
-                    console.log(me.$emit)
+                    me.$store.commit("updateIdFolderUpload", {
+                        id: response["message"]["name"]
+                    })
                     me.onAnalysisFile(response["message"]["name"])
                 })
                 this.dropzone.on('error', function (file, errorMessage) {

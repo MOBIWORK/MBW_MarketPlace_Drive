@@ -95,7 +95,7 @@
             Empty Trash
           </Button>
           <template v-else>
-            <Button v-if="$route.name === 'Home'" :variant="'outline'" theme="gray" size="sm" class="mr-3" @click="showMonitorTaskingDialog=true">
+            <Button v-if="$route.name === 'Home' || $route.name === 'Folder'" :variant="'outline'" theme="gray" size="sm" class="mr-3" @click="showMonitorTaskingDialog=true">
                 <template #prefix>
                   <FeatherIcon name="monitor" class="w-4" />
                 </template>
@@ -143,6 +143,7 @@
   <UploadVideoDialog 
     v-model="showNewVideoDialog"
     :parent="$route.params.entityName"
+    @success="onResetData"
   />
   <NewFolderDialog
     v-model="showNewFolderDialog"
@@ -474,6 +475,9 @@ export default {
         )
       }
     },
+    onResetData(){
+      console.log("Dòng 479 reset data")
+    }
   },
   resources: {
     createDocument() {

@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "prompt",
  "creation": "2024-11-22 15:18:51.186484",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -37,10 +38,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-06 11:09:44.247823",
+ "modified": "2024-12-11 10:11:16.861380",
  "modified_by": "Administrator",
  "module": "Drive",
  "name": "Drive Task Queue",
+ "naming_rule": "Set by user",
  "owner": "Administrator",
  "permissions": [
   {
