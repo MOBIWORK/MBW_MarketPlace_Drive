@@ -1,12 +1,21 @@
 <template>
     <LoadingIndicator v-show="loading" class="w-10 h-full text-neutral-100 mx-auto" />
-    <div class="flex" v-show="!loading">
-        <video :key="src" ref="mediaRef" class="max-h-full" :class="isDashcam? 'w-2/3' : 'w-full'" autoplay muted preload="none"
+    <div class="flex w-full" v-show="!loading">
+        
+        <div class="w-full max-h-full relative" id="map" v-show="isDashcam">
+            <div class="absolute z-10 bg-white h-[280px] w-[489px] left-1 bottom-1">
+                <video :key="src" ref="mediaRef" class="h-full w-full" autoplay muted preload="none"
+                    controlslist="nodownload noremoteplayback noplaybackrate disablepictureinpicture" controls draggable="false"
+                    @loadedmetadata="handleMediaReady" @timeupdate="onTimeUpdate">
+                    <source :src="src" :type="type" />
+                </video>
+            </div>
+        </div>
+        <video :key="src" ref="mediaRef" class="max-h-full w-full" autoplay muted preload="none"
             controlslist="nodownload noremoteplayback noplaybackrate disablepictureinpicture" controls draggable="false"
-            @loadedmetadata="handleMediaReady" @timeupdate="onTimeUpdate">
+            @loadedmetadata="handleMediaReady" v-show="!isDashcam">
             <source :src="src" :type="type" />
         </video>
-        <div class="w-1/3 max-h-full" id="map" v-show="isDashcam"></div>
     </div>
 </template>
 
@@ -60,7 +69,6 @@ watch(
 )
 
 onMounted(() => {
-    initMap()
     if (props.previewEntity.name != null) {
         onCallDataGPS()
     }
@@ -75,6 +83,7 @@ function onCallDataGPS() {
         },
         onSuccess(data) {
             if(data.length == 0) isDashcam.value = false
+            if(isDashcam.value) initMap()
             dataGPSRef.value = data
             let geojson = {
                 'type': "Feature",
@@ -86,11 +95,11 @@ function onCallDataGPS() {
             for (let i = 0; i < data.length; i++) {
                 geojson.geometry.coordinates.push([data[i].lon, data[i].lat])
             }
-            if (mapRef.value.isStyleLoaded()) {
+            if (mapRef.value != null && mapRef.value.isStyleLoaded()) {
                 onAddLayerLine(geojson)
                 onAddLayerCar()
                 onAddLayerHistorialPath()
-            } else {
+            } else if(mapRef.value != null) {
                 mapRef.value.on("load", () => {
                     onAddLayerLine(geojson)
                     onAddLayerCar()
