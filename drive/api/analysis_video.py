@@ -72,6 +72,7 @@ def analytic_with_geometry(name_file, parent):
             response = sdk.process_video_gpx(doc_task_queue.name, url_file_video, url_file_gps, hook_url)
             doc_task_queue.status = "Processing"
             doc_task_queue.save(ignore_permissions=True)
+            frappe.publish_realtime('event_analytic_video_job', message=doc_task_queue.name, user=frappe.session.user)
     except Exception as e:
         doc_task_queue.status = "Error"
         doc_task_queue.pupv = 0
@@ -147,6 +148,7 @@ def analytic_without_geometry(name_file, parent):
         response = sdk.process_single_video_velocity(doc_task_queue.name, video_url, 7, hook_url)
         doc_task_queue.status = "Processing"
         doc_task_queue.save(ignore_permissions=True)
+        frappe.publish_realtime('event_analytic_video_job', message=doc_task_queue.name, user=frappe.session.user)
     except Exception as e:
         doc_task_queue.task_metadata = json.dumps(obj_task_metadata)
         doc_task_queue.pupv = 0

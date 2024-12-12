@@ -33,6 +33,7 @@ from io import BytesIO
 from drive.utils.using_quota import exist_storage_file
 import boto3
 import gpxpy
+import cv2
 
 def if_folder_exists(folder_name, parent):
     values = {
@@ -646,7 +647,10 @@ def get_file_content_preview(entity_name, trigger_download=0):
 def get_file_gps(entity_name):
     arr_gps = []
     doc_file_video = frappe.get_doc("Drive Entity", entity_name)
+    video = cv2.VideoCapture(doc_file_video.path)
     name_gpx = None
+    fps = video.get(cv2.CAP_PROP_FPS)
+    video.release()
     if doc_file_video.name_gpx is not None and doc_file_video.name_gpx != "":
         name_gpx = doc_file_video.name_gpx
     else:
@@ -675,7 +679,7 @@ def get_file_gps(entity_name):
                             'time': point.time,
                             'el': point.elevation
                         })
-    return arr_gps
+    return {'arr_gps': arr_gps, 'fps': fps}
 
 def stream_file_content(drive_entity, range_header):
     """

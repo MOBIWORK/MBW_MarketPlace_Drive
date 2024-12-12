@@ -51,6 +51,7 @@ const geojsonRef = ref(null)
 const dataGPSRef = ref(null)
 const alongPath = ref([])
 const isDashcam = ref(true)
+const fpsRef = ref(null)
 
 const handleMediaReady = (event) => {
     mediaRef.value = event.target
@@ -82,9 +83,11 @@ function onCallDataGPS() {
             entity_name: props.previewEntity.name
         },
         onSuccess(data) {
-            if(data.length == 0) isDashcam.value = false
+            if(data.fps != null && data.fps != 0) fpsRef.value = data.fps
+            else fpsRef.value = 30
+            if(data.arr_gps.length == 0) isDashcam.value = false
             if(isDashcam.value) initMap()
-            dataGPSRef.value = data
+            dataGPSRef.value = data.arr_gps
             let geojson = {
                 'type': "Feature",
                 'geometry': {
@@ -92,8 +95,8 @@ function onCallDataGPS() {
                     'coordinates': []
                 }
             }
-            for (let i = 0; i < data.length; i++) {
-                geojson.geometry.coordinates.push([data[i].lon, data[i].lat])
+            for (let i = 0; i < data.arr_gps.length; i++) {
+                geojson.geometry.coordinates.push([data.arr_gps[i].lon, data.arr_gps[i].lat])
             }
             if (mapRef.value != null && mapRef.value.isStyleLoaded()) {
                 onAddLayerLine(geojson)
@@ -117,7 +120,7 @@ function onCallDataGPS() {
 }
 
 function onTimeUpdate(evt) {
-    const fps = 30
+    const fps = fpsRef.value
     const currentTime = evt.target.currentTime
     const currentFrame = Math.floor(currentTime * fps)
     if (dataGPSRef.value[currentFrame] != null) {

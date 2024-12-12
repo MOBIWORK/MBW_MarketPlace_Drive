@@ -4,7 +4,7 @@
         title: 'Tasking',
     }">
         <template #body-content>
-            <ListView class="h-full w-full" :columns="columnTask" :rows="arrTask" :options="{
+            <ListView class="h-[350px] w-full" :columns="columnTask" :rows="arrTask" :options="{
                 selectable: false,
                 showTooltip: true,
                 resizeColumn: true,
