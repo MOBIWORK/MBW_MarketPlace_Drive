@@ -34,6 +34,7 @@ from drive.utils.using_quota import exist_storage_file
 import boto3
 import gpxpy
 import cv2
+import time
 
 def if_folder_exists(folder_name, parent):
     values = {
@@ -1732,3 +1733,42 @@ def get_shared_breadcrumbs(share_name):
             )
         )
     return share_breadcrumbs[::-1]
+
+@frappe.whitelist(methods=["POST"])
+def upload_file(src_file):
+    doc_setting = frappe.get_single('Drive Instance Settings')
+    aws_access_key = doc_setting.aws_access_key
+    aws_secret_access_key = doc_setting.get_password('aws_secret_key')
+    start_time = time.time()
+    connect_s3 = boto3.client(
+        "s3",
+        aws_access_key_id = aws_access_key,
+        aws_secret_access_key = aws_secret_access_key
+    )
+    connect_s3.upload_file(src_file, "eov-geoviz", "xxxxxx/abcd.mp4")
+    end_time = time.time()
+    excution_time = end_time - start_time
+    return {'excution_time': excution_time, 'key': "xxxxxx/abcd.mp4"}
+
+@frappe.whitelist(allow_guest=True)
+def get_file_by_object_key():
+    doc_setting = frappe.get_single('Drive Instance Settings')
+    aws_access_key = doc_setting.aws_access_key
+    aws_secret_access_key = doc_setting.get_password('aws_secret_key')
+    start_time = time.time()
+    connect_s3 = boto3.client(
+        "s3",
+        aws_access_key_id = aws_access_key,
+        aws_secret_access_key = aws_secret_access_key
+    )
+    response = connect_s3.get_object(Bucket="eov-geoviz", Key="xxxxxx/abcd.mp4")
+    end_time = time.time()
+    return send_file(
+        response["Body"],
+        mimetype="video/mp4",
+        as_attachment=0,
+        conditional=True,
+        max_age=3600,
+        download_name="annotated_video.mp4",
+        environ=frappe.request.environ,
+    )

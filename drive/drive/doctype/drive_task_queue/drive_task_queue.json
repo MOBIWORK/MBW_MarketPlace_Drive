@@ -9,7 +9,11 @@
   "task_metadata",
   "status",
   "pupv",
-  "error_message"
+  "error_message",
+  "uploaded_time",
+  "start_processing_time",
+  "end_processing_time",
+  "entry_time"
  ],
  "fields": [
   {
@@ -22,7 +26,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
-   "options": "Processing\nSuccess\nError"
+   "options": "Pending\nProcessing\nSuccess\nError"
   },
   {
    "fieldname": "pupv",
@@ -34,11 +38,31 @@
    "fieldname": "error_message",
    "fieldtype": "Text",
    "label": "ErrorMessage"
+  },
+  {
+   "fieldname": "uploaded_time",
+   "fieldtype": "Datetime",
+   "label": "Uploaded Time"
+  },
+  {
+   "fieldname": "start_processing_time",
+   "fieldtype": "Datetime",
+   "label": "Start Processing Time"
+  },
+  {
+   "fieldname": "end_processing_time",
+   "fieldtype": "Datetime",
+   "label": "End Processing Time"
+  },
+  {
+   "fieldname": "entry_time",
+   "fieldtype": "Int",
+   "label": "Entry Time"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-11 10:11:16.861380",
+ "modified": "2024-12-13 10:48:31.034041",
  "modified_by": "Administrator",
  "module": "Drive",
  "name": "Drive Task Queue",

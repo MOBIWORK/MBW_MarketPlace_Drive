@@ -52,6 +52,15 @@ const dataGPSRef = ref(null)
 const alongPath = ref([])
 const isDashcam = ref(true)
 const fpsRef = ref(null)
+const featureLocationMarker = ref({
+    type: "FeatureCollection",
+    features: []
+})
+const featureLocationHistory = ref({
+    type: "FeatureCollection",
+    features: []
+})
+const bearingRef = ref(null)
 
 const handleMediaReady = (event) => {
     mediaRef.value = event.target
@@ -99,11 +108,13 @@ function onCallDataGPS() {
                 geojson.geometry.coordinates.push([data.arr_gps[i].lon, data.arr_gps[i].lat])
             }
             if (mapRef.value != null && mapRef.value.isStyleLoaded()) {
+                onAddLayerSatellite()
                 onAddLayerLine(geojson)
                 onAddLayerCar()
                 onAddLayerHistorialPath()
             } else if(mapRef.value != null) {
                 mapRef.value.on("load", () => {
+                    onAddLayerSatellite()
                     onAddLayerLine(geojson)
                     onAddLayerCar()
                     onAddLayerHistorialPath()
@@ -141,16 +152,19 @@ function onTimeUpdate(evt) {
                 turf.point(coordinateActive)
             )
             feature.properties["bearing"] = bearing
+            bearingRef.value = bearing
             mapRef.value.panTo(coordinateActive, { animate: true, essential: true, curve: 1.42, duration: 100, pitch: 60, bearing: bearing, zoom: 17 })
             if (mapRef.value.getSource('locationMarker')) {
+                featureLocationMarker.value = feature
                 mapRef.value.getSource('locationMarker').setData(feature)
             }
             if (alongPath.value.length > 1) {
                 if (mapRef.value.getSource("LocationHistory")) {
-                    mapRef.value.getSource("LocationHistory").setData({
+                    featureLocationHistory.value = {
                         type: "FeatureCollection",
                         features: [turf.lineString(alongPath.value)]
-                    })
+                    }
+                    mapRef.value.getSource("LocationHistory").setData(featureLocationHistory.value)
                 }
             }
         }
@@ -191,16 +205,39 @@ function initMap() {
                 width: "50px",
                 height: "50px",
             },
+            {
+                id: 'satellite',
+                title: 'Vệ tinh',
+                thumbnail: 'https://files.ekgis.vn/widget/v1.0.0/assets/image/satellite.png',
+                width: '50px',
+                height: '50px'
+            }
         ],
     })
-    mapRef.value.addControl(basemapControl, "bottom-left")
+    mapRef.value.addControl(basemapControl, "top-left")
     basemapControl.on("changeBaseLayer", async function (response) {
-        await new ekmapplf.VectorBaseMap(response.layer, apiKey).addTo(mapRef.value)
-        mapRef.value.once('load', () => {
-            onAddLayerLine(geojsonRef.value)
-            onAddLayerCar()
-            onAddLayerHistorialPath()
-        })
+        if(response.layer != "satellite"){
+            await new ekmapplf.VectorBaseMap(response.layer, apiKey).addTo(mapRef.value)
+            mapRef.value.once('styledata', () => {
+                onAddLayerSatellite()
+                onAddLayerLine(geojsonRef.value)
+                onAddLayerCar()
+                onAddLayerHistorialPath()
+                if(bearingRef.value != null){
+                    mapRef.value.panTo(mapRef.value.getCenter(), { animate: true, essential: true, curve: 1.42, duration: 100, pitch: 60, bearing: bearingRef.value, zoom: 17 })
+                }
+            })
+        }else{
+            let layers = mapRef.value.getStyle().layers
+            for(let i = 0; i < layers.length; i++){
+                if(["l_satellite", "l_line_gps", "locationMarker", "LocationHistory"].includes(layers[i].id)){
+                    mapRef.value.setLayoutProperty(layers[i].id, 'visibility', 'visible')
+                }else{
+                    mapRef.value.setLayoutProperty(layers[i].id, 'visibility', 'none')
+                }
+            }
+        }
+        
     })
     mapRef.value.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "bottom-right")
     var is3DMap = false;
@@ -241,6 +278,28 @@ function initMap() {
         }
     });
     mapRef.value.addControl(btn3D, "bottom-right");
+}
+
+function onAddLayerSatellite(){
+    if(!mapRef.value.getSource("s_satellite")){
+        mapRef.value.addSource("s_satellite", {
+            "type": "raster",
+            "tileSize": 256,
+            "tiles": [
+                "https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}"
+            ]
+        })
+        mapRef.value.addLayer({
+            "id": "l_satellite",
+            "type": "raster",
+            "source": "s_satellite",
+            "minzoom": 0,
+            "maxzoom": 22,
+            "layout": {
+                "visibility": "none"
+            }
+        })
+    }
 }
 
 function onAddLayerLine(geojson) {
@@ -287,10 +346,7 @@ function onAddLayerCar() {
             "data:image/svg+xml;charset=utf-8;base64," +
             btoa(icon_navigation);
     }
-    var locationMarker = {
-        type: "FeatureCollection",
-        features: []
-    }
+    var locationMarker = featureLocationMarker.value
     if (!mapRef.value.getSource("locationMarker")) {
         mapRef.value.addSource("locationMarker", {
             type: "geojson",
@@ -317,10 +373,7 @@ function onAddLayerCar() {
 }
 
 function onAddLayerHistorialPath() {
-    let fHistorialPath = {
-        type: "FeatureCollection",
-        features: []
-    }
+    let fHistorialPath = featureLocationHistory.value
     if (!mapRef.value.getSource("LocationHistory")) {
         mapRef.value.addSource("LocationHistory", {
             type: "geojson",
@@ -352,3 +405,8 @@ onBeforeUnmount(() => {
     type.value = ""
 })
 </script>
+<style>
+#basemap_control{
+    max-width: 100% !important;
+}
+</style>

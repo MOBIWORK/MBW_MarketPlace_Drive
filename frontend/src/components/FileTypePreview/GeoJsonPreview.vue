@@ -29,10 +29,10 @@
                         }" row-key="ID">
                             <ListHeader class="mx-0" />
                             <ListRows id="list-rows">
-                                <ListRow class="mx-0" v-for="row in dataProperties" :key="row.ID"
+                                <ListRow class="mx-0" :class="idRowActivateRef==row.ID? 'bg-[#F3F3F3]' : ''" v-for="row in dataProperties" :key="row.ID"
                                     v-slot="{ idx, column, item }" :row="row">
                                     <template v-if="column.key == 'image'">
-                                        <a :href="row.image" target="_blank"
+                                        <a href="javascript:;" @click="openFullscreen(row.image)" class="z-50 w-full"
                                             style="text-decoration: underline;color: rgb(14 165 233);">Link</a>
                                     </template>
                                     <template v-else>
@@ -111,6 +111,7 @@ const columns = ref(
 )
 
 const geojsonStringfyRef = ref("")
+const idRowActivateRef = ref(null)
 
 //Biến tra cứu một điểm trên bản đồ
 const popupQueryInfo = ref(null)
@@ -138,11 +139,12 @@ async function fetchContent() {
     if (res.ok) {
         contentGeoJson.value = objRes
         geojsonStringfyRef.value = JSON.stringify(objRes, null, 4)
-        console.log(objRes)
         if (mapPreview.value.isStyleLoaded()) {
+            onAddLayerSatellite()
             if (contentGeoJson.value != null) onAddLayer()
         } else {
             mapPreview.value.on("load", () => {
+                onAddLayerSatellite()
                 if (contentGeoJson.value != null) onAddLayer()
             })
         }
@@ -182,14 +184,33 @@ function initMap() {
                 width: "50px",
                 height: "50px",
             },
+            {
+                id: 'satellite',
+                title: 'Vệ tinh',
+                thumbnail: 'https://files.ekgis.vn/widget/v1.0.0/assets/image/satellite.png',
+                width: '50px',
+                height: '50px'
+            }
         ],
     })
     mapPreview.value.addControl(basemapControl, "bottom-left")
     basemapControl.on("changeBaseLayer", async function (response) {
-        await new ekmapplf.VectorBaseMap(response.layer, apiKey).addTo(mapPreview.value)
-        mapPreview.value.once("load", () => {
-            onAddLayer()
-        })
+        if(response.layer != "satellite"){
+            await new ekmapplf.VectorBaseMap(response.layer, apiKey).addTo(mapPreview.value)
+            mapPreview.value.once("styledata", () => {
+                onAddLayerSatellite()
+                onAddLayer()
+            })
+        }else{
+            let layers = mapPreview.value.getStyle().layers
+            for(let i = 0; i < layers.length; i++){
+                if(["l_satellite", "l_object_detect", "l_object_detect_activate"].includes(layers[i].id)){
+                    mapPreview.value.setLayoutProperty(layers[i].id, 'visibility', 'visible')
+                }else{
+                    mapPreview.value.setLayoutProperty(layers[i].id, 'visibility', 'none')
+                }
+            }
+        }
     })
     mapPreview.value.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "bottom-right")
     var is3DMap = false;
@@ -235,43 +256,95 @@ function initMap() {
 }
 
 function clickInfoPointPopup(evt) {
+    let features = mapPreview.value.queryRenderedFeatures(evt.point, { layers: ['l_object_detect'] })
+    if (features.length > 0) {
+        let properties = features[0].properties
+        let dataPropertisFilter = dataProperties.value.filter(x => x.longitude == properties.longitude && x.latitude == properties.latitude)
+        if(dataPropertisFilter.length > 0){
+            idRowActivateRef.value = dataPropertisFilter[0].ID
+        }
+        showInfoPopup(evt.features[0], evt.lngLat)
+    }
+}
+
+function showInfoPopup(feature, lngLat){
     if (popupQueryInfo.value != null) {
         popupQueryInfo.value.remove()
     }
-    // let features = mapPreview.value.queryRenderedFeatures(evt.point, { layers: ['l_object_detect'] })
-    // if (features.length > 0) {
-    //     const coordinates = evt.features[0].geometry.coordinates.slice()
-    //     const properties = evt.features[0].properties
-    //     const description = `
-    //         <div class="w-52 h-36">
-    //             <img draggable="false" class="h-full w-full" src=${properties.image} id-="" />
-    //         </div>
-    //     `
-    //     while (Math.abs(evt.lngLat.lng - coordinates[0]) > 180) {
-    //         coordinates[0] += evt.lngLat.lng > coordinates[0] ? 360 : -360;
-    //     }
-    //     new maplibregl.Popup({closeButton: false})
-    //         .setLngLat(coordinates)
-    //         .setHTML(description)
-    //         .addTo(mapPreview.value);
-    // }
+    const coordinates = feature.geometry.coordinates.slice()
+    const properties = feature.properties
+    const description = `
+        <div class="w-52 h-36 relative group">
+            <img draggable="false" class="h-full w-full object-cover" src="${properties.image}" alt="Image" />
+            <!-- Fullscreen Icon -->
+            <div id="fullscreen_icon"
+                class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-maximize text-white"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+            </div>
+        </div>
+    `
+    if(lngLat != null){
+        while (Math.abs(lngLat.lng - coordinates[0]) > 180) {
+            coordinates[0] += lngLat.lng > coordinates[0] ? 360 : -360;
+        }
+    }
+    popupQueryInfo.value = new maplibregl.Popup({closeButton: false})
+            .setLngLat(coordinates)
+            .setHTML(description)
+            .addTo(mapPreview.value);
+    document.getElementById("fullscreen_icon").addEventListener('click', () => {
+        openFullscreen(properties.image)
+    })
 }
 
 function onActiveRow(row){
+    if(idRowActivateRef.value == row.ID){
+        idRowActivateRef.value = null
+        if(popupQueryInfo.value != null) popupQueryInfo.value.remove()
+        return
+    }else{
+        idRowActivateRef.value = row.ID
+    }
     let feature = {
         type: "Feature",
         geometry: {
             type: "Point",
             coordinates: [row.longitude, row.latitude]
-        }
+        },
+        properties: row
     }
     onAddLayerActivateRow(feature)
     mapPreview.value.flyTo({
         center: [row.longitude, row.latitude]
     })
+    showInfoPopup(feature)
+}
+
+function onAddLayerSatellite(){
+    if(!mapPreview.value.getSource("s_satellite")){
+        mapPreview.value.addSource("s_satellite", {
+            "type": "raster",
+            "tileSize": 256,
+            "tiles": [
+                "https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}"
+            ]
+        })
+        mapPreview.value.addLayer({
+            "id": "l_satellite",
+            "type": "raster",
+            "source": "s_satellite",
+            "minzoom": 0,
+            "maxzoom": 22,
+            "layout": {
+                "visibility": "none"
+            }
+        })
+    }
 }
 
 function onAddLayerActivateRow(feature) {
+    return
     const sizeAnimateCircle = 100
     const pulsingDot = {
         width: sizeAnimateCircle,
@@ -347,6 +420,12 @@ function onAddLayerActivateRow(feature) {
 }
 
 function onAddLayer() {
+    if(contentGeoJson.value == null){
+        contentGeoJson.value = {
+            type: "FeatureCollection",
+            features: []
+        }
+    }
     if (mapPreview.value.getSource("s_object_detect")) {
         mapPreview.value.getSource("s_object_detect").setData(contentGeoJson.value)
     } else {
@@ -368,6 +447,7 @@ function onAddLayer() {
     }
     let arrLine = []
     let arrProperties = []
+    console.log(contentGeoJson.value)
     for (let i = 0; i < contentGeoJson.value.features.length; i++) {
         let geometry = contentGeoJson.value.features[i]["geometry"]
         let properties = contentGeoJson.value.features[i]["properties"]
@@ -404,6 +484,32 @@ function onCopyData() {
     })
 }
 
+function openFullscreen(imageSrc) {
+    // Tạo phần tử mới để hiển thị ảnh fullscreen
+    const fullscreenDiv = document.createElement('div');
+    fullscreenDiv.className = 'fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50';
+
+    // Thêm ảnh vào fullscreenDiv
+    fullscreenDiv.innerHTML = `
+        <img src="${imageSrc}" class="max-h-full max-w-full object-contain" alt="Fullscreen Image" />
+        <button id="btn-close-image" class="absolute top-4 right-4 text-white text-3xl font-bold">&times;</button>
+    `;
+
+    // Thêm fullscreenDiv vào body
+    document.body.appendChild(fullscreenDiv);
+    document.getElementById('btn-close-image').addEventListener("click", () => {
+        closeFullscreen()
+    })
+}
+
+function closeFullscreen() {
+    // Xóa phần tử fullscreen
+    const fullscreenDiv = document.querySelector('.fixed.inset-0');
+    if (fullscreenDiv) {
+        fullscreenDiv.remove();
+    }
+}
+
 onMounted(() => {
     initMap()
     fetchContent()
@@ -416,3 +522,40 @@ onBeforeUnmount(() => {
     showPropertiesDialog.value = false
 })
 </script>
+
+<style>
+#basemap_control{
+    max-width: 100% !important;
+}
+
+.fixed {
+    position: fixed;
+  }
+
+  .inset-0 {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+
+  .z-50 {
+    z-index: 50;
+  }
+
+  .bg-opacity-90 {
+    background-opacity: 0.9;
+  }
+
+  .absolute {
+    position: absolute;
+  }
+
+  .top-4 {
+    top: 1rem;
+  }
+
+  .right-4 {
+    right: 1rem;
+  }
+</style>
