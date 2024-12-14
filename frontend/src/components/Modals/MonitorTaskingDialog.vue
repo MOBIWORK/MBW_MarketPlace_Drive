@@ -1,6 +1,6 @@
 <template>
     <Dialog v-model="open" :options="{
-        size: '3xl',
+        size: '4xl',
         title: 'Tasking',
     }">
         <template #body-content>
@@ -8,7 +8,6 @@
                 selectable: false,
                 showTooltip: true,
                 resizeColumn: true,
-                onRowClick:(row) => clickRow(row),
                 emptyState: {
                     description: 'There are no records'
                 }
@@ -22,12 +21,27 @@
                         <Badge v-if="row['status'] == 'Success'" :variant="'subtle'" :ref_for="true" theme="green" size="sm">
                             Success
                         </Badge>
-                        <Badge v-else-if="row['status'] == 'Error'" :variant="'subtle'" :ref_for="true" theme="red" size="sm">
-                            Error
+                        <Tooltip v-else-if="row['status'] == 'Error'"
+                            :text="row['error_message']"
+                            :placement="'top'"
+                            :hoverDelay="0"
+                        >
+                            <Badge  :variant="'subtle'" :ref_for="true" theme="red" size="sm" class="cursor-pointer">
+                                Error
+                            </Badge>
+                        </Tooltip>
+                        <Badge v-else-if="row['status'] == 'Pending'" :variant="'subtle'" :ref_for="true" theme="gray" size="sm">
+                            Pending
                         </Badge>
                         <Badge v-else :variant="'subtle'" :ref_for="true" theme="blue" size="sm">
                             Processing
                         </Badge>
+                    </template>
+                    <template v-else-if="column.key == 'file_size'">
+                        {{ formatSizeFile(row["file_size"]) }}
+                    </template>
+                    <template v-else-if="['uploaded_time','start_processing_time','end_processing_time'].includes(column.key)">
+                        {{ formatDateFile(row[column.key]) }}
                     </template>
                     <template v-else>
                         <span class="text-base">{{ row[column.key] }}</span>
@@ -42,23 +56,11 @@
         </template>
     </Dialog>
 
-    <Dialog v-if="showErrorDialog" v-model="showErrorDialog" :options="{
-            title: 'Analysis Failed',
-            message: messageError,
-            size: 'sm',
-            actions: [
-                {
-                    label: 'Confirm',
-                    onClick: () => {
-                        showErrorDialog = false
-                    },
-                },
-            ],
-        }" />
 </template>
 
 <script>
-import { Dialog, ListView, Badge, Button } from 'frappe-ui'
+import { Dialog, ListView, Badge, Button, Tooltip } from 'frappe-ui'
+import { formatSize, formatDate } from "@/utils/format"
 
 export default{
     name: "MonitorTaskingDialog",
@@ -66,7 +68,8 @@ export default{
         Dialog,
         ListView,
         Badge,
-        Button
+        Button,
+        Tooltip
     },
     props: {
         modelValue: {
@@ -106,6 +109,11 @@ export default{
                     key: 'title'
                 },
                 {
+                    label: 'File Size',
+                    key: 'file_size',
+                    width: '90px'
+                },
+                {
                     label: 'Type Analysis',
                     key: 'type_analysis'
                 },
@@ -114,11 +122,23 @@ export default{
                     key: 'pupv'
                 },
                 {
+                    label: 'Uploaded Time',
+                    key: 'uploaded_time'
+                },
+                {
                     label: 'Status',
-                    key: 'status'
+                    key: 'status',
+                    width: '90px'
+                },
+                {
+                    label: 'Start Processing Time',
+                    key: 'start_processing_time'
+                },
+                {
+                    label: 'End Processing Time',
+                    key: 'end_processing_time'
                 }
             ],
-            showErrorDialog: false,
             messageError: ""
         }
     },
@@ -126,12 +146,13 @@ export default{
         onCloseDialog(){
             this.open = false
         },
-        clickRow(row){
-            console.log("Dòng 114 ", row)
-            if(row.status == "Error"){
-                this.messageError = row.error_message
-                this.showErrorDialog = true
-            }
+        formatSizeFile(size_file){
+            if(size_file == null) return ""
+            return formatSize(size_file)
+        },
+        formatDateFile(date){
+            if(date == null) return ""
+            return formatDate(date)
         }
     },
     mounted(){

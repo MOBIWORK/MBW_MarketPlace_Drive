@@ -42,6 +42,7 @@ def analytic_with_geometry(name_file, parent):
                 'parent': parent,
                 'type': "video_with_gps",
                 'title_file': doc_video.title,
+                'file_size': doc_video.file_size,
                 'name_gpx': doc_gpx.name
             }
             convert_mb_to_pupv = frappe.db.get_single_value('Drive Instance Settings', 'convert_mb_to_pupv')
@@ -70,7 +71,7 @@ def analytic_with_geometry(name_file, parent):
             hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_result_detect"
             sdk = RoadSDK(BASE_URL_AI)
             response = sdk.process_video_gpx(doc_task_queue.name, url_file_video, url_file_gps, hook_url)
-            doc_task_queue.status = "Processing"
+            doc_task_queue.status = "Pending"
             doc_task_queue.save(ignore_permissions=True)
             frappe.publish_realtime('event_analytic_video_job', message=doc_task_queue.name, user=frappe.session.user)
     except Exception as e:
@@ -116,7 +117,8 @@ def analytic_without_geometry(name_file, parent):
         'name_file': name_file,
         'parent': parent,
         'type': "video_without_gps",
-        'title_file': doc_file.title
+        'title_file': doc_file.title,
+        'file_size': doc_file.file_size
     }
     try:
         doc_file.is_analysis = True
@@ -146,7 +148,7 @@ def analytic_without_geometry(name_file, parent):
         #BASE_URL_AI
         sdk = RoadSDK(BASE_URL_AI)
         response = sdk.process_single_video_velocity(doc_task_queue.name, video_url, 7, hook_url)
-        doc_task_queue.status = "Processing"
+        doc_task_queue.status = "Pending"
         doc_task_queue.save(ignore_permissions=True)
         frappe.publish_realtime('event_analytic_video_job', message=doc_task_queue.name, user=frappe.session.user)
     except Exception as e:
@@ -156,6 +158,18 @@ def analytic_without_geometry(name_file, parent):
         doc_task_queue.error_message = str(e)
         doc_task_queue.save(ignore_permissions=True)
         frappe.publish_realtime('event_analytic_video_job', message=doc_task_queue.name, user=frappe.session.user)
+
+#API nhận trạng thái bắt đầu phân tích từ server AI trả về
+##Tham số đầu vào:
+###result: Kết quả server trả về
+@frappe.whitelist(methods=["POST"], allow_guest=True)
+def send_start_processing(result):
+    task_id = result["task_id"]
+    doc_tasking = frappe.get_doc("Drive Task Queue", task_id)
+    doc_tasking.status = "Processing"
+    doc_tasking.start_processing_time = datetime.now()
+    doc_tasking.save(ignore_permissions=True)
+    frappe.publish_realtime('event_analytic_video_job', message=result["task_id"], user=frappe.session.user)
 
 #API nhận kết quả phân tích video từ server AI trả về
 ##Tham số đầu vào:
@@ -212,17 +226,21 @@ def list_tasks():
         filters={
             'owner': frappe.session.user
         },
-        fields=["name", "task_metadata", "status", "pupv", "error_message"]
+        fields=["name", "task_metadata", "status", "pupv", "error_message", "uploaded_time", "start_processing_time", "end_processing_time"]
     )
     for doc_task in doc_tasks:
         task_metadata = json.loads(doc_task.task_metadata)
         task_response = {
             'name': doc_task.name,
-            'title': task_metadata["title_file"],
-            'type_analysis': task_metadata["type"],
+            'title': task_metadata.get("title_file", None),
+            'file_size': task_metadata.get("file_size", None),
+            'type_analysis': task_metadata.get("type", None),
             'status': doc_task.status,
             'pupv': doc_task.pupv,
-            'error_message': doc_task.error_message
+            'error_message': doc_task.error_message,
+            'uploaded_time': doc_task.uploaded_time,
+            'start_processing_time': doc_task.start_processing_time,
+            'end_processing_time': doc_task.end_processing_time
         }
         tasks_response.append(task_response)
     return tasks_response
@@ -237,6 +255,7 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key,
         if result["status"]["process_status"] != "SUCCESS":
             doc_task_queue.status = "Error"
             doc_task_queue.error_message = str(result)
+            doc_task_queue.end_processing_time = datetime.now()
             doc_task_queue.save(ignore_permissions=True)
             frappe.publish_realtime('event_analytic_video_job', message=doc_task_queue.name, user=frappe.session.user)
             return
@@ -385,6 +404,7 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key,
                 mime_type="video/mp4"
             )
         doc_task_queue.status = "Success"
+        doc_task_queue.end_processing_time = datetime.now()
         doc_task_queue.save(ignore_permissions=True)
         frappe.publish_realtime('event_analytic_video_job', message=result["task_id"], user=frappe.session.user)
         frappe.publish_realtime('event_load_entities', user=frappe.session.user)
@@ -401,6 +421,7 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_access_key, 
         if result["status"]["process_status"] != "SUCCESS":
             doc_task_queue.status = "Error"
             doc_task_queue.error_message = str(result)
+            doc_task_queue.end_processing_time = datetime.now()
             doc_task_queue.save(ignore_permissions=True)
             frappe.publish_realtime('event_analytic_video_job', message=doc_task_queue.name, user=frappe.session.user)
             return
@@ -535,6 +556,7 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_access_key, 
                 mime_type="video/mp4"
             )
         doc_task_queue.status = "Success"
+        doc_task_queue.end_processing_time = datetime.now()
         doc_task_queue.save(ignore_permissions=True)
         frappe.publish_realtime('event_analytic_video_job', message=doc_task_queue.name, user=frappe.session.user)
         frappe.publish_realtime('event_load_entities', user=frappe.session.user)
@@ -547,4 +569,5 @@ def update_doc_task_queue(taskId, status, errorMessage=None):
     doc_task_queue.status = status
     doc_task_queue.error_message = errorMessage
     doc_task_queue.pupv = 0
+    doc_task_queue.end_processing_time = datetime.now()
     doc_task_queue.save(ignore_permissions=True)
