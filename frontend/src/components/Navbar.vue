@@ -139,11 +139,11 @@
   <MonitorTaskingDialog
     v-model="showMonitorTaskingDialog"
     :arrTask="arrTassking"
+    v-if="showMonitorTaskingDialog"
   />
   <UploadVideoDialog 
     v-model="showNewVideoDialog"
     :parent="$route.params.entityName"
-    @success="onResetData"
   />
   <NewFolderDialog
     v-model="showNewFolderDialog"
@@ -474,9 +474,6 @@ export default {
           this.$store.state.currentFolder
         )
       }
-    },
-    onResetData(){
-      console.log("Dòng 479 reset data")
     }
   },
   resources: {

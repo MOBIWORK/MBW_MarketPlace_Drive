@@ -22,10 +22,24 @@
                             Success
                         </Badge>
                         <Tooltip v-else-if="row['status'] == 'Error'"
-                            :text="row['error_message']"
                             :placement="'top'"
                             :hoverDelay="0"
                         >
+                        <template #body>
+                            <div class="max-w-80 relative group">
+                                <div
+                                    class="w-full rounded px-2 py-1 text-xs text-ink-gray-9 shadow-xl overflow-y-auto text-white bg-gray-900"
+                                >
+                                    {{row['error_message']}}
+                                </div>
+                                <div class="absolute top-1 right-1 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Button :variant="'outline'" theme="gray" size="sm" @click="() => onCopyError(row['error_message'])">
+                                        <FeatherIcon name="copy" class="w-3" />
+                                    </Button>
+                                </div>
+                            </div>
+                            
+                        </template>
                             <Badge  :variant="'subtle'" :ref_for="true" theme="red" size="sm" class="cursor-pointer">
                                 Error
                             </Badge>
@@ -38,10 +52,10 @@
                         </Badge>
                     </template>
                     <template v-else-if="column.key == 'file_size'">
-                        {{ formatSizeFile(row["file_size"]) }}
+                        <span class="text-sm">{{ formatSizeFile(row["file_size"]) }}</span>
                     </template>
                     <template v-else-if="['uploaded_time','start_processing_time','end_processing_time'].includes(column.key)">
-                        {{ formatDateFile(row[column.key]) }}
+                        <span class="text-sm">{{ formatDateFile(row[column.key]) }}</span>
                     </template>
                     <template v-else>
                         <span class="text-base">{{ row[column.key] }}</span>
@@ -59,8 +73,9 @@
 </template>
 
 <script>
-import { Dialog, ListView, Badge, Button, Tooltip } from 'frappe-ui'
+import { Dialog, ListView, Badge, Button, Tooltip, FeatherIcon } from 'frappe-ui'
 import { formatSize, formatDate } from "@/utils/format"
+import { toast } from "@/utils/toasts.js"
 
 export default{
     name: "MonitorTaskingDialog",
@@ -69,7 +84,8 @@ export default{
         ListView,
         Badge,
         Button,
-        Tooltip
+        Tooltip,
+        FeatherIcon
     },
     props: {
         modelValue: {
@@ -153,6 +169,24 @@ export default{
         formatDateFile(date){
             if(date == null) return ""
             return formatDate(date)
+        },
+        onCopyError(errorMessage){
+            const textarea = document.createElement('textarea')
+            textarea.value = errorMessage
+            document.body.appendChild(textarea)
+
+            // Chọn nội dung và sao chép
+            textarea.select()
+            textarea.setSelectionRange(0, errorMessage.length) // Đảm bảo chọn hết nội dung
+            document.execCommand('copy')
+
+            // Loại bỏ textarea khỏi DOM
+            document.body.removeChild(textarea)
+            toast({
+                title: "Copy successfully",
+                position: "bottom-right",
+                timeout: 2,
+            })
         }
     },
     mounted(){

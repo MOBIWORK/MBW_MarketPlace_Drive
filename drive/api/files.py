@@ -36,6 +36,8 @@ import gpxpy
 import cv2
 import time
 
+import io
+
 def if_folder_exists(folder_name, parent):
     values = {
         "title": folder_name,
@@ -1735,7 +1737,7 @@ def get_shared_breadcrumbs(share_name):
     return share_breadcrumbs[::-1]
 
 @frappe.whitelist(methods=["POST"])
-def upload_file(src_file):
+def upload_file_test_boto(src_file):
     doc_setting = frappe.get_single('Drive Instance Settings')
     aws_access_key = doc_setting.aws_access_key
     aws_secret_access_key = doc_setting.get_password('aws_secret_key')
@@ -1751,24 +1753,67 @@ def upload_file(src_file):
     return {'excution_time': excution_time, 'key': "xxxxxx/abcd.mp4"}
 
 @frappe.whitelist(allow_guest=True)
-def get_file_by_object_key():
+def get_file_from_s3_with_cache():
+    """
+    Lấy file từ Amazon S3 với Redis Cache tích hợp.
+    """
+    object_key = "xxxxxx/abcd.mp4"
+    cache_key = f"s3_cache:{object_key}"
+
+    # 1. Kiểm tra trong cache
+    cached_value = frappe.cache().get(cache_key)
+    if cached_value:
+        print("Dòng 1766 đã có cache")
+        frappe.logger().info(f"Cache hit for {object_key}")
+        # Chuyển đổi bytes thành file-like object
+        file_like_object = io.BytesIO(cached_value)
+        return send_file(
+            file_like_object,
+            mimetype="video/mp4",
+            as_attachment=0,
+            conditional=True,
+            max_age=3600,
+            download_name=object_key.split("/")[-1],
+            environ=frappe.request.environ,
+        )
+
+    # 2. Không có cache, lấy từ S3
+    frappe.logger().info(f"Cache miss for {object_key}, fetching from S3...")
     doc_setting = frappe.get_single('Drive Instance Settings')
     aws_access_key = doc_setting.aws_access_key
     aws_secret_access_key = doc_setting.get_password('aws_secret_key')
-    start_time = time.time()
-    connect_s3 = boto3.client(
-        "s3",
-        aws_access_key_id = aws_access_key,
-        aws_secret_access_key = aws_secret_access_key
-    )
-    response = connect_s3.get_object(Bucket="eov-geoviz", Key="xxxxxx/abcd.mp4")
-    end_time = time.time()
-    return send_file(
-        response["Body"],
-        mimetype="video/mp4",
-        as_attachment=0,
-        conditional=True,
-        max_age=3600,
-        download_name="annotated_video.mp4",
-        environ=frappe.request.environ,
-    )
+
+    try:
+        start_time = time.time()
+        s3_client = boto3.client(
+            "s3",
+            aws_access_key_id=aws_access_key,
+            aws_secret_access_key=aws_secret_access_key,
+        )
+        response = s3_client.get_object(Bucket="eov-geoviz", Key=object_key)
+        file_content = response["Body"].read()  # Đọc nội dung file từ S3
+        end_time = time.time()
+        frappe.logger().info(f"Fetched {object_key} from S3 in {end_time - start_time} seconds.")
+        print("Dòng 1797 chưa có cache")
+        # 3. Lưu vào Redis Cache
+        frappe.cache().setex(cache_key, 3600, file_content)  # TTL = 1 giờ
+
+        # 4. Trả dữ liệu cho người dùng
+        file_like_object = io.BytesIO(file_content)
+        return send_file(
+            file_like_object,
+            mimetype="video/mp4",
+            as_attachment=0,
+            conditional=True,
+            max_age=3600,
+            download_name=object_key.split("/")[-1],
+            environ=frappe.request.environ,
+        )
+    except Exception as e:
+        frappe.throw(f"Error fetching file from S3: {str(e)}")
+
+@frappe.whitelist(allow_guest=True)
+def clear_cache():
+    object_key = "xxxxxx/abcd.mp4"
+    cache_key = f"s3_cache:{object_key}"
+    frappe.cache.delete_value(cache_key)

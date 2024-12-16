@@ -447,7 +447,6 @@ function onAddLayer() {
     }
     let arrLine = []
     let arrProperties = []
-    console.log(contentGeoJson.value)
     for (let i = 0; i < contentGeoJson.value.features.length; i++) {
         let geometry = contentGeoJson.value.features[i]["geometry"]
         let properties = contentGeoJson.value.features[i]["properties"]

@@ -157,7 +157,6 @@ export default {
           this.$resources.getUserGroups.fetch()
         },
         onError(data) {
-          console.log(data)
           this.errorMessage = data
         },
         auto: false,

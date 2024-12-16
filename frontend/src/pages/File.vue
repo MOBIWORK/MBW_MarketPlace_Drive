@@ -159,7 +159,6 @@ let file = createResource({
     store.commit("setEntityInfo", [data])
   },
   onSuccess(data) {
-    console.log(data)
     let currentBreadcrumbs = [
       {
         label: "Shared",

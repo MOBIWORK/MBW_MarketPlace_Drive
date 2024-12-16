@@ -112,7 +112,6 @@ export default {
   },
   methods: {
     addUser(data) {
-      console.log(data)
       data.forEach((user) => {
         this.memberError = ""
         this.UsersInRole.push(user)
@@ -145,7 +144,6 @@ export default {
           this.$emit("success", data)
         },
         onError(data) {
-          console.log(data.messages)
           if (data.messages === "Please set the document name") {
             this.groupNameError = "Group name is required"
           }

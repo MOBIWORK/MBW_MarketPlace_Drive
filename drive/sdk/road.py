@@ -11,7 +11,7 @@ class RoadSDK:
         """
         self.base_url = base_url
 
-    def process_single_video(self,task_id: str, video_url: str, hook_url: str) -> Dict:
+    def process_single_video(self,task_id: str, video_url: str, hook_url: str, status_hook_url: str) -> Dict:
         """
         Gửi yêu cầu xử lý video đơn lẻ.
 
@@ -22,12 +22,12 @@ class RoadSDK:
             dict: Kết quả trả về từ API.
         """
         endpoint = f"{self.base_url}/process-single-video/"
-        payload = {"task_id": task_id, "video_url": video_url, "hook_url": hook_url}
+        payload = {"task_id": task_id, "video_url": video_url, "hook_url": hook_url, "status_hook_url": status_hook_url}
         response = requests.post(endpoint, json=payload)
         response.raise_for_status()
         return response.json()
     
-    def process_single_video_velocity(self, task_id: str,  video_url: str, velocity: float, hook_url: str) -> Dict:
+    def process_single_video_velocity(self, task_id: str,  video_url: str, velocity: float, hook_url: str, status_hook_url: str) -> Dict:
         """
         Gửi yêu cầu xử lý video đơn lẻ.
 
@@ -38,12 +38,12 @@ class RoadSDK:
             dict: Kết quả trả về từ API.
         """
         endpoint = f"{self.base_url}/process-single-video-velocity/"
-        payload = {"task_id": task_id, "video_url": video_url, "velocity": velocity, "hook_url": hook_url}
+        payload = {"task_id": task_id, "video_url": video_url, "velocity": velocity, "hook_url": hook_url, "status_hook_url": status_hook_url}
         response = requests.post(endpoint, json=payload)
         response.raise_for_status()
         return response.json()
 
-    def process_video_gpx(self,task_id: str,  video_url: str, gpx_url: str, hook_url: str) -> Dict:
+    def process_video_gpx(self,task_id: str,  video_url: str, gpx_url: str, hook_url: str, status_hook_url: str) -> Dict:
         """
         Gửi yêu cầu xử lý video và file GPX.
 
@@ -55,12 +55,12 @@ class RoadSDK:
             dict: Kết quả trả về từ API.
         """
         endpoint = f"{self.base_url}/process-video-gpx/"
-        payload = {"task_id": task_id, "video_url": video_url, "gpx_url": gpx_url, "hook_url": hook_url}
+        payload = {"task_id": task_id, "video_url": video_url, "gpx_url": gpx_url, "hook_url": hook_url, "status_hook_url": status_hook_url}
         response = requests.post(endpoint, json=payload)
         response.raise_for_status()
         return response.json()
 
-    # def process_dual_video_gpx(self,task_id: str,  left_video_url: str, right_video_url: str, gpx_url: str, hook_url: str) -> Dict:
+    # def process_dual_video_gpx(self,task_id: str,  left_video_url: str, right_video_url: str, gpx_url: str, hook_url: str, status_hook_url: str) -> Dict:
     #     """
     #     Gửi yêu cầu xử lý hai video và file GPX.
 
@@ -78,6 +78,7 @@ class RoadSDK:
     #         "left_video_url": left_video_url,
     #         "right_video_url": right_video_url,
     #         "gpx_url": gpx_url,
+            # "status_hook_url": status_hook_url
             # "hook_url": hook_url
     #     }
     #     response = requests.post(endpoint, json=payload)
@@ -121,7 +122,3 @@ class RoadSDK:
         response = requests.get(url, stream=True)
         response.raise_for_status()
         return response
-
-
-# sdk = RoadSDK()
-# print(sdk.process_video_gpx('1', "http://10.0.1.247:8083/images/input/Data_potholes.mp4", "http://10.0.1.247:8083/images/input/111.gpx"))

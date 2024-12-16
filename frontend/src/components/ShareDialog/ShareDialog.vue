@@ -485,7 +485,6 @@ export default {
         this.usersWithAccess
       )
       for (let i in updatedUsers) {
-        console.log(updatedUsers[i])
         this.$resources.share.submit({
           entity_name: this.entityName,
           method: "share",

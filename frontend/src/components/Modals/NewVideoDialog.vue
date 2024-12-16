@@ -160,7 +160,6 @@ export default {
                         } else if (file.fullPath) {
                             formData.append("fullpath", file.fullPath)
                         }
-                        console.log("Form Data:", formData);
                     },
                     params: function (files, xhr, chunk) {
                         if (chunk) {
@@ -207,7 +206,6 @@ export default {
         },
         onAddFileToDropZone(file) {
             this.dropzone.addFile(file)
-            console.log(this.dropzone)
         },
         onChooseVideoFirst() {
             document.getElementById('video_1').click()
