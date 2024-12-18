@@ -1,10 +1,10 @@
 <template>
     <Dialog v-model="open" :options="{
         size: '4xl',
-        title: 'Service Packages',
+        title: __('Service Packages'),
     }" @after-leave="onCleanData">
         <template #body-content>
-            <div class="text-base">Set the service package you want to reserve</div>
+            <div class="text-base">{{__('Set the service package you want to reserve')}}</div>
             <div class="container">
                 <div v-for="(item, index) in list_package" :key="index" class="package-card">
                     <div class="package-content">
@@ -20,7 +20,7 @@
                                 class="w-[150px] mb-4"
                                 @click="() => onRegisterPackage(item)"
                             >
-                                Register package
+                                {{__('Register package')}}
                             </Button>
                         </div>
                         <div class="w-full border-t border-gray-500"></div>
@@ -28,13 +28,13 @@
                             <div class="flex items-start mb-1">
                                 <FeatherIcon name="check" class="h-5 w-5 mr-2" />
                                 <div class="text-base">
-                                    {{renderStorageVolume(item.storage_volume)}} {{renderUnitStorageVolume(item.storage_volume)}} storage capacity
+                                    {{renderStorageVolume(item.storage_volume)}} {{renderUnitStorageVolume(item.storage_volume)}} {{__('storage capacity')}}
                                 </div>
                             </div>
                             <div class="flex items-start mb-1">
                                 <FeatherIcon name="check" class="h-5 w-5 mr-2" />
                                 <div class="text-base">
-                                    {{item.pupv}} PUPV(Process Unit Per's Videos)
+                                    {{item.pupv}} {{__("PUPV(Process Unit Per's Videos)")}}
                                 </div>
                             </div>
                         </div>
@@ -84,14 +84,14 @@ export default {
                     onSuccess(data){
                         if(data.price == 0){
                             toast({
-                                title: "You have successfully changed the package",
+                                title: __("You have successfully changed the package"),
                                 position: "bottom-right",
                                 timeout: 2,
                             })
                             this.open = false
                         }else{
                             toast({
-                                title: "Invoice created successfully. Please pay to experience the service",
+                                title: __("Invoice created successfully. Please pay to experience the service"),
                                 position: "bottom-right",
                                 timeout: 2,
                             })

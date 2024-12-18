@@ -1,7 +1,7 @@
 <template>
     <Dialog v-model="open" :options="{
         size: '4xl',
-        title: 'Tasking',
+        title: __('Tasking'),
     }">
         <template #body-content>
             <ListView class="h-[350px] w-full" :columns="columnTask" :rows="arrTask" :options="{
@@ -9,17 +9,17 @@
                 showTooltip: true,
                 resizeColumn: true,
                 emptyState: {
-                    description: 'There are no records'
+                    description: __('There are no records')
                 }
             }" row-key="name">
                 <template #cell="{ item, row, column }">
                     <template v-if="column.key == 'type_analysis'">
-                        <span v-if="row['type_analysis'] == 'video_with_gps'" class="text-base">Video With GPS</span>
-                        <span v-else class="text-base">Video Without GPS</span>
+                        <span v-if="row['type_analysis'] == 'video_with_gps'" class="text-base">{{__('Video With GPS')}}</span>
+                        <span v-else class="text-base">{{__('Video Without GPS')}}</span>
                     </template>
                     <template v-else-if="column.key == 'status'">
                         <Badge v-if="row['status'] == 'Success'" :variant="'subtle'" :ref_for="true" theme="green" size="sm">
-                            Success
+                            {{__('Success')}}
                         </Badge>
                         <Tooltip v-else-if="row['status'] == 'Error'"
                             :placement="'top'"
@@ -41,14 +41,14 @@
                             
                         </template>
                             <Badge  :variant="'subtle'" :ref_for="true" theme="red" size="sm" class="cursor-pointer">
-                                Error
+                                {{__('Error')}}
                             </Badge>
                         </Tooltip>
                         <Badge v-else-if="row['status'] == 'Pending'" :variant="'subtle'" :ref_for="true" theme="gray" size="sm">
-                            Pending
+                            {{__('Pending')}}
                         </Badge>
                         <Badge v-else :variant="'subtle'" :ref_for="true" theme="blue" size="sm">
-                            Processing
+                            {{__('Processing')}}
                         </Badge>
                     </template>
                     <template v-else-if="column.key == 'file_size'">
@@ -121,37 +121,37 @@ export default{
             arrTask: [],
             columnTask: [
                 {
-                    label: 'Title',
+                    label: __('Title'),
                     key: 'title'
                 },
                 {
-                    label: 'File Size',
+                    label: __('File Size'),
                     key: 'file_size',
                     width: '90px'
                 },
                 {
-                    label: 'Type Analysis',
+                    label: __('Type Analysis'),
                     key: 'type_analysis'
                 },
                 {
-                    label: 'PUPV',
+                    label: __('PUPV'),
                     key: 'pupv'
                 },
                 {
-                    label: 'Uploaded Time',
+                    label: __('Uploaded Time'),
                     key: 'uploaded_time'
                 },
                 {
-                    label: 'Status',
+                    label: __('Status'),
                     key: 'status',
                     width: '90px'
                 },
                 {
-                    label: 'Start Processing Time',
+                    label: __('Start Processing Time'),
                     key: 'start_processing_time'
                 },
                 {
-                    label: 'End Processing Time',
+                    label: __('End Processing Time'),
                     key: 'end_processing_time'
                 }
             ],
@@ -183,7 +183,7 @@ export default{
             // Loại bỏ textarea khỏi DOM
             document.body.removeChild(textarea)
             toast({
-                title: "Copy successfully",
+                title: __("Copy successfully"),
                 position: "bottom-right",
                 timeout: 2,
             })

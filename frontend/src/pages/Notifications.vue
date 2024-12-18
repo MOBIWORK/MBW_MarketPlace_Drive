@@ -12,7 +12,7 @@
               : ''
           "
           @click="onlyUnread = true"
-          >Unread</Button
+          >{{__('Unread')}}</Button
         >
         <Button
           class="max-h-6"
@@ -22,7 +22,7 @@
               : 'bg-white shadow-sm hover:bg-white active:bg-white'
           "
           @click="onlyUnread = false"
-          >All</Button
+          >{{__('All')}}</Button
         >
       </div>
       <div>
@@ -37,7 +37,7 @@
           @click="
             markAsRead.submit({ all: true }), (store.state.notifCount = 0)
           "
-          >Mark all as Read</Button
+          >{{__('Mark all as Read')}}</Button
         >
       </div>
     </div>
@@ -54,7 +54,7 @@
       class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center"
     >
       <FeatherIcon name="inbox" class="w-14 h-auto text-gray-500 pb-4" />
-      <span class="text-base text-gray-600 font-medium">No Notifications</span>
+      <span class="text-base text-gray-600 font-medium">{{__('No Notifications')}}</span>
     </div>
   </div>
 </template>
@@ -85,13 +85,13 @@ const options = {
 
 const columns = [
   {
-    label: "Subject",
+    label: __("Subject"),
     key: "subject",
     width: "80px",
     getLabel: ({ row }) => row.type,
   },
   {
-    label: "Message",
+    label: __("Message"),
     key: "message",
     width: 4,
     getLabel: ({ row }) => row.message,

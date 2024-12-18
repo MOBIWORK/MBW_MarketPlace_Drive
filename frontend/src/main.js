@@ -14,6 +14,7 @@ import emitter from "./event-bus"
 import "./index.css"
 import VueTippy from "vue-tippy"
 import { initSocket, RealTimeHandler } from "./socket"
+import translationPlugin from './translation'
 
 setConfig("resourceFetcher", frappeRequest)
 const app = createApp(App)
@@ -22,6 +23,7 @@ app.config.globalProperties.emitter = emitter
 app.provide("emitter", emitter)
 app.use(router)
 app.use(store)
+app.use(translationPlugin)
 
 app.use(FrappeUI, { socketio: false })
 const socket = initSocket()

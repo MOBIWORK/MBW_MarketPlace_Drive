@@ -5,7 +5,7 @@
     :allow-empty-context-menu="false"
     :show-sort="false"
     :icon="Recent"
-    primary-message="No Recent Files"
+    :primary-message="__('No Recent Files')"
     :secondary-message="''"
   />
 </template>

@@ -14,7 +14,8 @@ dependencies = [
     "geojson",
     "payos",
     "minio",
-    "gpxpy"
+    "gpxpy",
+    "av"
 ]
 
 [build-system]

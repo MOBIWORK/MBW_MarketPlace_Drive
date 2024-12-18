@@ -161,7 +161,7 @@ let file = createResource({
   onSuccess(data) {
     let currentBreadcrumbs = [
       {
-        label: "Shared",
+        label: __("Shared"),
         route: "/shared",
       },
     ]
@@ -169,7 +169,7 @@ let file = createResource({
     if (root_item.name === store.state.homeFolderID) {
       currentBreadcrumbs = [
         {
-          label: "Home",
+          label: __("Home"),
           route: "/home",
         },
       ]

@@ -9,7 +9,7 @@
       v-if="pages > 100"
       class="flex w-full items-center justify-center rounded-t bg-gray-50 bg-opacity-50 mt-8 border gap-x-2 p-1"
     >
-      <Button variant="ghost" icon="chevron-left">Prev</Button>
+      <Button variant="ghost" icon="chevron-left">{{__('Prev')}}</Button>
       <Input
         v-model.number="currentPage"
         type="number"

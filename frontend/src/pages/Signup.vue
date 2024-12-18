@@ -8,7 +8,7 @@
       <Input
         v-model="fullName"
         class="mb-2"
-        label="Name"
+        :label="__('Name')"
         type="text"
         autocomplete="name"
         required
@@ -23,7 +23,7 @@
       />
       <Input
         v-model="pwd"
-        label="Password"
+        :label="__('Password')"
         type="password"
         required
       />
@@ -33,22 +33,22 @@
         :loading="loading"
         variant="solid"
       >
-        Submit
+        {{__('Submit')}}
       </Button>
       <div class="mt-10 text-center border-t">
         <div class="transform -translate-y-1/2">
           <span
             class="px-2 text-xs leading-8 tracking-wider text-gray-800 bg-white"
           >
-            OR
+            {{__('OR')}}
           </span>
         </div>
       </div>
       <div class="flex justify-center items-center">
-        <span>Already have an account?</span>
+        <span>{{__('Already have an account?')}}</span>
         <span>&nbsp;&nbsp;</span>
         <router-link class="text-base text-blue-500" to="/login">
-          LOG IN
+          {{__('LOG IN')}}
         </router-link>
       </div>
     </form>
@@ -134,19 +134,18 @@ export default {
             let [code] = res
             if (code > 0) this.request_status_ok = true
             if (code === 0) {
-              this.errorMessage = "This account already exists"
+              this.errorMessage = __("This account already exists")
             } else if (code === 1) {
               this.response = {
-                title: "Register Account Successfully",
-                message: `Your account was created successfully. Please <a href="/drive" class="text-base text-blue-500">LOGIN IN</a> to use the service.`,
+                title: __("Register Account Successfully"),
+                message: `${__('Your account was created successfully. Please')} <a href="/drive" class="text-base text-blue-500">${__('LOGIN IN')}</a> ${__('to use the service')}.`,
                 color: "green",
               }
             } else {
               this.request_status_ok = true
               this.response = {
-                title: "Verification Needed",
-                message: `Verification email was not sent. Please ask your administrator to
-                verify your sign-up`,
+                title: __("Verification Needed"),
+                message: __('Verification email was not sent. Please ask your administrator to verify your sign-up'),
                 color: "red",
               }
             }

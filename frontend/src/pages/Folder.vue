@@ -7,7 +7,7 @@
     :is-shared-folder="isSharedFolder"
     :entity-name="entityName"
     :icon="Folder"
-    :primaryMessage="'Folder is Empty'"
+    :primaryMessage="__('Folder is Empty')"
     :secondaryMessage="''"
   />
 </template>
@@ -76,7 +76,7 @@ let currentFolder = createResource({
     data.creation = formatDate(data.creation)
     let currentBreadcrumbs = [
       {
-        label: "Shared",
+        label: __("Shared"),
         route: "/shared",
       },
     ]
@@ -84,7 +84,7 @@ let currentFolder = createResource({
     if (root_item.name === store.state.homeFolderID) {
       currentBreadcrumbs = [
         {
-          label: "Home",
+          label: __("Home"),
           route: "/home",
         },
       ]

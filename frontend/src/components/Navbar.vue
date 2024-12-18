@@ -113,7 +113,7 @@
                 <template #prefix>
                   <FeatherIcon name="upload" class="w-4" />
                 </template>
-                New
+                {{__('New')}}
                 <template #suffix>
                   <FeatherIcon name="chevron-down" class="w-4" />
                 </template>

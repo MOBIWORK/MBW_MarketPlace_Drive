@@ -76,7 +76,7 @@ const tabsContent = ref([
     },
     {
         name: "table",
-        label: 'Table',
+        label: __('Table'),
         icon: h(FeatherIcon, {
             name: "table",
             class: "h-4 w-4"
@@ -96,15 +96,15 @@ const columns = ref(
             width: '50px'
         },
         {
-            label: 'Acreage(m)',
+            label: __('Acreage(m)'),
             key: 'area_real'
         },
         {
-            label: 'Acreage(pixel)',
+            label: __('Acreage(pixel)'),
             key: 'area_pixel'
         },
         {
-            label: 'Image',
+            label: __('Image'),
             key: 'image'
         }
     ]
@@ -165,28 +165,28 @@ function initMap() {
         baseLayers: [
             {
                 id: "OSM:Night",
-                title: "Night basemap",
+                title: __("Night basemap"),
                 thumbnail: "https://docs.ekgis.vn/assets/dem-map.png",
                 width: "50px",
                 height: "50px",
             },
             {
                 id: "OSM:Bright",
-                title: "Bright basemap",
+                title: __("Bright basemap"),
                 thumbnail: "https://docs.ekgis.vn/assets/map-sang.png",
                 width: "50px",
                 height: "50px",
             },
             {
                 id: "OSM:Standard",
-                title: "Basemap Standard",
+                title: __("Basemap Standard"),
                 thumbnail: "https://docs.ekgis.vn/assets/map-chuan.png",
                 width: "50px",
                 height: "50px",
             },
             {
                 id: 'satellite',
-                title: 'Vệ tinh',
+                title: __('Satellite'),
                 thumbnail: 'https://files.ekgis.vn/widget/v1.0.0/assets/image/satellite.png',
                 width: '50px',
                 height: '50px'
@@ -477,7 +477,7 @@ function onCopyData() {
     // Loại bỏ textarea khỏi DOM
     document.body.removeChild(textarea)
     toast({
-        title: "Copy successfully",
+        title: __("Copy successfully"),
         position: "bottom-right",
         timeout: 2,
     })

@@ -1,4 +1,6 @@
 from . import __version__ as app_version
+import frappe
+import csv
 
 app_name = "drive"
 app_title = "Frappe Drive"
@@ -206,3 +208,13 @@ scheduler_events = {
 # auth_hooks = [
 # 	"drive.auth.validate"
 # ]
+
+def load_custom_translations():
+    translation_file_path = frappe.get_app_path("drive", "translations", "vi.csv")
+    with open(translation_file_path, newline='', encoding='utf-8') as csvfile:
+        translation_reader = csv.DictReader(csvfile)
+        for row in translation_reader:
+            frappe._dict(row)
+
+def before_install():
+    load_custom_translations()

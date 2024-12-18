@@ -5,7 +5,7 @@
     :allow-empty-context-menu="false"
     :show-sort="true"
     :icon="Star"
-    :primaryMessage="'No Favourite Files'"
+    :primaryMessage="__('No Favourite Files')"
     :secondaryMessage="''"
   />
 </template>

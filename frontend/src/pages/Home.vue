@@ -6,8 +6,8 @@
     :entity-name="homeID.data"
     :show-sort="true"
     :icon="Home"
-    :primary-message="'Home is empty'"
-    :secondary-message="'Add files by dropping them here'"
+    :primary-message="__('Home is empty')"
+    :secondary-message="__('Add files by dropping them here')"
   />
 </template>
 
@@ -33,8 +33,8 @@ let homeID = createResource({
       store.commit("setError", {
         iconName: "alert-triangle",
         iconClass: "fill-amber-500 stroke-white",
-        primaryMessage: "Forbidden",
-        secondaryMessage: "You do not have access to Frappe Drive",
+        primaryMessage: __("Forbidden"),
+        secondaryMessage: __("You do not have access to Frappe Drive"),
         hideButton: true,
       })
       if (store.state.user.role === "Drive Guest") {

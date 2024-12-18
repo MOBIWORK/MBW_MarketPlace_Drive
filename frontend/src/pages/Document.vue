@@ -143,7 +143,7 @@ const getDocument = createResource({
     contentLoaded.value = true
     let currentBreadcrumbs = [
       {
-        label: "Shared",
+        label: __("Shared"),
         route: "/shared",
       },
     ]
@@ -151,7 +151,7 @@ const getDocument = createResource({
     if (root_item.name === store.state.homeFolderID) {
       currentBreadcrumbs = [
         {
-          label: "Home",
+          label: __("Home"),
           route: "/home",
         },
       ]

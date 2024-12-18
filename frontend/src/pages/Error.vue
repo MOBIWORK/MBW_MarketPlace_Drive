@@ -38,8 +38,8 @@ const router = useRouter()
 
 const redirText = computed(() => {
   if (store.getters.isLoggedIn) {
-    return "Back to Home"
+    return __("Back to Home")
   }
-  return "Login"
+  return __("Login")
 })
 </script>

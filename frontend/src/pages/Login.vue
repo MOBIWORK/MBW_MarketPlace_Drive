@@ -14,7 +14,7 @@
       />
       <Input
         v-model="password"
-        label="Password"
+        :label="__('Password')"
         type="password"
         name="password"
         autocomplete="current-password"
@@ -26,14 +26,14 @@
         variant="solid"
         @click="login"
       >
-        Submit
+        {{__('Submit')}}
       </Button>
       <div class="mt-10 text-center border-t">
         <div class="transform -translate-y-1/2">
           <span
             class="px-2 text-xs leading-8 tracking-wider text-gray-800 bg-white"
           >
-            OR
+            {{__('OR')}}
           </span>
         </div>
       </div>
@@ -59,13 +59,13 @@
             />
           </svg>
         </template>
-        Login via {{ provider.provider_name }}
+        {{__('Login via')}} {{ provider.provider_name }}
       </Button>
       <div class="flex justify-center items-center">
-        <span>Don't have an account?</span>
+        <span>{{__("Don't have an account?")}}</span>
         <span>&nbsp;&nbsp;</span>
         <router-link class="text-base text-blue-500" to="/signup">
-          SIGN UP
+          {{__('SIGN UP')}}
         </router-link>
       </div>
     </form>

@@ -186,28 +186,28 @@ function initMap() {
         baseLayers: [
             {
                 id: "OSM:Night",
-                title: "Night basemap",
+                title: __("Night basemap"),
                 thumbnail: "https://docs.ekgis.vn/assets/dem-map.png",
                 width: "50px",
                 height: "50px",
             },
             {
                 id: "OSM:Bright",
-                title: "Bright basemap",
+                title: __("Bright basemap"),
                 thumbnail: "https://docs.ekgis.vn/assets/map-sang.png",
                 width: "50px",
                 height: "50px",
             },
             {
                 id: "OSM:Standard",
-                title: "Basemap Standard",
+                title: __("Basemap Standard"),
                 thumbnail: "https://docs.ekgis.vn/assets/map-chuan.png",
                 width: "50px",
                 height: "50px",
             },
             {
                 id: 'satellite',
-                title: 'Vệ tinh',
+                title: __('Satellite'),
                 thumbnail: 'https://files.ekgis.vn/widget/v1.0.0/assets/image/satellite.png',
                 width: '50px',
                 height: '50px'
