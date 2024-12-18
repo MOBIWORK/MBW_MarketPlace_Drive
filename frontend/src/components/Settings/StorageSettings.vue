@@ -1,5 +1,5 @@
 <template>
-  <h1 class="font-semibold mb-4">Storage</h1>
+  <h1 class="font-semibold mb-4">{{__('Storage')}}</h1>
   <UserStorage
     v-if="showFileStorage"
     :used-space="fileUsedSpace"
@@ -21,7 +21,7 @@
           ]"
           @click="showFileStorage = false"
         >
-          System
+          {{__('System')}}
         </Button>
         <Button
           variant="ghost"
@@ -33,7 +33,7 @@
           ]"
           @click="showFileStorage = true"
         >
-          You
+          {{__('You')}}
         </Button>
       </div>
     </template>
@@ -61,7 +61,7 @@
           ]"
           @click="showFileStorage = false"
         >
-          System
+          {{__('System')}}
         </Button>
         <Button
           variant="ghost"
@@ -73,7 +73,7 @@
           ]"
           @click="showFileStorage = true"
         >
-          You
+          {{__('You')}}
         </Button>
       </div>
     </template>

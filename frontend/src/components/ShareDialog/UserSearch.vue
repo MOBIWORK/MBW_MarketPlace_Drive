@@ -32,7 +32,7 @@
               <template v-if="index > 0">, </template>
               {{ user.full_name }}
             </span>
-            <span v-if="!newUsers.length" class="w-full">Select users</span>
+            <span v-if="!newUsers.length" class="w-full">{{__('Select users')}}</span>
           </PopoverButton>
           <PopoverPanel
             class="z-10 rounded-lg w-full"
@@ -65,7 +65,7 @@
         class="text-gray-700 relative flex-shrink-0 col-span-4 ml-auto border-l border-gray-600"
       >
         <PopoverButton class="flex gap-1 px-2 focus:outline-none">
-          {{ newUserAccess.write ? "Can Edit" : "Can View" }}
+          {{ newUserAccess.write ? __("Can Edit") : __("Can View") }}
           <ChevronDown
             :class="{ '[transform:rotateX(180deg)]': open }"
             class="w-4"
@@ -78,7 +78,7 @@
               class="flex items-center p-1 hover:bg-gray-100 w-full rounded-[6px] cursor-pointer"
               @click="newUserAccess = { read: 1, write: 0 }"
             >
-              <span class="line-clamp-1">Can View</span>
+              <span class="line-clamp-1">{{__('Can View')}}</span>
               <Check
                 v-if="newUserAccess.read === 1 && newUserAccess.write === 0"
                 class="h-3 pl-1"
@@ -88,7 +88,7 @@
               class="flex items-center p-1 hover:bg-gray-100 w-full rounded-[6px] cursor-pointer"
               @click="newUserAccess = { read: 1, write: 1 }"
             >
-              Can Edit
+              {{__('Can Edit')}}
               <Check v-if="newUserAccess.write === 1" class="h-3 pl-1" />
             </li></ul
         ></PopoverPanel>

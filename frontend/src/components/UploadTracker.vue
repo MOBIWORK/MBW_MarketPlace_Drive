@@ -11,22 +11,22 @@
         v-if="uploadsInProgress.length > 0"
         class="font-medium truncate text-lg"
       >
-        Uploading {{ uploadsInProgress.length }}
-        {{ uploadsInProgress.length == 1 ? "file" : "files" }}
+        {{__('Uploading')}} {{ uploadsInProgress.length }}
+        {{ uploadsInProgress.length == 1 ? __("file") : __("files") }}
       </div>
       <div
         v-else-if="uploadsCompleted.length > 0"
         class="font-medium truncate text-lg"
       >
         {{ uploadsCompleted.length }}
-        {{ uploadsCompleted.length == 1 ? "upload" : "uploads" }} complete
+        {{ uploadsCompleted.length == 1 ? __("upload") : __("uploads") }} {{__('complete')}}
       </div>
       <div
         v-else-if="uploadsFailed.length > 0"
         class="font-medium truncate text-lg"
       >
         {{ uploadsFailed.length }}
-        {{ uploadsFailed.length == 1 ? "upload" : "uploads" }} failed
+        {{ uploadsFailed.length == 1 ? __("upload") : __("uploads") }} {{__('failed')}}
       </div>
       <div class="ml-auto flex items-center gap-4">
         <button
@@ -54,7 +54,7 @@
         ]"
         @click="currentTab = 1"
       >
-        In Progress
+        {{__('In Progress')}}
       </Button>
       <Button
         variant="ghost"
@@ -66,7 +66,7 @@
         ]"
         @click="currentTab = 2"
       >
-        Completed
+        {{__('Completed')}}
       </Button>
       <Button
         v-show="uploadsFailed.length > 0"
@@ -79,7 +79,7 @@
         ]"
         @click="currentTab = 3"
       >
-        Failed
+        {{__('Failed')}}
       </Button>
     </div>
     <div v-if="!collapsed" class="max-h-64 overflow-y-auto bg-white w-full">
@@ -147,12 +147,12 @@
       v-if="showErrorDialog"
       v-model="showErrorDialog"
       :options="{
-        title: 'Upload Failed',
+        title: __('Upload Failed'),
         message: selectedUpload.error,
         size: 'sm',
         actions: [
           {
-            label: 'Confirm',
+            label: __('Confirm'),
             onClick: () => {
               showErrorDialog = false
             },
@@ -164,12 +164,12 @@
       v-if="showCancelDialog"
       v-model="showCancelDialog"
       :options="{
-        title: 'Cancel uploads',
-        message: 'Are you sure you want to cancel all ongoing uploads?',
+        title: __('Cancel uploads'),
+        message: __('Are you sure you want to cancel all ongoing uploads?'),
         size: 'sm',
         actions: [
           {
-            label: 'Confirm',
+            label: __('Confirm'),
             variant: 'subtle',
             theme: 'red',
             onClick: () => {
@@ -206,7 +206,7 @@ export default {
       showErrorDialog: false,
       selectedUpload: null,
       currentTab: 1,
-      emptyMessage: "No uploads in progress",
+      emptyMessage: __("No uploads in progress"),
     }
   },
   computed: {
@@ -219,16 +219,16 @@ export default {
     currentTabGetter() {
       switch (this.currentTab) {
         case 1:
-          this.emptyMessage = "No uploads in progress"
+          this.emptyMessage = __("No uploads in progress")
           return this.uploadsInProgress
         case 2:
-          this.emptyMessage = "No uploads completed"
+          this.emptyMessage = __("No uploads completed")
           return this.uploadsCompleted
         case 3:
-          this.emptyMessage = "No failed uploads"
+          this.emptyMessage = __("No failed uploads")
           return this.uploadsFailed
         default:
-          this.emptyMessage = "No uploads completed"
+          this.emptyMessage = __("No uploads completed")
           return this.uploadsCompleted
       }
     },

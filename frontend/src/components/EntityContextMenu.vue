@@ -17,7 +17,7 @@
         }
       "
     >
-      <ColorPopover v-if="item.label === 'Color'" :entity-name="entityName" />
+      <ColorPopover v-if="item.label === __('Color')" :entity-name="entityName" />
       <div
         v-else
         class="h-7 px-2 hover:bg-gray-100 text-sm cursor-pointer rounded flex justify-start items-center"
@@ -28,7 +28,7 @@
           class="h-4 w-4 mr-2"
           :class="[
             item.danger ? 'text-red-500' : '',
-            item.label === 'Unfavourite' ? 'fill-amber-400 text-amber-400' : '',
+            item.label === __('Unfavourite') ? 'fill-amber-400 text-amber-400' : '',
           ]"
         />
         <component

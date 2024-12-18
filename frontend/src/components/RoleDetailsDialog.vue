@@ -1,7 +1,7 @@
 <template>
   <Dialog v-model="open" :options="{ title: roleName, size: 'lg' }">
     <template #body-content>
-      <label class="block text-base text-gray-600 my-2">Add User</label>
+      <label class="block text-base text-gray-600 my-2">{{__('Add User')}}</label>
       <UserSearch
         button-text="Add"
         :button-variant="'solid'"
@@ -14,7 +14,7 @@
         v-if="UsersInRole.length"
         class="block text-base text-gray-600 mt-6 mb-2"
       >
-        Users in this Group
+        {{__('Users in this Group')}}
       </label>
       <div
         v-for="(user, index) in uniqueUsers"
@@ -30,7 +30,7 @@
             {{ user.user_name }}
           </p>
         </div>
-        <Button class="ml-auto" @click="removeUser(user)">Remove</Button>
+        <Button class="ml-auto" @click="removeUser(user)">{{__('Remove')}}</Button>
       </div>
       <ErrorMessage class="mt-2" :message="errorMessage" />
     </template>
@@ -155,7 +155,7 @@ export default {
         },
         validate: () => {
           if (!this.uniqueEmails.length) {
-            this.errorMessage = "Group needs atleast one member"
+            this.errorMessage = __("Group needs atleast one member")
           }
         },
         onSuccess(data) {
@@ -178,7 +178,7 @@ export default {
         },
         validate: () => {
           if (this.uniqueEmails.length === 1) {
-            this.errorMessage = "Group needs atleast one active member"
+            this.errorMessage = __("Group needs atleast one active member")
           }
         },
         onSuccess() {
@@ -187,7 +187,7 @@ export default {
         },
         onError(data) {
           if (data.messages === "Data missing in table: User Group Members'") {
-            this.errorMessage = "Group needs atleast one active member"
+            this.errorMessage = __("Group needs atleast one active member")
           }
         },
         auto: false,

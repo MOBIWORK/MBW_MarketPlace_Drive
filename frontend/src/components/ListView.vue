@@ -4,24 +4,24 @@
       class="hidden sm:grid items-center rounded bg-gray-100 min-h-7 p-2 overflow-hidden mb-2"
       :style="{ gridTemplateColumns: tableColumnsGridWidth }"
     >
-      <div class="flex w-full items-center text-sm text-gray-600">Name</div>
+      <div class="flex w-full items-center text-sm text-gray-600">{{__('Name')}}</div>
       <div class="flex w-full items-center justify-start text-sm text-gray-600">
-        Owner
+        {{__('Owner')}}
       </div>
       <div
         v-if="$route.name === 'Recents'"
         class="flex w-full items-center justify-end text-sm text-gray-600"
       >
-        Last Accessed
+        {{__('Last Accessed')}}
       </div>
       <div
         v-else
         class="flex w-full items-center justify-end text-sm text-gray-600"
       >
-        Last Modified
+        {{__('Last Modified')}}
       </div>
       <div class="flex w-full items-center justify-end text-sm text-gray-600">
-        Size
+        {{__('Size')}}
       </div>
       <div />
     </div>
@@ -145,7 +145,7 @@
       :loading="true"
       :disabled="true"
       variant="ghost"
-      >Loading</Button
+      >{{__('Loading')}}</Button
     >
   </div>
 </template>

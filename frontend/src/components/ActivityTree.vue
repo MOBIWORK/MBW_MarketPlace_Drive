@@ -144,19 +144,19 @@ function generateMessage(activity) {
     case "create":
       return `${user} ${creationText} ${entityText.value}`
     case "rename":
-      return `${user} renamed this ${entityText.value}`
+      return `${user} ${__('renamed this')} ${entityText.value}`
     case "edit":
-      return `${user} edited this ${entityText.value}`
+      return `${user} ${__('edited this')} ${entityText.value}`
     case "delete":
-      return `${user} deleted this ${entityText.value}`
+      return `${user} ${__('deleted this')} ${entityText.value}`
     case "share_add":
-      return `${user} shared this ${entityText.value}`
+      return `${user} ${__('shared this')} ${entityText.value}`
     case "share_edit":
-      return `${user} updated permissions on this ${entityText.value}`
+      return `${user} ${__('updated permissions on this')} ${entityText.value}`
     case "share_remove":
-      return `${user} restricted this ${entityText.value}`
+      return `${user} ${__('restricted this')} ${entityText.value}`
     case "move":
-      return `${user} moved this ${entityText.value}`
+      return `${user} ${__('moved this')} ${entityText.value}`
     default:
       return `Unknown action type: ${activity.action_type}`
   }

@@ -12,7 +12,7 @@
                 <label for="video_without_gps" class="ml-2 text-base">{{__('Video Without GPS')}}</label>
             </div>
             <div v-if="typeInput == 'video_gps'" class="grid mt-3 grid-cols-1">
-                <div class="text-sm text-gray-600 mb-1">Files</div>
+                <div class="text-sm text-gray-600 mb-1">{{__('Files')}}</div>
                 <div class="h-28 border-2 border-dashed rounded-lg flex cursor-pointer items-center justify-center"
                     @click="onChooseFileWithGPS">
                     <input class="hidden" type="file" accept="video/mp4,.gpx" id="file_with_gps" multiple
@@ -21,14 +21,13 @@
                     <div class="flex flex-col items-center text-center">
                         <FeatherIcon name="plus" class="h-6" />
                         <div class="text-center">
-                            <span class="text-sm font-medium">The video and gps file names must be the same to be able
-                                to extract information</span>
+                            <span class="text-sm font-medium">{{__('The video and gps file names must be the same to be able to extract information')}}</span>
                         </div>
                     </div>
                 </div>
             </div>
             <div v-if="typeInput == 'video_without_gps'" class="grid mt-3 grid-cols-1">
-                <div class="text-sm text-gray-600 mb-1">Files</div>
+                <div class="text-sm text-gray-600 mb-1">{{__('Files')}}</div>
                 <div class="h-28 border-2 border-dashed rounded-lg flex cursor-pointer items-center justify-center"
                     @click="onChooseFileWithOutGPS">
                     <input class="hidden" type="file" accept="video/mp4" id="file_without_gps" multiple
@@ -37,7 +36,7 @@
                     <div class="flex flex-col items-center text-center">
                         <FeatherIcon name="plus" class="h-6" />
                         <div class="text-center">
-                            <span class="text-sm font-medium">Select video files to extract information</span>
+                            <span class="text-sm font-medium">{{__('Select video files to extract information')}}</span>
                         </div>
                     </div>
                 </div>
@@ -45,7 +44,7 @@
         </template>
         <template #actions>
             <div class="flex flex-row-reverse gap-2">
-                <Button variant="solid" label="Cancel" @click="onCloseDialog" />
+                <Button variant="solid" :label="__('Cancel')" @click="onCloseDialog" />
             </div>
         </template>
     </Dialog>

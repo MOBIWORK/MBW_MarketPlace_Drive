@@ -389,27 +389,27 @@ export default {
     columnHeaders() {
       return [
         {
-          label: "Name",
+          label: __("Name"),
           field: "title",
           sortable: true,
         },
         {
-          label: "Owner",
+          label: __("Owner"),
           field: "owner",
           sortable: true,
         },
         {
-          label: "Modified",
+          label: __("Modified"),
           field: "modified",
           sortable: true,
         },
         {
-          label: "Size",
+          label: __("Size"),
           field: "file_size",
           sortable: true,
         },
         {
-          label: "Type",
+          label: __("Type"),
           field: "mime_type",
           sortable: true,
         },
@@ -418,7 +418,7 @@ export default {
     emptyActionItems() {
       return [
         {
-          label: "Upload File",
+          label: __("Upload File"),
           icon: FileUpload,
           handler: () => (this.showNewVideoDialog = true),  //this.emitter.emit("uploadFile"),
           isEnabled: () => this.selectedEntities.length === 0,
@@ -430,13 +430,13 @@ export default {
         //   isEnabled: () => this.selectedEntities.length === 0,
         // },
         {
-          label: "New Folder",
+          label: __("New Folder"),
           icon: NewFolder,
           handler: () => (this.showNewFolderDialog = true),
           isEnabled: () => this.selectedEntities.length === 0,
         },
         {
-          label: "New Document",
+          label: __("New Document"),
           icon: NewFile,
           handler: () => this.newDocument(),
           isEnabled: () => this.selectedEntities.length === 0,
@@ -455,7 +455,7 @@ export default {
       if (this.$route.name === "Trash") {
         return [
           {
-            label: "Restore",
+            label: __("Restore"),
             icon: RotateCcw,
             onClick: () => {
               this.showRestoreDialog = true
@@ -465,7 +465,7 @@ export default {
             },
           },
           {
-            label: "Delete forever",
+            label: __("Delete forever"),
             icon: Trash,
             danger: true,
             onClick: () => {
@@ -481,7 +481,7 @@ export default {
       } else {
         return [
           {
-            label: "Preview",
+            label: __("Preview"),
             icon: Preview,
             onClick: () => {
               this.openEntity(this.selectedEntities[0])
@@ -493,7 +493,7 @@ export default {
             },
           },
           {
-            label: "Download",
+            label: __("Download"),
             icon: Download,
             onClick: () => {
               window.location.href = `/api/method/drive.api.files.get_file_content?entity_name=${this.selectedEntities[0].name}&trigger_download=1`
@@ -515,7 +515,7 @@ export default {
           },
           /* Folder Download */
           {
-            label: "Download",
+            label: __("Download"),
             icon: Download,
             onClick: () => {
               if (this.selectedEntities.length > 1) {
@@ -544,7 +544,7 @@ export default {
           },
 
           {
-            label: "Share",
+            label: __("Share"),
             icon: Share,
             onClick: () => {
               this.showShareDialog = true
@@ -558,7 +558,7 @@ export default {
             },
           },
           {
-            label: "Get Link",
+            label: __("Get Link"),
             icon: Link,
             onClick: () => {
               getLink(this.selectedEntities[0])
@@ -568,7 +568,7 @@ export default {
             },
           },
           {
-            label: "Rename",
+            label: __("Rename"),
             icon: Rename,
             onClick: () => {
               this.showRenameDialog = true
@@ -582,7 +582,7 @@ export default {
             },
           },
           {
-            label: "Move",
+            label: __("Move"),
             icon: Move,
             onClick: () => {
               this.showMoveDialog = true
@@ -612,7 +612,7 @@ export default {
             },
           }, */
           {
-            label: "Show Info",
+            label: __("Show Info"),
             icon: Info,
             onClick: () => {
               this.$store.commit("setShowInfo", true)
@@ -625,7 +625,7 @@ export default {
             },
           },
           {
-            label: "Hide Info",
+            label: __("Hide Info"),
             icon: Info,
             onClick: () => {
               this.$store.commit("setShowInfo", false)
@@ -651,7 +651,7 @@ export default {
             },
           },*/
           {
-            label: "Favourite",
+            label: __("Favourite"),
             icon: Star,
             onClick: () => {
               this.$resources.toggleFavourite.submit()
@@ -664,7 +664,7 @@ export default {
             },
           },
           {
-            label: "Unfavourite",
+            label: __("Unfavourite"),
             icon: Star,
             onClick: () => {
               this.$resources.toggleFavourite.submit()
@@ -677,7 +677,7 @@ export default {
             },
           },
           {
-            label: "Color",
+            label: __("Color"),
             isEnabled: () => {
               return (
                 this.selectedEntities.length === 1 &&
@@ -688,7 +688,7 @@ export default {
             },
           },
           {
-            label: "Remove from Recents",
+            label: __("Remove from Recents"),
             icon: Trash,
             danger: true,
             onClick: () => {
@@ -701,7 +701,7 @@ export default {
             },
           },
           {
-            label: "Unshare",
+            label: __("Unshare"),
             danger: true,
             icon: "trash-2",
             onClick: () => {
@@ -721,7 +721,7 @@ export default {
             },
           },
           {
-            label: "Move to Trash",
+            label: __("Move to Trash"),
             icon: Trash,
             danger: true,
             onClick: () => {
@@ -1152,8 +1152,8 @@ export default {
         onError(error) {
           if (error && error.exc_type === "PermissionError") {
             this.$store.commit("setError", {
-              primaryMessage: "Forbidden",
-              secondaryMessage: "Insufficient permissions for this resource",
+              primaryMessage: __("Forbidden"),
+              secondaryMessage: __("Insufficient permissions for this resource"),
             })
             this.$router.replace({ name: "Error" })
           }
@@ -1175,16 +1175,16 @@ export default {
           if (this.selectedEntities[0].is_favourite) {
             toast({
               title: `${this.selectedEntities.length} ${
-                this.selectedEntities.length > 1 ? " items" : " item"
-              } removed from Favourites`,
+                this.selectedEntities.length > 1 ? ` ${__('items')}` : ` ${__('item')}`
+              } ${__('removed from Favourites')}`,
               position: "bottom-right",
               timeout: 2,
             })
           } else {
             toast({
               title: `${this.selectedEntities.length} ${
-                this.selectedEntities.length > 1 ? " items" : " item"
-              } added to Favourites`,
+                this.selectedEntities.length > 1 ? ` ${__('items')}` : ` ${__('item')}`
+              } ${__('added to Favourites')}`,
               position: "bottom-right",
               timeout: 2,
             })
@@ -1206,9 +1206,9 @@ export default {
         },
         onSuccess() {
           toast({
-            title: `Cleared  ${this.selectedEntities.length} ${
-              this.selectedEntities.length > 1 ? " items" : " item"
-            } from Recents`,
+            title: `${__('Cleared')}  ${this.selectedEntities.length} ${
+              this.selectedEntities.length > 1 ? ` ${__('items')}` : ` ${__('item')}`
+            } ${__('from Recents')}`,
             position: "bottom-right",
             timeout: 2,
           })

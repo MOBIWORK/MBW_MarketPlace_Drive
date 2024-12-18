@@ -1,13 +1,13 @@
 <template>
   <div class="flex items-center mb-6">
-    <h1 class="font-semibold">Tags</h1>
+    <h1 class="font-semibold">{{__('Tags')}}</h1>
     <Button
       variant="solid"
       icon-left="plus"
       class="ml-auto"
       @click="showNewTagDialog = true"
     >
-      New
+      {{__('New')}}
     </Button>
   </div>
   <div class="flex flex-col items-stretch justify-start overflow-y-auto">
@@ -39,14 +39,14 @@
           placement="right"
           :options="[
             {
-              label: 'Edit',
+              label: __('Edit'),
               icon: 'edit-2',
               onClick: () => {
                 showEditDialog = true
               },
             },
             {
-              label: 'Delete',
+              label: __('Delete'),
               theme: 'red',
               icon: 'trash-2',
               onClick: () => {
@@ -70,7 +70,7 @@
       class="h-full w-full flex flex-col items-center justify-center my-auto"
     >
       <Tag class="h-7 stroke-1 text-gray-600" />
-      <span class="text-gray-800 text-sm mt-2">No Tags</span>
+      <span class="text-gray-800 text-sm mt-2">{{__('No Tags')}}</span>
     </div>
   </div>
   <NewTagDialog
@@ -88,12 +88,12 @@
     v-if="showDeleteDialog"
     v-model="showDeleteDialog"
     :options="{
-      title: 'Delete Tag',
-      message: `Are you sure you want to delete the tag ${selectedTag.title}? This action cannot be undone`,
+      title: __('Delete Tag'),
+      message: `${__('Are you sure you want to delete the tag')} ${selectedTag.title}? ${__('This action cannot be undone')}`,
       size: 'sm',
       actions: [
         {
-          label: 'Confirm',
+          label: __('Confirm'),
           variant: 'subtle',
           theme: 'red',
           onClick: () => {
@@ -131,7 +131,7 @@ export default {
   },
   computed: {
     deleteMessage() {
-      return `Are you sure you want to delete the tag "blog"? This action cannot be undone. All files with this tag will also lose it.`
+      return __('Are you sure you want to delete the tag "blog"? This action cannot be undone. All files with this tag will also lose it.')
     },
   },
   resources: {

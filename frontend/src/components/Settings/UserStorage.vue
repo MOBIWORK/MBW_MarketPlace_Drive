@@ -1,8 +1,7 @@
 <template>
   <div class="flex items-center justify-between w-full mb-2">
     <span class="text-base font-medium text-gray-900"
-      >You have used {{ formatSize(usedSpace) }} out of
-      {{ base2BlockSize(planSizeLimit) }}</span
+      >{{__('You have used')}} {{ formatSize(usedSpace) }} {{__('out of')}} {{ base2BlockSize(planSizeLimit) }}</span
     >
     <slot name="control"></slot>
   </div>
@@ -26,7 +25,7 @@
     class="h-full w-full flex flex-col items-center justify-center my-auto"
   >
     <Cloud class="h-7 stroke-1 text-gray-600" />
-    <span class="text-gray-800 text-sm mt-2">No Storage Used</span>
+    <span class="text-gray-800 text-sm mt-2">{{__('No Storage Used')}}</span>
   </div>
   <div
     class="flex flex-col items-start justify-start w-full rounded full px-1.5 overflow-y-auto"

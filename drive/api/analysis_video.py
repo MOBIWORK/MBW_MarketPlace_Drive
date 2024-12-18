@@ -204,7 +204,8 @@ def send_result_detect(result):
                 aws_access_key=aws_access_key,
                 aws_secret_access_key=aws_secret_access_key,
                 result=result,
-                name_gpx=task_metadata["name_gpx"]
+                name_gpx=task_metadata["name_gpx"],
+                base_url=frappe.utils.get_url()
             )
         else:
             #Tạo dữ liệu phi không gian excel và ảnh
@@ -217,7 +218,8 @@ def send_result_detect(result):
                 parent=task_metadata["parent"],
                 aws_access_key=aws_access_key,
                 aws_secret_access_key=aws_secret_access_key,
-                result=result
+                result=result,
+                base_url=frappe.utils.get_url()
             )
     except Exception as e:
         doc_task_queue = frappe.get_doc('Drive Task Queue', task_id)
@@ -254,7 +256,7 @@ def list_tasks():
     return tasks_response
 
 
-def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key, aws_secret_access_key, result, name_gpx):
+def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key, aws_secret_access_key, result, name_gpx, base_url):
     try:
         #BASE_URL_AI
         sdk = RoadSDK(BASE_URL_AI)
@@ -322,8 +324,7 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key,
             # )
 
             #Triển khai code
-            image_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name}")
-
+            image_url = base_url + f"/api/method/drive.api.files.get_file_content?entity_name={name}"
             #Trên local
             #image_url = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={name}"
             if item["gps"]["longitude"] is not None and item["gps"]["longitude"] != 0 and item["gps"]["latitude"] is not None and item["gps"]["latitude"] != 0:
@@ -428,7 +429,7 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key,
         update_doc_task_queue(result["task_id"], "Error", str(err))
         frappe.publish_realtime('event_analytic_video_job', message=result["task_id"], user=frappe.session.user)
 
-def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_access_key, aws_secret_access_key, result):
+def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_access_key, aws_secret_access_key, result, base_url):
     try:
         #BASE_URL_AI
         sdk = RoadSDK(BASE_URL_AI)
@@ -497,7 +498,7 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_access_key, 
             # )
 
             #Triển khai code
-            image_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name}")
+            image_url = base_url + f"/api/method/drive.api.files.get_file_content?entity_name={name}"
 
             #Trên local
             #image_url = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={name}"

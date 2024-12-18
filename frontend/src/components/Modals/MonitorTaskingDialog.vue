@@ -144,7 +144,7 @@ export default{
                 {
                     label: __('Status'),
                     key: 'status',
-                    width: '90px'
+                    width: '150px'
                 },
                 {
                     label: __('Start Processing Time'),

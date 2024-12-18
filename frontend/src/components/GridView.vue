@@ -66,7 +66,7 @@
       :loading="true"
       :disabled="true"
       variant="ghost"
-      >Loading</Button
+      >{{__('Loading')}}</Button
     >
   </div>
 </template>

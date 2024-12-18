@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model="open" :options="{ title: 'New Folder', size: 'xs' }">
+  <Dialog v-model="open" :options="{ title: __('New Folder'), size: 'xs' }">
     <template #body-content>
       <Input
         ref="input"
@@ -22,7 +22,7 @@
           :loading="$resources.createFolder.loading"
           @click="$resources.createFolder.submit()"
         >
-          Create
+          {{__('Create')}}
         </Button>
       </div>
     </template>

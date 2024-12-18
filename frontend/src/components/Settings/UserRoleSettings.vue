@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-center mb-4">
-    <h1 class="font-semibold">Groups</h1>
+    <h1 class="font-semibold">{{__('Groups')}}</h1>
     <Button
       v-if="isDriveadmin"
       variant="solid"
@@ -8,7 +8,7 @@
       class="ml-auto"
       @click="CreateRoleDialog = !CreateRoleDialog"
     >
-      Create
+      {{__('Create')}}
     </Button>
   </div>
   <div
@@ -31,7 +31,7 @@
           placement="right"
           :options="[
             {
-              label: 'Delete',
+              label: __('Delete'),
               icon: 'trash-2',
               onClick: () => {
                 activeGroup = group.name
@@ -53,7 +53,7 @@
       class="h-1/2 w-full flex flex-col items-center justify-center my-auto"
     >
       <FeatherIcon class="h-8 stroke-1 text-gray-600" name="users" />
-      <span class="text-gray-800 text-sm mt-2">No groups</span>
+      <span class="text-gray-800 text-sm mt-2">{{__('No groups')}}</span>
     </div>
 
     <NewRoleDialog
@@ -79,13 +79,12 @@
     <Dialog
       v-model="showDeleteDialog"
       :options="{
-        title: 'Delete ' + activeGroup,
-        message:
-          'This will delete the group. Members in it will lose access to files shared with this group',
+        title: `${__('Delete')} ` + activeGroup,
+        message: __('This will delete the group. Members in it will lose access to files shared with this group'),
         size: 'sm',
         actions: [
           {
-            label: 'Confirm',
+            label: __('Confirm'),
             variant: 'solid',
             theme: 'red',
             onClick: () => {

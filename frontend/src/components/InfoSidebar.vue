@@ -11,7 +11,7 @@
       <div class="w-full px-5 py-4 border-b overflow-visible">
         <div class="flex items-center">
           <div class="font-medium truncate text-lg">
-            {{ store.state.entityInfo.length }} items selected
+            {{ store.state.entityInfo.length }} {{__('items selected')}}
           </div>
         </div>
       </div>
@@ -36,7 +36,7 @@
           class="inline-flex items-center gap-2.5 mb-5 text-gray-800 font-medium text-lg w-full"
         >
           <!-- <Info /> -->
-          Information
+          {{__('Information')}}
         </span>
         <div
           v-if="
@@ -91,25 +91,25 @@
             </div>
           </div>
           <div>
-            <div class="text-base font-medium mb-4">Tags</div>
+            <div class="text-base font-medium mb-4">{{__('Tags')}}</div>
             <TagInput class="min-w-full" :entity="entity" />
           </div>
           <div>
-            <div class="text-base font-medium mb-4">Properties</div>
+            <div class="text-base font-medium mb-4">{{__('Properties')}}</div>
             <div class="text-base grid grid-flow-row grid-cols-2 gap-y-3">
-              <span class="col-span-1 text-gray-600">Type</span>
+              <span class="col-span-1 text-gray-600">{{__('Type')}}</span>
               <span class="col-span-1">{{ formattedMimeType }}</span>
               <span v-if="entity.file_size" class="col-span-1 text-gray-600">
-                Size
+                {{__('Size')}}
               </span>
               <span v-if="entity.file_size" class="col-span-1">
                 {{ entity.file_size }}
               </span>
-              <span class="col-span-1 text-gray-600">Modified</span>
+              <span class="col-span-1 text-gray-600">{{__('Modified')}}</span>
               <span class="col-span-1">{{ entity.modified }}</span>
-              <span class="col-span-1 text-gray-600">Created</span>
+              <span class="col-span-1 text-gray-600">{{__('Created')}}</span>
               <span class="col-span-1">{{ entity.creation }}</span>
-              <span class="col-span-1 text-gray-600">Owner</span>
+              <span class="col-span-1 text-gray-600">{{__('Owner')}}</span>
               <span class="col-span-1">{{ entity.full_name }}</span>
             </div>
           </div>
@@ -124,7 +124,7 @@
           class="inline-flex items-center gap-2.5 px-5 mb-5 text-gray-800 font-medium text-lg w-full"
         >
           <!--  <Comment /> -->
-          Comments
+          {{__('Comments')}}
         </span>
         <div v-if="entity.allow_comments" class="pb-2 px-5">
           <div
@@ -163,7 +163,7 @@
               <textarea
                 v-model="newComment"
                 class="w-full form-textarea bg-transparent resize-none border-none hover:bg-transparent focus:ring-0 focus:shadow-none focus:bg-transparent"
-                placeholder="Add a comment"
+                :placeholder="__('Add a comment')"
                 @input="resize($event)"
                 @keypress.enter.stop.prevent="postComment"
               />
@@ -178,8 +178,8 @@
           </div>
         </div>
         <div v-else class="text-gray-600 text-sm px-5">
-          Comments have been disabled for this
-          {{ entity.is_group ? "folder" : "file" }} by its owner.
+          {{__('Comments have been disabled for this')}}
+          {{ entity.is_group ? "folder" : "file" }} {{__('by its owner')}}.
         </div>
       </div>
       <div
@@ -190,7 +190,7 @@
           class="inline-flex items-center gap-2.5 px-5 mb-5 text-gray-800 font-medium text-lg w-full"
         >
           <!-- <Clock /> -->
-          Activity
+          {{__('Activity')}}
         </span>
         <ActivityTree v-if="showActivity" />
       </div>
@@ -200,7 +200,7 @@
       class="flex h-full w-full flex-col items-center justify-center rounded-lg text-center"
     >
       <File class="w-auto h-10 text-gray-600 mb-2" />
-      <p class="text-sm text-gray-600 font-medium">No file selected</p>
+      <p class="text-sm text-gray-600 font-medium">{{__('No file selected')}}</p>
     </div>
   </div>
 

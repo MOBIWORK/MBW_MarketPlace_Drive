@@ -1,10 +1,10 @@
 <template>
-  <Dialog v-model="open" :options="{ title: 'Settings', size: '5xl' }">
+  <Dialog v-model="open" :options="{ title: __('Settings'), size: '5xl' }">
     <template #body>
       <div class="flex" :style="{ height: 'calc(100vh - 9rem)' }">
         <div class="flex w-52 shrink-0 flex-col bg-gray-50 py-3 p-4 border-r">
           <h1 class="text-xl font-semibold leading-6 text-gray-900 px-2">
-            Settings
+            {{__('Settings')}}
           </h1>
           <div class="mt-3 space-y-1">
             <button
@@ -66,37 +66,37 @@ const isDriveGuest = computed(() => {
 let tabs = [
   {
     enabled: true,
-    label: "Profile",
+    label: __("Profile"),
     icon: User,
     component: markRaw(ProfileSettings),
   },
   {
     enabled: true,
-    label: "Users",
+    label: __("Users"),
     icon: AddUser,
     component: markRaw(UserListSettings),
   },
   {
     enabled: true,
-    label: "Groups",
+    label: __("Groups"),
     icon: Users,
     component: markRaw(UserRoleSettings),
   },
   {
     enabled: !isDriveGuest.value,
-    label: "Storage",
+    label: __("Storage"),
     icon: Cloud,
     component: markRaw(StorageSettings),
   },
   {
     enabled: !isDriveGuest.value,
-    label: "Tags",
+    label: __("Tags"),
     icon: Tag,
     component: markRaw(TagSettings),
   },
   {
     enabled: true,
-    label: "Payments",
+    label: __("Payments"),
     icon: CreditCard,
     component: markRaw(HistorialPayments)
   }

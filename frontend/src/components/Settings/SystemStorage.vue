@@ -3,14 +3,14 @@
     <div class="flex justify-end">
       <div class="flex items-center">
         <a class="text-base text-blue-600 cursor-pointer underline" href="javascript:;"
-          @click="onShowServicePackages">Change package plan</a>
+          @click="onShowServicePackages">{{__('Change package plan')}}</a>
         <slot name="control"></slot>
       </div>
     </div>
     <div class="flex w-full mt-2">
       <div class="w-9/12">
         <div class="flex items-center w-full mb-2 justify-between">
-          <span class="text-base font-medium text-gray-900">Used {{ formatSize(usedSpace) }} out of
+          <span class="text-base font-medium text-gray-900">Used {{ formatSize(usedSpace) }} {{__('out of')}}
             {{ base2BlockSize(planSizeLimit) }}</span>
         </div>
         <div v-if="usedSpace > 0"
@@ -29,14 +29,14 @@
           />
         </div>
         <div class="w-full flex justify-center">
-          <span class="text-base font-medium text-gray-900">{{renderPUPVUsed(pupvUsed)}} of {{pupvLimit}} PUPV used</span>
+          <span class="text-base font-medium text-gray-900">{{renderPUPVUsed(pupvUsed)}} of {{pupvLimit}} {{__('PUPV used')}}</span>
         </div>
       </div>
     </div>
   </div>
   <div v-if="!usedSpace" class="h-full w-full flex flex-col items-center justify-center my-auto">
     <Cloud class="h-7 stroke-1 text-gray-600" />
-    <span class="text-gray-800 text-sm mt-2">No Storage Used</span>
+    <span class="text-gray-800 text-sm mt-2">{{__('No Storage Used')}}</span>
   </div>
   <div class="flex flex-col items-start justify-start w-full rounded full px-1.5 overflow-y-auto">
     <div v-for="(i, index) in entities" :key="i.file_kind" class="w-full flex items-center justify-start py-3 gap-x-2"

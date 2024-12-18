@@ -1,8 +1,8 @@
 <template>
-  <Dialog v-model="open" :options="{ title: 'Open a file', size: '5xl' }">
+  <Dialog v-model="open" :options="{ title: __('Open a file'), size: '5xl' }">
     <template #body>
       <h3 class="text-2xl font-semibold leading-6 text-gray-900 px-6 pt-5">
-        Open a file
+        {{__('Open a file')}}
       </h3>
       <div class="px-2 pt-2">
         <div class="flex items-center justify-start px-4 my-2">
@@ -63,14 +63,14 @@
                 @click="emitter.emit('uploadFile')"
               >
                 <template #prefix><Upload class="w-4 stroke-1.5" /></template>
-                Upload
+                {{__('Upload')}}
               </Button>
               <!-- <span class="text-gray-700 text-base mt-2" >Or drag a file here to upload</span> -->
             </div>
             <NoFilesSection
               v-else-if="isEmpty"
               class="my-auto"
-              primary-message="No Files"
+              :primary-message="__('No Files')"
               secondary-message=" "
             />
             <div v-else class="h-full p-4">
@@ -80,7 +80,7 @@
                     v-if="folders.length > 0"
                     class="text-gray-600 font-medium text-base"
                   >
-                    Folders
+                    {{__('Folders')}}
                   </span>
                   <span v-else></span>
                   <Button
@@ -137,7 +137,7 @@
                 v-if="files.length > 0"
                 :class="folders.length > 0 ? 'mt-8' : 'mt-2'"
               >
-                <div class="text-gray-600 font-medium text-base">Files</div>
+                <div class="text-gray-600 font-medium text-base">{{__('Files')}}</div>
                 <div class="inline-flex flex-row flex-wrap gap-4 mt-0.5">
                   <div
                     v-for="file in files"
@@ -233,24 +233,24 @@ const open = computed({
 
 const tabs = [
   {
-    label: "Home",
+    label: __("Home"),
     icon: h(Home, { class: "w-4 h-4" }),
     component: NoFilesSection,
   },
   {
-    label: "Recents",
+    label: __("Recents"),
     icon: h(Recent, { class: "w-4 h-4" }),
   },
   {
-    label: "Favourite",
+    label: __("Favourite"),
     icon: h(Star, { class: "w-4 h-4" }),
   },
   {
-    label: "Shared",
+    label: __("Shared"),
     icon: h(Users, { class: "w-4 h-4" }),
   },
   {
-    label: "Upload",
+    label: __("Upload"),
     icon: h(Plus, { class: "w-4 h-4 stroke-[1.5]" }),
   },
 ]
@@ -258,7 +258,7 @@ const tabs = [
 watch(tabIndex, (newValue) => {
   switch (newValue) {
     case 0:
-      breadcrumbs.value = [{ name: store.state.homeFolderID, title: "Home" }]
+      breadcrumbs.value = [{ name: store.state.homeFolderID, title: __("Home") }]
       currentFolder.value = store.state.homeFolderID
       fetchFolderContents.fetch({
         entity_name: currentFolder.value,
@@ -271,7 +271,7 @@ watch(tabIndex, (newValue) => {
       })
       break
     case 1:
-      breadcrumbs.value = [{ name: "", title: "Recents" }]
+      breadcrumbs.value = [{ name: "", title: __("Recents") }]
       currentFolder.value = null
       fetchFolderContents.fetch({
         entity_name: "",
@@ -284,7 +284,7 @@ watch(tabIndex, (newValue) => {
       })
       break
     case 2:
-      breadcrumbs.value = [{ name: "", title: "Favourites" }]
+      breadcrumbs.value = [{ name: "", title: __("Favourites") }]
       currentFolder.value = null
       fetchFolderContents.fetch({
         is_active: 1,
@@ -296,7 +296,7 @@ watch(tabIndex, (newValue) => {
       })
       break
     case 3:
-      breadcrumbs.value = [{ name: "", title: "Shared" }]
+      breadcrumbs.value = [{ name: "", title: __("Shared") }]
       currentFolder.value = null
       sharedWithMe.fetch({
         is_active: 1,
@@ -417,8 +417,8 @@ const fetchFolderContents = createResource({
   onError(error) {
     if (error && error.exc_type === "PermissionError") {
       this.$store.commit("setError", {
-        primaryMessage: "Forbidden",
-        secondaryMessage: "Insufficient permissions for this resource",
+        primaryMessage: __("Forbidden"),
+        secondaryMessage: __("Insufficient permissions for this resource"),
       })
       this.$router.replace({ name: "Error" })
     }

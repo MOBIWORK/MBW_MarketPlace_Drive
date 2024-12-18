@@ -80,7 +80,7 @@ export default {
         },
         validate(params) {
           if (!params?.new_color) {
-            return "New name is required"
+            return __("New name is required")
           }
         },
         onSuccess() {

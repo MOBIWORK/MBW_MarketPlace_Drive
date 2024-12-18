@@ -62,7 +62,7 @@
             class="flex flex-col items-center justify-center h-[45vh] my-2"
           >
             <Folder class="text-gray-600 h-10 w-auto" />
-            <span class="text-gray-600 text-base mt-2">Folder is Empty</span>
+            <span class="text-gray-600 text-base mt-2">{{__('Folder is Empty')}}</span>
           </div>
         </Tabs>
         <div class="flex items-center justify-between max-h-7">
@@ -135,7 +135,7 @@
             <template #prefix>
               <Move />
             </template>
-            Move
+            {{__('Move')}}
           </Button>
         </div>
       </div>
@@ -190,9 +190,9 @@ const evalPermission = computed(() => {
 
 const DialogTitle = computed(() => {
   if (store.state.entityInfo.length > 1) {
-    return `Moving ${store.state.entityInfo.length} items`
+    return `${__('Moving')} ${store.state.entityInfo.length} ${__('items')}`
   } else {
-    return `Moving "${store.state.entityInfo[0].title}"`
+    return `${__('Moving')} "${store.state.entityInfo[0].title}"`
   }
 })
 
@@ -221,15 +221,15 @@ const dropDownItems = computed(() => {
 
 const tabs = [
   {
-    label: "Home",
+    label: __("Home"),
     icon: h(Home, { class: "w-4 h-4" }),
   },
   {
-    label: "Favourites",
+    label: __("Favourites"),
     icon: h(Star, { class: "w-4 h-4" }),
   },
   {
-    label: "Shared",
+    label: __("Shared"),
     icon: h(Users, { class: "w-4 h-4" }),
   },
 ]
@@ -249,7 +249,7 @@ const folderPermissions = createResource({
 watch(tabIndex, (newValue) => {
   switch (newValue) {
     case 0:
-      breadcrumbs.value = [{ name: store.state.homeFolderID, title: "Home" }]
+      breadcrumbs.value = [{ name: store.state.homeFolderID, title: __("Home") }]
       currentFolder.value = store.state.homeFolderID
       fetchFolderContents.fetch({
         entity_name: currentFolder.value,
@@ -260,7 +260,7 @@ watch(tabIndex, (newValue) => {
       })
       break
     case 1:
-      breadcrumbs.value = [{ name: "", title: "Favourites" }]
+      breadcrumbs.value = [{ name: "", title: __("Favourites") }]
       currentFolder.value = null
       fetchFolderContents.fetch({
         entity_name: "",
@@ -271,7 +271,7 @@ watch(tabIndex, (newValue) => {
       })
       break
     case 2:
-      breadcrumbs.value = [{ name: "", title: "Shared" }]
+      breadcrumbs.value = [{ name: "", title: __("Shared") }]
       currentFolder.value = null
       sharedWithMe.fetch({
         is_active: 1,
@@ -345,8 +345,8 @@ const fetchFolderContents = createResource({
   onError(error) {
     if (error && error.exc_type === "PermissionError") {
       this.$store.commit("setError", {
-        primaryMessage: "Forbidden",
-        secondaryMessage: "Insufficient permissions for this resource",
+        primaryMessage: __("Forbidden"),
+        secondaryMessage: __("Insufficient permissions for this resource"),
       })
       this.$router.replace({ name: "Error" })
     }

@@ -10,7 +10,7 @@
       <PopoverButton
         class="flex gap-1 px-2 focus:outline-none bg-gray-100 rounded h-7 items-center text-base"
       >
-        {{ accessObj.write ? "Can Edit" : "Can View" }}
+        {{ accessObj.write ? __("Can Edit") : __("Can View") }}
         <span class="hidden">{{
           open ? disableScroll.on() : disableScroll.off()
         }}</span>
@@ -32,7 +32,7 @@
                   close()
               "
             >
-              Can View
+              {{__('Can View')}}
               <Check
                 v-if="accessObj.read === 1 && accessObj.write === 0"
                 class="h-3"
@@ -47,7 +47,7 @@
                   close()
               "
             >
-              Can Edit
+              {{__('Can Edit')}}
               <Check v-if="accessObj.write === 1" class="h-3" />
             </li>
             <hr class="my-0.5" />
@@ -55,7 +55,7 @@
               class="flex items-center justify-between px-1 text-base line-clamp-1 py-1 gap-x-0.5 hover:bg-gray-100 w-full rounded-[6px] cursor-pointer text-red-500"
               @click="$emit('removeAccess'), close()"
             >
-              Remove
+              {{__('Remove')}}
             </li>
           </ul>
         </div>

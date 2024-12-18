@@ -6,9 +6,9 @@
         <template #body-content>
             <div class="flex items-center mt-3">
                 <input type="radio" value="Video_GPS" v-model="typeInput" id="Video_GPS" />
-                <label for="Video_GPS" class="ml-2 text-sm">Video + GPS</label>
+                <label for="Video_GPS" class="ml-2 text-sm">{{__('Video + GPS')}}</label>
                 <input class="ml-10" type="radio" value="Video_Velocity" v-model="typeInput" id="Video_Velocity" />
-                <label for="Video_Velocity" class="ml-2 text-base">Video + Speed</label>
+                <label for="Video_Velocity" class="ml-2 text-base">{{__('Video + Speed')}}</label>
             </div>
             <div class="grid gap-5 mt-3" :class="typeInput == 'Video_GPS' && processVideo==2 ? 'grid-cols-2' : 'grid-cols-1'">
                 <div>

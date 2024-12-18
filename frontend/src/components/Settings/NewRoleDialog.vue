@@ -1,10 +1,10 @@
 <template>
-  <Dialog v-model="open" :options="{ title: 'New Group', size: 'lg' }">
+  <Dialog v-model="open" :options="{ title: __('New Group'), size: 'lg' }">
     <template #body-content>
-      <label class="block text-sm text-gray-600 mb-2">Group Name</label>
-      <Input v-model="roleName" placeholder="Group Name" type="text" />
+      <label class="block text-sm text-gray-600 mb-2">{{__('Group Name')}}</label>
+      <Input v-model="roleName" :placeholder="__('Group Name')" type="text" />
       <ErrorMessage class="text-sm mt-2" :message="groupNameError" />
-      <label class="block text-sm text-gray-600 mt-4 mb-1">Add User</label>
+      <label class="block text-sm text-gray-600 mt-4 mb-1">{{__('Add User')}}</label>
       <UserSearch
         :show-button="false"
         :search-groups="false"
@@ -14,7 +14,7 @@
       />
       <ErrorMessage class="text-sm mt-2" :message="memberError" />
       <label v-if="UsersInRole.length" class="block text-sm text-gray-600 mt-6">
-        Users in this Group
+        {{__('Users in this Group')}}
       </label>
       <div
         v-for="(user, index) in uniqueUsers"
@@ -31,7 +31,7 @@
           </p>
         </div>
         <Button class="ml-auto" @click="UsersInRole.splice(index, 1)"
-          >Remove</Button
+          >{{__('Remove')}}</Button
         >
       </div>
       <div class="flex mt-6">
@@ -40,7 +40,7 @@
           class="w-full"
           @click="$resources.createUserGroup.submit"
         >
-          Create
+          {{__('Create')}}
         </Button>
       </div>
     </template>
@@ -131,10 +131,10 @@ export default {
         },
         validate: () => {
           if (!this.roleName.length) {
-            this.groupNameError = "Group name is required"
+            this.groupNameError = __("Group name is required")
           }
           if (!this.uniqueEmails.length) {
-            this.memberError = "Group needs atleast one member"
+            this.memberError = __("Group needs atleast one member")
           }
         },
         onSuccess(data) {
@@ -145,7 +145,7 @@ export default {
         },
         onError(data) {
           if (data.messages === "Please set the document name") {
-            this.groupNameError = "Group name is required"
+            this.groupNameError = __("Group name is required")
           }
         },
         auto: false,

@@ -60,43 +60,42 @@ export default {
     dialogData() {
       const items =
         this.entities.length === 1
-          ? `${this.entities.length} item`
-          : `${this.entities.length} items`
+          ? `${this.entities.length} ${__('item')}`
+          : `${this.entities.length} ${__('items')}`
       switch (this.for) {
         case "unshare":
           return {
-            title: "Unshare",
-            message:
-              "Selected items will not be shared with you anymore and you will lose access to them.",
-            buttonMessage: "Remove",
+            title: __("Unshare"),
+            message: __("Selected items will not be shared with you anymore and you will lose access to them."),
+            buttonMessage: __("Remove"),
             theme: "red",
             buttonIcon: "trash-2",
             methodName: "drive.api.files.unshare_entities",
-            toastMessage: `Unshared ${items}`,
+            toastMessage: `${__('Unshared')} ${items}`,
           }
         case "restore":
           return {
-            title: "Restore Items",
+            title: __("Restore Items"),
             message:
-              "Selected items will be restored to their original locations.",
-            buttonMessage: "Restore",
+              __("Selected items will be restored to their original locations."),
+            buttonMessage: __("Restore"),
             variant: "solid",
             buttonIcon: "refresh-ccw",
             methodName: "drive.api.files.remove_or_restore",
-            toastMessage: `Restored ${items}`,
+            toastMessage: `${__('Restored')} ${items}`,
           }
         case "remove":
           return {
-            title: "Move to Trash",
+            title: __("Move to Trash"),
             message:
               items +
-              " will be moved to Trash. Items in trash are deleted forever after 30 days. Other users will lose access to this.",
-            buttonMessage: "Move to Trash",
+              ` ${__('will be moved to Trash. Items in trash are deleted forever after 30 days. Other users will lose access to this.')}`,
+            buttonMessage: __("Move to Trash"),
             theme: "red",
             variant: "subtle",
             buttonIcon: "trash-2",
             methodName: "drive.api.files.remove_or_restore",
-            toastMessage: `Moved ${items} to Trash`,
+            toastMessage: `${__('Moved')} ${items} ${__('to Trash')}`,
           }
         default:
           return {}

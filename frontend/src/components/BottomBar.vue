@@ -70,7 +70,7 @@ export default {
             highlight: () => {},
           }, */
         {
-          label: "Home",
+          label: __("Home"),
           route: "/home",
           icon: "home",
           highlight: () => {
@@ -78,7 +78,7 @@ export default {
           },
         },
         {
-          label: "Recents",
+          label: __("Recents"),
           route: "/recents",
           icon: "clock",
           highlight: () => {
@@ -86,7 +86,7 @@ export default {
           },
         },
         {
-          label: "Favourites",
+          label: __("Favourites"),
           route: "/favourites",
           icon: "star",
           highlight: () => {
@@ -96,7 +96,7 @@ export default {
           },
         },
         {
-          label: "Shared",
+          label: __("Shared"),
           route: "/shared",
           icon: "users",
           highlight: () => {
@@ -104,7 +104,7 @@ export default {
           },
         },
         {
-          label: "Trash",
+          label: __("Trash"),
           route: "/trash",
           icon: "trash-2",
           highlight: () => {

@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-center mb-4">
-    <h1 class="font-semibold">Users</h1>
+    <h1 class="font-semibold">{{__('Users')}}</h1>
     <Button
       v-if="$store.state.user.role === 'Drive Admin'"
       variant="solid"
@@ -8,7 +8,7 @@
       class="ml-auto"
       @click="showInviteUserDialog = true"
     >
-      Invite
+      {{__('Invite')}}
     </Button>
   </div>
   <div class="flex flex-col items-stretch justify-start overflow-y-auto">
@@ -52,16 +52,16 @@
     class="h-1/2 w-full flex flex-col items-center justify-center my-auto"
   >
     <FeatherIcon class="h-8 stroke-1 text-gray-600" name="users" />
-    <span class="text-gray-800 text-sm mt-2">No Users</span>
+    <span class="text-gray-800 text-sm mt-2">{{__('No Users')}}</span>
   </div>
   <Dialog
     v-model="showInviteUserDialog"
     :options="{
-      title: 'Invite User',
+      title: __('Invite User'),
       size: 'lg',
       actions: [
         {
-          label: 'Send Invitation',
+          label: __('Send Invitation'),
           variant: 'solid',
           disabled: !emailsToInvite.length,
           loading: $resources.inviteUsers.loading,
@@ -127,14 +127,14 @@
                   class="flex items-center justify-between px-1 text-base line-clamp-1 py-1 gap-1 hover:bg-gray-100 w-full rounded-[6px] cursor-pointer"
                   @click=";(NewUserRole = 'Drive Guest'), close()"
                 >
-                  Guest
+                  {{__('Guest')}}
                   <Check v-if="NewUserRole === 'Drive Guest'" class="h-3" />
                 </li>
                 <li
                   class="flex items-center justify-between px-1 text-base line-clamp-1 py-1 gap-1 hover:bg-gray-100 w-full rounded-[6px] cursor-pointer"
                   @click=";(NewUserRole = 'Drive User'), close()"
                 >
-                  User
+                  {{__('User')}}
                   <Check v-if="NewUserRole === 'Drive User'" class="h-3" />
                 </li></ul
             ></PopoverPanel>
@@ -147,15 +147,15 @@
     v-if="showRemoveUserDialog"
     v-model="showRemoveUserDialog"
     :options="{
-      title: 'Remove User',
+      title: __('Remove User'),
       size: 'md',
-      message: `Removing ${selectedUser.full_name} will revoke their access to Frappe Drive. All files and folders owned by them will remain intact. You can add them back using the same email address.
+      message: `${__('Removing')} ${selectedUser.full_name} ${__('will revoke their access to Frappe Drive. All files and folders owned by them will remain intact. You can add them back using the same email address.')}
 `,
       actions: [
         {
           variant: 'solid',
           theme: 'red',
-          label: 'Remove',
+          label: __('Remove'),
           loading: $resources.inviteUsers.loading,
           onClick: () => {
             $resources.inviteUsers.submit({

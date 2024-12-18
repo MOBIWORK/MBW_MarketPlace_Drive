@@ -19,7 +19,7 @@
           ]"
           @click="$store.commit('toggleShareView', 'with')"
         >
-          Shared with You
+          {{__('Shared with You')}}
         </Button>
         <Button
           variant="ghost"
@@ -31,12 +31,12 @@
           ]"
           @click="$store.commit('toggleShareView', 'by')"
         >
-          Shared by You
+          {{__('Shared by You')}}
         </Button>
       </div>
       <Dropdown :options="filterItems" placement="left">
         <Button
-          >Filter
+          >{{__('Filter')}}
           <template #prefix>
             <Filter />
           </template>
@@ -243,77 +243,77 @@ export default {
     filterItems() {
       return [
         {
-          label: "Folder",
+          label: __("Folder"),
           icon: Folder,
           onClick: () => {
             this.$store.state.activeFilters.push("Folder")
           },
         },
         {
-          label: "Image",
+          label: __("Image"),
           icon: Image,
           onClick: () => {
             this.$store.state.activeFilters.push("Image")
           },
         },
         {
-          label: "Audio",
+          label: __("Audio"),
           icon: Audio,
           onClick: () => {
             this.$store.state.activeFilters.push("Audio")
           },
         },
         {
-          label: "Video",
+          label: __("Video"),
           icon: Video,
           onClick: () => {
             this.$store.state.activeFilters.push("Video")
           },
         },
         {
-          label: "PDF",
+          label: __("PDF"),
           icon: PDF,
           onClick: () => {
             this.$store.state.activeFilters.push("PDF")
           },
         },
         {
-          label: "Document",
+          label: __("Document"),
           icon: Document,
           onClick: () => {
             this.$store.state.activeFilters.push("Document")
           },
         },
         {
-          label: "Spreadsheet",
+          label: __("Spreadsheet"),
           icon: Spreadsheet,
           onClick: () => {
             this.$store.state.activeFilters.push("Spreadsheet")
           },
         },
         {
-          label: "Archive",
+          label: __("Archive"),
           icon: Archive,
           onClick: () => {
             this.$store.state.activeFilters.push("Archive")
           },
         },
         {
-          label: "Presentation",
+          label: __("Presentation"),
           icon: Presentation,
           onClick: () => {
             this.$store.state.activeFilters.push("Presentation")
           },
         },
         {
-          label: "GeoJson",
+          label: __("GeoJson"),
           icon: GeoJson,
           onClick: () => {
             this.$store.state.activeFilters.push("GeoJson")
           },
         },
         {
-          label: "Unknown",
+          label: __("Unknown"),
           icon: Unknown,
           onClick: () => {
             this.$store.state.activeFilters.push("Unknown")
@@ -338,4 +338,4 @@ export default {
   },
 }
 </script>
-./EspressoIcons/Sort.vue
+<!-- ./EspressoIcons/Sort.vue -->

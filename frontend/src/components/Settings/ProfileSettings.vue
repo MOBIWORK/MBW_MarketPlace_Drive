@@ -1,5 +1,5 @@
 <template>
-  <h1 class="font-semibold mb-8">Profile</h1>
+  <h1 class="font-semibold mb-8">{{__('Profile')}}</h1>
   <div class="flex justify-start w-full items-center gap-x-4">
     <Avatar :image="imageURL" size="3xl" :label="fullName" class="w-20 h-20" />
     <div class="flex flex-col">
@@ -7,17 +7,17 @@
       <span class="text-base text-gray-700">{{ currentUserEmail }}</span>
     </div>
     <Button class="ml-auto" @click="editProfileDialog = true"
-      >Edit profile</Button
+      >{{__('Edit profile')}}</Button
     >
   </div>
   <Dialog
     v-model="editProfileDialog"
     :options="{
-      title: 'Edit Profile',
+      title: __('Edit Profile'),
       size: 'md',
       actions: [
         {
-          label: 'Confirm',
+          label: __('Confirm'),
           variant: 'solid',
           onClick: submit,
         },
@@ -26,7 +26,7 @@
   >
     <template #body-content>
       <div class="flex flex-col items-start justify-start gap-y-2">
-        <span class="text-base text-gray-600">Profile Photo</span>
+        <span class="text-base text-gray-600">{{__('Profile Photo')}}</span>
         <div class="flex items-center justify-between w-full">
           <Avatar
             :image="newImageUrl"
@@ -62,14 +62,14 @@
             <template
               #default="{ file, progress, uploading, openFileSelector }"
             >
-              <Button @click="openFileSelector"> Add Image </Button>
+              <Button @click="openFileSelector"> {{__('Add Image')}} </Button>
             </template>
           </FileUploader>
         </div>
         <div class="w-full flex flex-col gap-y-2 my-2">
-          <span class="text-base text-gray-600">First Name</span>
+          <span class="text-base text-gray-600">{{__('First Name')}}</span>
           <Input v-model="newFirstName"></Input>
-          <span class="text-base text-gray-600">Last Name</span>
+          <span class="text-base text-gray-600">{{__('Last Name')}}</span>
           <Input v-model="newLastName"></Input>
         </div>
       </div>
@@ -80,11 +80,11 @@
       />
     </template>
   </Dialog>
-  <h1 class="font-semibold mt-12 mb-4">Preferences</h1>
-  <Switch v-model="foldersBefore" label="Group folders before files"></Switch>
+  <h1 class="font-semibold mt-12 mb-4">{{__('Preferences')}}</h1>
+  <Switch v-model="foldersBefore" :label="__('Group folders before files')"></Switch>
   <Switch
     v-model="singleClick"
-    label="Single click to open files and folders"
+    :label="__('Single click to open files and folders')"
   ></Switch>
 </template>
 <script>
@@ -121,23 +121,23 @@ export default {
           items: [
             {
               icon: "home",
-              label: "Home",
+              label: __("Home"),
             },
             {
               icon: "clock",
-              label: "Recents",
+              label: __("Recents"),
             },
             {
               icon: "star",
-              label: "Favourites",
+              label: __("Favourites"),
             },
             {
               icon: "users",
-              label: "Shared",
+              label: __("Shared"),
             },
             {
               icon: "trash-2",
-              label: "Trash",
+              label: __("Trash"),
             },
           ],
         },
@@ -209,7 +209,7 @@ export default {
     validateFile(file) {
       let extension = file.name.split(".").pop().toLowerCase()
       if (!["jpg", "jpeg", "png"].includes(extension)) {
-        this.errorMessage = "Not a valid Image file"
+        this.errorMessage = __("Not a valid Image file")
       } else {
         this.errorMessage = null
       }

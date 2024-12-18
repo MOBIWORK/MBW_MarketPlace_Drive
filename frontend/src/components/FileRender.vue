@@ -11,7 +11,7 @@
       class="h-12 mb-4 fill-blue-500 stroke-white"
       name="alert-circle"
     />
-    <span class="mb-4">Cannot open file</span>
+    <span class="mb-4">{{__('Cannot open file')}}</span>
     <span class="text-base text-center text-gray-700">
       {{ error }}
     </span>
@@ -24,7 +24,7 @@
       variant="solid"
       @click="download"
     >
-      Download
+      {{__('Download')}}
     </Button>
   </div>
   <template v-else>
@@ -181,13 +181,12 @@ export default {
         ].some((type) => this.previewEntity.mime_type.startsWith(type))
 
       if (!isSupportedType) {
-        this.error = "Previews are not supported for this file type"
+        this.error = __("Previews are not supported for this file type")
         if (
           this.$store.state.entityInfo[0].allow_download ||
           this.$store.state.entityInfo[0].owner === "You"
         ) {
-          this.error =
-            "Previews are not supported for this file type. Would you like to download it instead?"
+          this.error = __("Previews are not supported for this file type. Would you like to download it instead?")
         }
         this.loading = false
       } else if (
@@ -196,7 +195,7 @@ export default {
       ) {
         this.loading = false
       } else if (this.previewEntity.size_in_bytes > 400 * 1024 * 1024) {
-        this.error = "File is too large to preview"
+        this.error = __("File is too large to preview")
         this.loading = false
       } else {
         this.loading = false

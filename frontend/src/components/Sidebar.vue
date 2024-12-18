@@ -13,7 +13,7 @@
     >
       <SidebarItem
         v-if="!isDriveGuest"
-        :label="'Search'"
+        :label="__('Search')"
         class="mb-0.5"
         :is-collapsed="!isExpanded"
         @click="() => emitter.emit('showSearchPopup', true)"
@@ -45,7 +45,7 @@
       </SidebarItem>
       <SidebarItem
         v-if="!isDriveGuest"
-        :label="'Notifications'"
+        :label="__('Notifications')"
         icon="inbox"
         class="mb-0.5"
         :is-collapsed="!isExpanded"
@@ -155,14 +155,14 @@ export default {
       return [
         {
           enabled: !this.isDriveGuest,
-          label: "Home",
+          label: __("Home"),
           route: "/home",
           icon: Home,
           highlight: this.$store.state.currentBreadcrumbs[0].label === "Home",
         },
         {
           enabled: true,
-          label: "Recents",
+          label: __("Recents"),
           route: "/recents",
           icon: Recent,
           highlight:
@@ -170,7 +170,7 @@ export default {
         },
         {
           enabled: true,
-          label: "Favourites",
+          label: __("Favourites"),
           route: "/favourites",
           icon: Star,
           highlight:
@@ -178,14 +178,14 @@ export default {
         },
         {
           enabled: true,
-          label: "Shared",
+          label: __("Shared"),
           route: "/shared",
           icon: Users,
           highlight: this.$store.state.currentBreadcrumbs[0].label === "Shared",
         },
         {
           enabled: true,
-          label: "Trash",
+          label: __("Trash"),
           route: "/trash",
           icon: Trash,
           highlight: this.$store.state.currentBreadcrumbs[0].label === "Trash",

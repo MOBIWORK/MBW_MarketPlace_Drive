@@ -6,7 +6,7 @@
           class="flex items-start w-full justify-between gap-x-15 mb-8 px-4 sm:px-6"
         >
           <span class="font-semibold text-2xl truncate"
-            >Sharing "{{ entity?.title }}"</span
+            >{{__('Sharing')}} "{{ entity?.title }}"</span
           >
           <Button
             class="ml-auto"
@@ -28,16 +28,16 @@
           <div class="flex flex-col space-y-4">
             <div>
               <span class="mb-0.5 block text-sm leading-4 text-gray-700"
-                >Preferences</span
+                >{{__('Preferences')}}</span
               >
-              <Switch v-model="allowComments" label="Allow Comments" />
-              <Switch v-model="allowDownload" label="Allow Downloading" />
+              <Switch v-model="allowComments" :label="__('Allow Comments')" />
+              <Switch v-model="allowDownload" :label="__('Allow Downloading')" />
             </div>
             <div>
               <DatePicker
                 v-model="invalidAfter"
                 variant="subtle"
-                label="Access Until"
+                :label="__('Access Until')"
               ></DatePicker>
               <span
                 v-if="invalidateAfterError"
@@ -49,14 +49,14 @@
                 v-else-if="invalidAfter"
                 class="block text-xs leading-4 text-gray-700 px-0.5 py-1.5"
               >
-                Selected documents will remain shared until
+                {{__('Selected documents will remain shared until')}}
                 {{ useDateFormat(invalidAfter, "YY-MM-DD") }}
               </span>
               <span
                 v-else
                 class="block text-xs leading-4 text-gray-700 px-0.5 py-1.5"
               >
-                Selected documents will remain shared indefinitely
+                {{__('Selected documents will remain shared indefinitely')}}
               </span>
             </div>
           </div>
@@ -110,7 +110,7 @@
                         close()
                     "
                   >
-                    Organization
+                    {{__('Organization')}}
                     <Check v-if="generalAccess.everyone" class="h-3" />
                   </li>
                   <li
@@ -122,7 +122,7 @@
                         close()
                     "
                   >
-                    Public
+                    {{__('Public')}}
                     <Check v-if="generalAccess.public" class="h-3" />
                   </li>
                   <li
@@ -136,7 +136,7 @@
                         close()
                     "
                   >
-                    Restricted
+                    {{__('Restricted')}}
                     <Check
                       v-if="!generalAccess.public && !generalAccess.everyone"
                       class="h-3"
@@ -152,7 +152,7 @@
               <PopoverButton
                 class="flex gap-1 px-2 focus:outline-none bg-gray-100 rounded h-7 items-center text-base justify-self-end"
               >
-                {{ generalAccess.write ? "Can Edit" : "Can View" }}
+                {{ generalAccess.write ? __("Can Edit") : __("Can View") }}
                 <FeatherIcon
                   :class="{ '[transform:rotateX(180deg)]': open }"
                   name="chevron-down"
@@ -171,7 +171,7 @@
                         close()
                     "
                   >
-                    Can View
+                    {{__('Can View')}}
                     <Check
                       v-if="
                         generalAccess.read === 1 && generalAccess.write === 0
@@ -188,7 +188,7 @@
                         close()
                     "
                   >
-                    Can Edit
+                    {{__('Can Edit')}}
                     <Check
                       v-if="
                         generalAccess.read === 1 && generalAccess.write === 1
@@ -220,7 +220,7 @@
               v-if="!$resources.getUsersWithAccess.loading"
               class="text-base space-y-4 mb-5"
             >
-              <span class="text-gray-600 font-medium text-base">Users</span>
+              <span class="text-gray-600 font-medium text-base">{{__('Users')}}</span>
 
               <!-- Owner -->
               <div class="flex items-center gap-x-3">
@@ -238,7 +238,7 @@
                   }}</span>
                 </div>
                 <span class="ml-auto flex items-center gap-1 text-gray-600">
-                  Owner
+                  {{__('Owner')}}
                   <Diamond class="h-3.5" />
                 </span>
               </div>
@@ -283,7 +283,7 @@
               <span
                 v-if="groupsWithAccess.length"
                 class="text-gray-600 font-medium text-base"
-                >Groups</span
+                >{{__('Groups')}}</span
               >
               <div
                 v-for="(group, index) in groupsWithAccess"
@@ -321,7 +321,7 @@
             <template #prefix>
               <Link />
             </template>
-            Get Link
+            {{__('Get Link')}}
           </Button>
           <Button
             class="ml-auto"
@@ -329,7 +329,7 @@
             :icon-left="showSettings ? 'arrow-left' : 'settings'"
             @click="showSettings = !showSettings"
           >
-            {{ showSettings ? "Back" : "Settings" }}
+            {{ showSettings ? __("Back") : __("Settings") }}
           </Button>
         </div>
       </div>
@@ -426,15 +426,15 @@ export default {
     accessMessage() {
       if (this.generalAccess.public) {
         return this.generalAccess.write
-          ? "Everyone with a link to this file can edit"
-          : "Everyone with a link to this file can view"
+          ? __("Everyone with a link to this file can edit")
+          : __("Everyone with a link to this file can view")
       }
       if (this.generalAccess.everyone) {
         return this.generalAccess.write
-          ? `Members of ${this.$resources.getOrgName.data?.org_name} can edit`
-          : `Members of ${this.$resources.getOrgName.data?.org_name} can view`
+          ? `${__('Members of')} ${this.$resources.getOrgName.data?.org_name} ${__('can edit')}`
+          : `${__('Members of')} ${this.$resources.getOrgName.data?.org_name} ${__('can view')}`
       } else {
-        return "Only people with access can view or edit"
+        return __("Only people with access can view or edit")
       }
     },
     openDialog: {
@@ -457,7 +457,7 @@ export default {
         const now = Math.floor(Date.now() / 1000)
         if (unix < now) {
           this.invalidAfter = null
-          this.invalidateAfterError = "Cannot select an earlier date"
+          this.invalidateAfterError = __("Cannot select an earlier date")
         } else {
           this.invalidateAfterError = null
           this.$resources.updateInvalidAfter.submit({

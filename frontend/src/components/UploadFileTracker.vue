@@ -4,16 +4,16 @@
         <div class="flex items-center justify-between w-full mb-4 pr-1.5" :class="[collapsed ? 'cursor-pointer' : '']"
             @click="collapsed = false">
             <div v-if="uploadFilesInProgress.length > 0" class="font-medium truncate text-lg">
-                Uploading {{ uploadFilesInProgress.length }}
-                {{ uploadFilesInProgress.length == 1 ? "file" : "files" }}
+                {{__('Uploading')}} {{ uploadFilesInProgress.length }}
+                {{ uploadFilesInProgress.length == 1 ? __("file") : __("files") }}
             </div>
             <div v-else-if="uploadFilesCompleted.length > 0" class="font-medium truncate text-lg">
                 {{ uploadFilesCompleted.length }}
-                {{ uploadFilesCompleted.length == 1 ? "file" : "files" }} complete
+                {{ uploadFilesCompleted.length == 1 ? __("file") : __("files") }} {{__('complete')}}
             </div>
             <div v-else-if="uploadFilesFailed.length > 0" class="font-medium truncate text-lg">
                 {{ uploadFilesFailed.length }}
-                {{ uploadFilesFailed.length == 1 ? "file" : "files" }} failed
+                {{ uploadFilesFailed.length == 1 ? __("file") : __("files") }} {{__('failed')}}
             </div>
             <div class="ml-auto flex items-center gap-4">
                 <button class="focus:outline-none" @click="close">
@@ -27,14 +27,14 @@
                     ? 'bg-white shadow-sm hover:bg-white active:bg-white'
                     : '',
             ]" @click="currentTab = 1">
-                In Progress
+                {{__('In Progress')}}
             </Button>
             <Button variant="ghost" class="max-h-6 leading-none transition-colors focus:outline-none" :class="[
                 currentTab === 2
                     ? 'bg-white shadow-sm hover:bg-white active:bg-white'
                     : '',
             ]" @click="currentTab = 2">
-                Completed
+                {{__('Completed')}}
             </Button>
             <Button v-show="uploadFilesFailed.length > 0" variant="ghost"
                 class="max-h-6 leading-none transition-colors focus:outline-none" :class="[
@@ -42,7 +42,7 @@
                         ? 'bg-white shadow-sm hover:bg-white active:bg-white'
                         : '',
                 ]" @click="currentTab = 3">
-                Failed
+                {{__('Failed')}}
             </Button>
         </div>
         <div v-if="!collapsed" class="max-h-64 overflow-y-auto bg-white w-full">
@@ -79,12 +79,12 @@
             </div>
         </div>
         <Dialog v-if="showErrorDialog" v-model="showErrorDialog" :options="{
-            title: 'Uploaded Failed',
+            title: __('Uploaded Failed'),
             message: selectedFileUploaded.error,
             size: 'sm',
             actions: [
                 {
-                    label: 'Confirm',
+                    label: __('Confirm'),
                     onClick: () => {
                         showErrorDialog = false
                     },
@@ -92,12 +92,12 @@
             ],
         }" />
         <Dialog v-if="showCancelDialog" v-model="showCancelDialog" :options="{
-            title: 'Close tracking uploads',
-            message: 'Are you sure you want to close tracking uploads?',
+            title: __('Close tracking uploads'),
+            message: __('Are you sure you want to close tracking uploads?'),
             size: 'sm',
             actions: [
                 {
-                    label: 'Confirm',
+                    label: __('Confirm'),
                     variant: 'subtle',
                     theme: 'red',
                     onClick: () => {
@@ -132,7 +132,7 @@ export default {
             showErrorDialog: false,
             selectedFileUploaded: null,
             currentTab: 1,
-            emptyMessage: "No upload in progress",
+            emptyMessage: __("No upload in progress"),
         }
     },
     computed: {
@@ -145,16 +145,16 @@ export default {
         currentTabGetter() {
             switch (this.currentTab) {
                 case 1:
-                    this.emptyMessage = "No upload in progress"
+                    this.emptyMessage = __("No upload in progress")
                     return this.uploadFilesInProgress
                 case 2:
-                    this.emptyMessage = "No upload completed"
+                    this.emptyMessage = __("No upload completed")
                     return this.uploadFilesCompleted
                 case 3:
-                    this.emptyMessage = "No upload analysis"
+                    this.emptyMessage = __("No upload analysis")
                     return this.uploadFilesFailed
                 default:
-                    this.emptyMessage = "No upload completed"
+                    this.emptyMessage = __("No upload completed")
                     return this.uploadFilesCompleted
             }
         },

@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model="open" :options="{ title: 'Rename', size: 'xs' }">
+  <Dialog v-model="open" :options="{ title: __('Rename'), size: 'xs' }">
     <template #body-content>
       <div class="flex items-center justify-center">
         <Input
@@ -27,7 +27,7 @@
           :loading="$resources.rename.loading"
           @click="$resources.rename.submit"
         >
-          Rename
+          {{__('Rename')}}
         </Button>
       </div>
     </template>

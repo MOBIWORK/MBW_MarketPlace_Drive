@@ -4,7 +4,7 @@
         showTooltip: true,
         resizeColumn: true,
         emptyState: {
-            title: 'There are no records'
+            title: __('There are no records')
         }
     }" row-key="name">
         <template #cell="{ item, row, column }">
@@ -13,10 +13,10 @@
             </template>
             <template v-else-if="column.key == 'status'">
                 <Badge v-if="row['status'] == 'Paid'" :variant="'subtle'" :ref_for="true" theme="green" size="sm">
-                    Paid
+                    {{__('Paid')}}
                 </Badge>
                 <Badge v-else :variant="'subtle'" :ref_for="true" theme="red" size="sm">
-                    Outstanding
+                    {{__('Outstanding')}}
                 </Badge>
             </template>
             <template v-else-if="column.key == 'payment_time'">
@@ -42,19 +42,19 @@ export default {
             arrHistorialPayment: [],
             columnsPayment: [
                 {
-                    label: 'Title',
+                    label: __('Title'),
                     key: 'title'
                 },
                 {
-                    label: 'Price',
+                    label: __('Price'),
                     key: 'price'
                 },
                 {
-                    label: 'Status',
+                    label: __('Status'),
                     key: 'status'
                 },
                 {
-                    label: 'Payment Time',
+                    label: __('Payment Time'),
                     key: 'payment_time'
                 }
             ]
@@ -68,7 +68,6 @@ export default {
                 auto: true,
                 onSuccess(data) {
                     this.arrHistorialPayment = data
-                    console.log(data)
                 }
             }
         }
