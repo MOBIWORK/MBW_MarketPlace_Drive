@@ -37,6 +37,7 @@ import cv2
 import time
 
 import io
+import av
 
 def if_folder_exists(folder_name, parent):
     values = {
@@ -229,39 +230,45 @@ def _finalize_upload(temp_path, save_path, form_dict, title, parent, last_modifi
     save_path.rename(path)
 
     #Save file in S3
-    # doc_setting = frappe.get_single('Drive Instance Settings')
-    # aws_access_key = doc_setting.aws_access_key
-    # aws_secret_access_key = doc_setting.get_password('aws_secret_key')
-    # key_object = f"{_get_user_directory_name()}/{secure_filename(file_name)}"
-    # connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
-    # upload_file_with_connect(connect_s3, path, key_object)
+    doc_setting = frappe.get_single('Drive Instance Settings')
+    aws_access_key = doc_setting.aws_access_key
+    aws_secret_access_key = doc_setting.get_password('aws_secret_key')
+    key_object = f"{_get_user_directory_name()}/{parent}/{secure_filename(title)}"
+    connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
+
+    #Lưu vào redis cache
+    with open(path, 'rb') as f:
+        cache_key = f"s3_cache:{key_object}"
+        frappe.cache().setex(cache_key, 3600, f.read())
+
+    upload_file_with_connect(connect_s3, path, key_object)
 
     # Create DriveEntity thay path với key_object
     drive_entity = create_drive_entity(
-        name, title, parent, path, file_size, file_ext, mime_type, last_modified
+        name, title, parent, key_object, file_size, file_ext, mime_type, last_modified
     )
     # Generate thumbnail for images and videos
     if mime_type.startswith(("image", "video")):
-        # frappe.enqueue(
-        #     create_thumbnail_by_object,
-        #     queue="default",
-        #     timeout=None,
-        #     now=True,
-        #     at_front=True,
-        #     entity_name=name,
-        #     object_id=key_object,
-        #     mime_type=mime_type
-        # )
         frappe.enqueue(
-            create_thumbnail,
+            create_thumbnail_by_object,
             queue="default",
             timeout=None,
             now=True,
             at_front=True,
             entity_name=name,
-            path=path,
-            mime_type=mime_type,
+            object_id=key_object,
+            mime_type=mime_type
         )
+        # frappe.enqueue(
+        #     create_thumbnail,
+        #     queue="default",
+        #     timeout=None,
+        #     now=True,
+        #     at_front=True,
+        #     entity_name=name,
+        #     path=path,
+        #     mime_type=mime_type,
+        # )
     return drive_entity
 
 def create_drive_entity(name, title, parent, path, file_size, file_ext, mime_type, last_modified, name_gpx = None):
@@ -545,10 +552,14 @@ def get_file_content(entity_name, trigger_download=0):  #
         raise ValueError
     if drive_entity.is_active != 1:
         raise FileNotFoundError
-
-    with DistributedLock(drive_entity.path, exclusive=False):
+    
+    cache_key = f"s3_cache:{drive_entity.path}"
+    cached_value = frappe.cache().get(cache_key)
+    if cached_value:
+        # Chuyển đổi bytes thành file-like object
+        file_like_object = io.BytesIO(cached_value)
         return send_file(
-            drive_entity.path,
+            file_like_object,
             mimetype=drive_entity.mime_type,
             as_attachment=trigger_download,
             conditional=True,
@@ -556,6 +567,29 @@ def get_file_content(entity_name, trigger_download=0):  #
             download_name=drive_entity.title,
             environ=frappe.request.environ,
         )
+
+    doc_setting = frappe.get_single('Drive Instance Settings')
+    aws_access_key = doc_setting.aws_access_key
+    aws_secret_access_key = doc_setting.get_password('aws_secret_key')
+    bucket_name = doc_setting.aws_bucket
+    s3_client = boto3.client(
+        "s3",
+        aws_access_key_id=aws_access_key,
+        aws_secret_access_key=aws_secret_access_key
+    )
+    response = s3_client.get_object(Bucket=bucket_name, Key=drive_entity.path)
+    file_content = response["Body"].read()
+    frappe.cache().setex(cache_key, 3600, file_content)  # TTL = 1h
+    file_like_object = io.BytesIO(file_content)
+    return send_file(
+        file_like_object,
+        mimetype=drive_entity.mime_type,
+        as_attachment=trigger_download,
+        conditional=True,
+        max_age=3600,
+        download_name=drive_entity.title,
+        environ=frappe.request.environ,
+    )
 
 
 @frappe.whitelist(allow_guest=True)
@@ -602,7 +636,7 @@ def get_file_content_preview(entity_name, trigger_download=0):
         s3_client = boto3.client(
             "s3",
             aws_access_key_id=aws_access_key,
-            aws_secret_access_key=aws_secret_access_key,
+            aws_secret_access_key=aws_secret_access_key
         )
         try:
             response = s3_client.head_object(Bucket=bucket_name, Key=drive_entity.path)
@@ -624,7 +658,7 @@ def get_file_content_preview(entity_name, trigger_download=0):
         s3_client = boto3.client(
             "s3",
             aws_access_key_id=doc_setting.aws_access_key,
-            aws_secret_access_key=doc_setting.get_password("aws_secret_key"),
+            aws_secret_access_key=doc_setting.get_password("aws_secret_key")
         )
         with DistributedLock(drive_entity.path, exclusive=False):
             s3_response = s3_client.get_object(Bucket=bucket_name, Key=drive_entity.path)
@@ -650,10 +684,9 @@ def get_file_content_preview(entity_name, trigger_download=0):
 def get_file_gps(entity_name):
     arr_gps = []
     doc_file_video = frappe.get_doc("Drive Entity", entity_name)
-    video = cv2.VideoCapture(doc_file_video.path)
+    # Chuyển đổi video_bytes thành đối tượng file-like
+    fps = 0
     name_gpx = None
-    fps = video.get(cv2.CAP_PROP_FPS)
-    video.release()
     if doc_file_video.name_gpx is not None and doc_file_video.name_gpx != "":
         name_gpx = doc_file_video.name_gpx
     else:
@@ -669,19 +702,67 @@ def get_file_gps(entity_name):
         if len(lst_gps_doc) > 0:
             name_gpx = lst_gps_doc[0].name
     if name_gpx is not None and name_gpx != "":
+        #Lấy dữ liệu FPS
+        cache_key_video = f"s3_cache:{doc_file_video.path}"
+        cached_value_video = frappe.cache().get(cache_key_video)
+        video_file = None
+        doc_setting = frappe.get_single("Drive Instance Settings")
+        # Kết nối S3 từ Drive Instance Settings
+        s3_client = boto3.client(
+                "s3",
+                aws_access_key_id=doc_setting.aws_access_key,
+                aws_secret_access_key=doc_setting.get_password("aws_secret_key")
+            )
+        if cached_value_video:
+            video_file = io.BytesIO(cached_value_video)
+        else:
+            
+            # Lấy video từ S3
+            response_video = s3_client.get_object(Bucket=doc_setting.aws_bucket, Key=doc_file_video.path)
+            # Tạo một đối tượng io.BytesIO để xử lý stream
+            video_file = io.BytesIO()
+            chunk_size = 8 * 1024 * 1024  # Kích thước mỗi chunk là 8MB
+
+            # Đọc và ghi từng chunk vào video_file
+            video_body = response_video["Body"]
+            for chunk in iter(lambda: video_body.read(chunk_size), b""):
+                video_file.write(chunk)
+
+            # Đặt con trỏ của video_file về vị trí đầu để sử dụng
+            video_file.seek(0)
+            frappe.cache().setex(cache_key_video, 3600, video_file.getvalue())
+        with av.open(video_file) as container:
+            video_stream = next(s for s in container.streams if s.type == 'video')
+            fps_fraction = video_stream.average_rate  # Đây là một fractions.Fraction
+            fps = float(fps_fraction)
+
         doc_gps = frappe.get_doc("Drive Entity", name_gpx)
-        with open(doc_gps.path, 'r') as gpx_file:
-            gpx = gpxpy.parse(gpx_file)
+        gpx_bytes = None
+        cache_key_gpx = f"s3_cache:{doc_gps.path}"
+        cached_value_gpx = frappe.cache().get(cache_key_gpx)
+        if cached_value_gpx:
+            gpx_bytes = cached_value_gpx
+        else:
+            # Lấy tệp GPX từ S3
+            response_gpx = s3_client.get_object(Bucket=doc_setting.aws_bucket, Key=doc_gps.path)
+            gpx_bytes = response_gpx["Body"].read()
+            frappe.cache().setex(cache_key_gpx, 3600, gpx_bytes)
+        
+        # Giải mã byte với xử lý lỗi
+        gpx_string = gpx_bytes.decode("utf-8")
+
+        # Parse dữ liệu GPX
+        gpx = gpxpy.parse(gpx_string)
         for track in gpx.tracks:
             for segment in track.segments:
                 for point in segment.points:
                     if point.longitude != 0 and point.latitude != 0:
                         arr_gps.append({
-                            'lon': point.longitude,
-                            'lat': point.latitude,
-                            'time': point.time,
-                            'el': point.elevation
-                        })
+                        'lon': float(point.longitude),
+                        'lat': float(point.latitude),
+                        'time': point.time.isoformat() if point.time else None,
+                        'el': float(point.elevation) if point.elevation else None
+                    })
     return {'arr_gps': arr_gps, 'fps': fps}
 
 def stream_file_content(drive_entity, range_header):
@@ -1115,9 +1196,9 @@ def unshare_entities(entity_names, move=False):
 
 def delete_background_job(entity, ignore_permissions, aws_access_key, aws_secret_access_key):
     #Xóa dữ liệu trong S3
-    #connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
+    connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
     doc_entity = frappe.get_doc('Drive Entity', entity)
-    #delete_object_with_connect(connect_s3, doc_entity.path)
+    delete_object_with_connect(connect_s3, doc_entity.path)
     frappe.delete_doc("Drive Entity", entity, ignore_permissions=ignore_permissions)
 
 
@@ -1763,8 +1844,6 @@ def get_file_from_s3_with_cache():
     # 1. Kiểm tra trong cache
     cached_value = frappe.cache().get(cache_key)
     if cached_value:
-        print("Dòng 1766 đã có cache")
-        frappe.logger().info(f"Cache hit for {object_key}")
         # Chuyển đổi bytes thành file-like object
         file_like_object = io.BytesIO(cached_value)
         return send_file(
@@ -1788,15 +1867,13 @@ def get_file_from_s3_with_cache():
         s3_client = boto3.client(
             "s3",
             aws_access_key_id=aws_access_key,
-            aws_secret_access_key=aws_secret_access_key,
+            aws_secret_access_key=aws_secret_access_key
         )
         response = s3_client.get_object(Bucket="eov-geoviz", Key=object_key)
         file_content = response["Body"].read()  # Đọc nội dung file từ S3
         end_time = time.time()
-        frappe.logger().info(f"Fetched {object_key} from S3 in {end_time - start_time} seconds.")
-        print("Dòng 1797 chưa có cache")
         # 3. Lưu vào Redis Cache
-        frappe.cache().setex(cache_key, 3600, file_content)  # TTL = 1 giờ
+        frappe.cache().setex(cache_key, 3600, file_content)  # TTL = 1 h
 
         # 4. Trả dữ liệu cho người dùng
         file_like_object = io.BytesIO(file_content)

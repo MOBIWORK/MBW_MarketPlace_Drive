@@ -117,3 +117,12 @@ def delete_objects(bucket_name):
             return "No objects to delete"
     else:
         return "Bucket is empty or does not exist"
+
+@frappe.whitelist()
+def get_bucket_region(bucket_name):
+    doc_setting = frappe.get_single('Drive Instance Settings')
+    aws_access_key = doc_setting.aws_access_key
+    aws_secret_access_key = doc_setting.get_password('aws_secret_key')
+    connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
+    response = connect_s3.get_bucket_location(Bucket=bucket_name)
+    return response.get('LocationConstraint')

@@ -8,6 +8,7 @@ from drive.locks.distributed_lock import DistributedLock
 import cv2
 from tempfile import NamedTemporaryFile
 from drive.utils.s3 import get_connect_s3
+from io import BytesIO
 
 
 def create_user_directory():
@@ -198,46 +199,60 @@ def create_thumbnail_by_object(entity_name, object_id, mime_type):
         user_thumbnails_directory = create_user_thumbnails_directory()
 
     thumbnail_savepath = Path(user_thumbnails_directory, entity_name)
-    # Tải tệp từ S3 về tệp tạm thời
-    doc_setting = frappe.get_single('Drive Instance Settings')
-    aws_access_key = doc_setting.aws_access_key
-    aws_secret_access_key = doc_setting.get_password('aws_secret_key')
-    connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
-    with NamedTemporaryFile(delete=True) as temp_file:
-        try:
-            bucket_name = frappe.db.get_single_value("Drive Instance Settings", "aws_bucket")
-            connect_s3.download_fileobj(bucket_name, object_id, temp_file)
-            temp_file.flush()
-            temp_path = temp_file.name
+    doc_entity = frappe.get_doc("Drive Entity", entity_name)
+    cache_key = f"s3_cache:{doc_entity.path}"
+    cached_value = frappe.cache().get(cache_key)
+    file_data = None
+    if cached_value:
+        file_data = cached_value
+    else:
+        # Tải tệp từ S3 về tệp tạm thời
+        doc_setting = frappe.get_single('Drive Instance Settings')
+        aws_access_key = doc_setting.aws_access_key
+        aws_secret_access_key = doc_setting.get_password('aws_secret_key')
+        connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
+        bucket_name = frappe.db.get_single_value("Drive Instance Settings", "aws_bucket")
+        # Lấy object từ S3
+        response = connect_s3.get_object(Bucket=bucket_name, Key=object_id)
+        file_data = response['Body'].read()  # Đọc dữ liệu file dưới dạng bytes
+        frappe.cache().setex(cache_key, 3600, file_data)
 
-            if mime_type.startswith("image"):
-                max_retries = 3
-                retry_count = 0
-                while retry_count < max_retries:
-                    try:
-                        with Image.open(temp_path).convert("RGB") as image:
-                            image = ImageOps.exif_transpose(image)
-                            image.thumbnail((512, 512))
-                            image.save(str(thumbnail_savepath) + ".thumbnail", format="webp")
-                        break
-                    except Exception as e:
-                        print(f"Failed to create image thumbnail. Retry {retry_count+1}/{max_retries}")
-                        retry_count += 1
-                else:
-                    print("Failed to create image thumbnail after maximum retries.")
-            
-            elif mime_type.startswith("video"):
-                max_retries = 3
-                retry_count = 0
-                while retry_count < max_retries:
-                    try:
-                        cap = cv2.VideoCapture(temp_path)
+    try:
+        
+        if mime_type.startswith("image"):
+            max_retries = 3
+            retry_count = 0
+            while retry_count < max_retries:
+                try:
+                    # Mở và xử lý hình ảnh từ bytes
+                    with Image.open(BytesIO(file_data)).convert("RGB") as image:
+                        image = ImageOps.exif_transpose(image)
+                        image.thumbnail((512, 512))  # Tạo thumbnail
+                        image.save(str(thumbnail_savepath) + ".thumbnail", format="webp")
+                    break
+                except Exception as e:
+                    print(f"Failed to create image thumbnail. Retry {retry_count+1}/{max_retries}")
+                    retry_count += 1
+            else:
+                print("Failed to create image thumbnail after maximum retries.")
+
+        elif mime_type.startswith("video"):
+            max_retries = 3
+            retry_count = 0
+            while retry_count < max_retries:
+                try:
+                    # Ghi dữ liệu video vào bộ nhớ tạm
+                    with NamedTemporaryFile(delete=True) as temp_video:
+                        temp_video.write(file_data)
+                        temp_video.flush()
+                        
+                        cap = cv2.VideoCapture(temp_video.name)
                         frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
                         target_frame = int(frame_count / 2)
                         cap.set(cv2.CAP_PROP_POS_FRAMES, target_frame)
                         ret, frame = cap.read()
                         cap.release()
-                        
+
                         if ret:
                             _, thumbnail_encoded = cv2.imencode(
                                 ".webp",
@@ -247,10 +262,11 @@ def create_thumbnail_by_object(entity_name, object_id, mime_type):
                             with open(str(thumbnail_savepath) + ".thumbnail", "wb") as f:
                                 f.write(thumbnail_encoded)
                         break
-                    except Exception as e:
-                        print(f"Failed to create video thumbnail. Retry {retry_count+1}/{max_retries}")
-                        retry_count += 1
-                else:
-                    print("Failed to create video thumbnail after maximum retries.")
-        except Exception as e:
-            print(f"Failed to download or process the file from S3: {e}")
+                except Exception as e:
+                    print(f"Failed to create video thumbnail. Retry {retry_count+1}/{max_retries}")
+                    retry_count += 1
+            else:
+                print("Failed to create video thumbnail after maximum retries.")
+
+    except Exception as e:
+        print(f"Failed to download or process the file from S3: {e}")
