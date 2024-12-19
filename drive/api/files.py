@@ -695,7 +695,8 @@ def get_file_gps(entity_name):
         lst_gps_doc = frappe.db.get_list("Drive Entity",
             filters={
                 'title': ['like', f'{title_without_extension}%'],
-                'file_ext': ".gpx"
+                'file_ext': ".gpx",
+                'parent_drive_entity': doc_file_video.parent_drive_entity
             },
             fields=['name', 'title']
         )
