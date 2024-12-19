@@ -721,13 +721,15 @@ def get_file_gps(entity_name):
             response_video = s3_client.get_object(Bucket=doc_setting.aws_bucket, Key=doc_file_video.path)
             # Tạo một đối tượng io.BytesIO để xử lý stream
             video_file = io.BytesIO()
-            chunk_size = 8 * 1024 * 1024  # Kích thước mỗi chunk là 8MB
+            chunk_size = 4 * 1024 * 1024  # Kích thước mỗi chunk là 4MB
 
             # Đọc và ghi từng chunk vào video_file
             video_body = response_video["Body"]
+            print("Dong 728 before write")
             for chunk in iter(lambda: video_body.read(chunk_size), b""):
+                print("write a chunk")
                 video_file.write(chunk)
-
+            print("Dòng 731 after write")
             # Đặt con trỏ của video_file về vị trí đầu để sử dụng
             video_file.seek(0)
             frappe.cache().setex(cache_key_video, 3600, video_file.getvalue())
