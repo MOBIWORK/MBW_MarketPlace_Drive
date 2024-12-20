@@ -23,7 +23,7 @@
             >
               <Edit2
                 class="h-3.5 w-auto stroke-[1.5]"
-                title="Edit Link"
+                :title="__('Edit Link')"
                 @click="componentSlotProps.onClick(button)"
               />
             </button>
@@ -36,7 +36,7 @@
                 ? 'bg-gray-200 text-gray-400'
                 : 'hover:bg-gray-100'
             "
-            :title="button.label"
+            :title="__(button.label)"
             @click="
               componentSlotProps?.onClick
                 ? componentSlotProps.onClick(button)

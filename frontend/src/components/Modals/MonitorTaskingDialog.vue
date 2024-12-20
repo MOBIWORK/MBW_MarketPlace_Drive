@@ -134,7 +134,7 @@ export default{
                     key: 'type_analysis'
                 },
                 {
-                    label: __('PUPV'),
+                    label: __("PUPV(Process Unit Per's Video)"),
                     key: 'pupv'
                 },
                 {

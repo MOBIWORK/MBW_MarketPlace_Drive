@@ -240,7 +240,7 @@ const store = createStore({
       localStorage.removeItem("is_drive_admin")
       commit("setAuth", { loading: true })
       clear()
-      let res = await call("login", {
+      let res = await call("drive.api.user.login", {
         usr: payload.email,
         pwd: payload.password,
       })

@@ -1,6 +1,6 @@
 <template>
   <LoginBox
-    title="Log in to your account"
+    :title="__('Log in to your account')"
     :class="{ 'pointer-events-none': loading }"
   >
     <form class="flex flex-col" @submit.prevent="">
@@ -110,7 +110,11 @@ export default {
           }
         }
       } catch (error) {
-        this.errorMessage = error.messages.join("\n")
+        if(error.messages.includes("User disabled or missing")){
+          this.errorMessage = "Account not activated"
+        }else{
+          this.errorMessage = error.messages.join("\n")
+        }
       } finally {
         this.loading = false
       }

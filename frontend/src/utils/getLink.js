@@ -11,7 +11,7 @@ export async function getLink(entity) {
   try {
     await copyToClipboard(link)
     toast({
-      title: "Copied link",
+      title: __("Copied link"),
       position: "bottom-right",
       timeout: 2,
     })
@@ -20,7 +20,7 @@ export async function getLink(entity) {
       toast({
         icon: "alert-triangle",
         iconClasses: "text-red-700",
-        title: "Clipboard permission denied",
+        title: __("Clipboard permission denied"),
         position: "bottom-right",
       })
     } else {

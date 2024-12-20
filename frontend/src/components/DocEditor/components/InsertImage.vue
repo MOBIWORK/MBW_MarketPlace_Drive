@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model="open" :options="{ title: 'Add Image' }" @after-leave="reset">
+  <Dialog v-model="open" :options="{ title: __('Add Image') }" @after-leave="reset">
     <template #body-content>
       <FileUploader
         file-types="image/*"
@@ -10,10 +10,10 @@
             <Button @click="openFileSelector">
               {{
                 uploading
-                  ? `Uploading ${progress}%`
+                  ? `${__('Uploading')} ${progress}%`
                   : addImageDialog.url
-                  ? "Change Image"
-                  : "Upload Image"
+                  ? __("Change Image")
+                  : __("Upload Image")
               }}
             </Button>
             <Button
@@ -25,7 +25,7 @@
                 }
               "
             >
-              Remove
+              {{__('Remove')}}
             </Button>
           </div>
         </template>
@@ -42,9 +42,9 @@
         variant="solid"
         @click="addImage(addImageDialog.url)"
       >
-        Insert Image
+        {{__('Insert Image')}}
       </Button>
-      <Button @click="reset">Cancel</Button>
+      <Button @click="reset">{{__('Cancel')}}</Button>
     </template>
   </Dialog>
 </template>

@@ -4,7 +4,7 @@
       <span
         class="inline-flex items-center gap-2.5 text-gray-800 font-medium text-lg w-full"
       >
-        Annotations
+        {{__('Annotations')}}
       </span>
       <Dropdown :options="filterItems" placement="left">
         <Button>
@@ -48,7 +48,7 @@
             </div>
             <span class="text-sm text-gray-700">
               {{ comment.get("replies").length }}
-              {{ comment.get("replies").length === 1 ? " reply" : "replies" }}
+              {{ comment.get("replies").length === 1 ? ` ${__('reply')}` : __("replies") }}
             </span>
           </div>
 
@@ -138,7 +138,7 @@
       </div>
 
       <div v-else class="text-gray-600 text-sm my-5">
-        There are annotations for the current document or category
+        {{__('There are annotations for the current document or category')}}
       </div>
     </div>
   </div>
@@ -230,19 +230,19 @@ const currentFilter = computed(() => {
 const filterItems = computed(() => {
   return [
     {
-      label: "Open",
+      label: __("Open"),
       onClick: () => {
         currentFilterState.value = 0
       },
     },
     {
-      label: "Unanchored",
+      label: __("Unanchored"),
       onClick: () => {
         currentFilterState.value = 1
       },
     },
     {
-      label: "Resolved",
+      label: __("Resolved"),
       onClick: () => {
         currentFilterState.value = 2
       },
@@ -308,7 +308,7 @@ const commentOptions = computed(() =>
       },
     }, */
     {
-      label: "Mark as Resolved",
+      label: __("Mark as Resolved"),
       onClick: () => {
         allAnnotations.forEach((yMap) => {
           if (yMap.get("id") === currentActiveAnnotation.value.get("id")) {
@@ -330,7 +330,7 @@ const commentOptions = computed(() =>
       },
     },
     {
-      label: "Mark as Open",
+      label: __("Mark as Open"),
       onClick: () => {
         allAnnotations.forEach((yMap) => {
           if (yMap.get("id") === currentActiveAnnotation.value.get("id")) {
@@ -353,7 +353,7 @@ const commentOptions = computed(() =>
     },
 
     {
-      label: "Delete",
+      label: __("Delete"),
       onClick: () => {
         editor.value
           .chain()
@@ -381,7 +381,7 @@ const replyOptions = computed(() =>
       },
     }, */
     {
-      label: "Delete",
+      label: __("Delete"),
       onClick: () => {
         let yarray = allAnnotations
         let targetId = currentActiveAnnotation.value.get("id")

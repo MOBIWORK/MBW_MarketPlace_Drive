@@ -88,7 +88,7 @@
       <StorageBar v-if="!isDriveGuest" />
       <!-- <span>{{ $resources.getRootFolderSize.data }}</span> -->
       <SidebarItem
-        :label="!isExpanded ? 'Expand' : 'Collapse'"
+        :label="!isExpanded ? __('Expand') : __('Collapse')"
         :is-collapsed="!isExpanded"
         class="mt-auto"
         @click="toggleExpanded"
@@ -158,7 +158,7 @@ export default {
           label: __("Home"),
           route: "/home",
           icon: Home,
-          highlight: this.$store.state.currentBreadcrumbs[0].label === "Home",
+          highlight: this.$store.state.currentBreadcrumbs[0].label === __("Home"),
         },
         {
           enabled: true,
@@ -166,7 +166,7 @@ export default {
           route: "/recents",
           icon: Recent,
           highlight:
-            this.$store.state.currentBreadcrumbs[0].label === "Recents",
+            this.$store.state.currentBreadcrumbs[0].label === __("Recents"),
         },
         {
           enabled: true,
@@ -174,21 +174,21 @@ export default {
           route: "/favourites",
           icon: Star,
           highlight:
-            this.$store.state.currentBreadcrumbs[0].label === "Favourites",
+            this.$store.state.currentBreadcrumbs[0].label === __("Favourites"),
         },
         {
           enabled: true,
           label: __("Shared"),
           route: "/shared",
           icon: Users,
-          highlight: this.$store.state.currentBreadcrumbs[0].label === "Shared",
+          highlight: this.$store.state.currentBreadcrumbs[0].label === __("Shared"),
         },
         {
           enabled: true,
           label: __("Trash"),
           route: "/trash",
           icon: Trash,
-          highlight: this.$store.state.currentBreadcrumbs[0].label === "Trash",
+          highlight: this.$store.state.currentBreadcrumbs[0].label === __("Trash"),
         },
       ].filter((item) => item.enabled)
     },

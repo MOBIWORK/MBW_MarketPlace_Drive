@@ -230,7 +230,7 @@ export default {
       showRenameDialog: false,
       newEntityOptions: [
         {
-          group: "Upload",
+          group: __("Upload"),
           items: [
             {
               label: __("Upload File"),
@@ -246,7 +246,7 @@ export default {
           ],
         },
         {
-          group: "New",
+          group: __("New"),
           items: [
             {
               label: __("New Folder"),

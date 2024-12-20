@@ -138,7 +138,7 @@ export default {
             } else if (code === 1) {
               this.response = {
                 title: __("Register Account Successfully"),
-                message: `${__('Your account was created successfully. Please')} <a href="/drive" class="text-base text-blue-500">${__('LOGIN IN')}</a> ${__('to use the service')}.`,
+                message: `${__('Your account was created successfully. Please activate account and')} <a href="/drive" class="text-base text-blue-500">${__('LOGIN IN')}</a> ${__('to use the service')}.`,
                 color: "green",
               }
             } else {

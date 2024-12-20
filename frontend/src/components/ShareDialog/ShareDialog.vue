@@ -87,10 +87,10 @@
               >
                 {{
                   generalAccess.public
-                    ? "Public"
+                    ? __("Public")
                     : generalAccess.everyone
-                    ? "Organization"
-                    : "Restricted"
+                    ? __("Organization")
+                    : __("Restricted")
                 }}
                 <FeatherIcon
                   :class="{ '[transform:rotateX(180deg)]': open }"
@@ -213,6 +213,7 @@
             :active-users="usersWithAccess"
             :active-groups="groupsWithAccess"
             @add-new-users="(data) => updateUsers(data)"
+            :buttonText="__('Share')"
           />
 
           <div class="overflow-y-auto max-h-96 px-4 sm:px-6">

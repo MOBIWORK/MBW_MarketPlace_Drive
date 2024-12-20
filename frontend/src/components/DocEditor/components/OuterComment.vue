@@ -58,7 +58,7 @@
             <textarea
               v-model="commentText"
               class="w-full form-textarea bg-transparent resize-none border-none hover:bg-transparent focus:ring-0 focus:shadow-none focus:bg-transparent"
-              placeholder="Add comment"
+              :placeholder="__('Add comment')"
               @input="resize($event)"
               @keypress.enter.stop.prevent="setComment"
             />

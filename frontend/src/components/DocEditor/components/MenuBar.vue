@@ -305,12 +305,12 @@ export default {
             }, */
             {
               icon: "share-2",
-              label: "Share File",
+              label: __("Share File"),
               handler: () => (this.showShareDialog = true),
             },
             {
               icon: "star",
-              label: "Add to favourites",
+              label: __("Add to favourites"),
               handler: () => alert("Open File"),
             },
           ],
@@ -321,7 +321,7 @@ export default {
           items: [
             {
               icon: "trash-2",
-              label: "Delete File",
+              label: __("Delete File"),
               handler: () => (this.showRemoveDialog = true),
             },
           ],
@@ -334,21 +334,21 @@ export default {
           items: [
             {
               icon: "eye",
-              label: "Reading",
+              label: __("Reading"),
               handler: () => {
                 this.emitter.emit("toggleReadMode")
               },
             },
             {
               icon: "edit-3",
-              label: "Editing",
+              label: __("Editing"),
               handler: () => {
                 this.emitter.emit("toggleEditMode")
               },
             },
             {
               icon: "message-square",
-              label: "Suggesting",
+              label: __("Suggesting"),
               handler: () => {
                 this.emitter.emit("toggleCommentMode")
               },

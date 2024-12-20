@@ -1,2 +1,263 @@
-Tags,Tags
+Tags,Thẻ
+New Tag,Thẻ mới
 Payments,Hóa đơn
+Recents,Gần đây
+Favourites,Yêu thích
+Shared,Được chia sẻ
+Trash,Thùng rác
+Storage,Kho lưu trữ
+used out of,đã sử dụng hết
+Collapse,Thu vào
+Expand,Mở rộng
+Apps,Ứng dụng
+Documentation,Tài liệu
+Support,Hỗ trợ
+Settings,Thiết lập
+Log out,Đăng xuất
+Log in to your account,Đăng nhập vào tài khoản của bạn
+Password,Mật khẩu
+Submit,Gửi
+OR,Hoặc
+Don't have an account?,Bạn chưa có tài khoản?
+SIGN UP,Đăng ký
+Create your account,Tạo tài khoản của bạn
+Name,Tên
+Already have an account?,Bạn đã có tài khoản?
+LOG IN,Đăng nhập
+Profile,Hồ sơ
+Profile Photo,Ảnh hồ sơ
+Edit profile,Sửa hồ sơ
+Add Image,Thêm ảnh
+Preferences,Tùy chọn
+Group folders before files,Nhóm các thư mục trước các tệp tin
+Single click to open files and folders,Nhấp chuột một lần để mở tệp và thư mục
+Invite,Mời
+Invite User,Mời người dùng
+Send Invitation,Gửi lời mời
+Enter email address,Nhập địa chỉ email
+Remove User,Xóa người dùng
+Removing,Xóa
+will revoke their access to Frappe Drive. All files and folders owned by them will remain intact. You can add them back using the same email address.,sẽ thu hồi quyền truy cập của họ vào Frappe Drive. Tất cả các tệp và thư mục do họ sở hữu sẽ vẫn còn nguyên vẹn. Bạn có thể thêm lại chúng bằng cùng một địa chỉ email.
+No Users,Không có người dùng
+No users found,Không tìm thấy người dùng
+Groups,Nhóm
+No groups, Không có nhóm
+New Group,Nhóm mới
+Group Name,Tên nhóm
+Add User,Thêm người dùng
+Group name is required,Tên nhóm là bắt buộc
+Group needs atleast one member,Nhóm cần ít nhất một thành viên
+Select users,Chọn người dùng
+Search users,Tìm kiếm người dùng
+Clear all,Xóa tất cả
+Users in this Group,Người dùng trong nhóm này
+Remove,Xóa
+Add Video,Thêm video
+Uploading,Tải lên
+Change Video,Thay đổi video
+Upload Video,Tải lên video
+Insert Video,Thêm video
+Used,Đã sử dụng
+out of,trong tổng số
+Change package plan,Thay đổi gói
+of,của
+PUPV used,PUPV sử dụng
+No Storage Used,Không sử dụng bộ nhớ
+Service Packages,Gói dịch vụ
+Set the service package you want to reserve,Đặt gói dịch vụ bạn muốn đặt trước
+Register package,Đăng ký gói
+storage capacity,dung lượng lưu trữ
+PUPV(Process Unit Per's Videos),PUPV(Đơn vị xử lý video)
+You have successfully changed the package,Bạn đã thay đổi gói thành công
+Invoice created successfully. Please pay to experience the service,Hóa đơn đã được tạo thành công. Vui lòng thanh toán để trải nghiệm dịch vụ
+Color,Màu
+There are no records,Không có bản ghi
+Price,Thành tiền
+Payment Time,Thời gian thanh toán
+Paid,Đã thanh toán
+Outstanding,Chưa thanh toán
+Jump to,Chuyển tới
+Notifications,Thông báo
+Search,Tìm kiếm
+Unread,Chưa đọc
+Mark all as Read,Đánh dấu tất cả đã đọc
+No Notifications,Không có thông báo
+New,Thêm mới
+Tasking,Tác vụ xử lý
+Last Modified,Sửa lần cuối
+Size,Dung lượng
+Share,Chia sẻ
+Sharing,Chia sẻ
+Restricted,Giới hạn
+Organization,Tổ chức
+Allow Comments,Cho phép bình luận
+Allow Downloading,Cho phép tải xuống
+Access Until,Truy cập cho đến khi
+Selected documents will remain shared until,Các tài liệu đã chọn sẽ vẫn được chia sẻ cho đến khi
+Selected documents will remain shared indefinitely,Các tài liệu đã chọn sẽ được chia sẻ vô thời hạn
+Can Edit,Có thể chỉnh sửa
+Can View,Có thể xem
+Get Link,Nhận liên kết
+Everyone with a link to this file can edit,Mọi người có liên kết đến tập tin này đều có thể chỉnh sửa
+Everyone with a link to this file can view,Mọi người có liên kết đến tập tin này đều có thể xem
+Members of,Thành viên của
+can edit,có thể chỉnh sửa
+can view,có thể xem
+Only people with access can view or edit,Chỉ những người có quyền truy cập mới có thể xem hoặc chỉnh sửa
+Share File,Chia sẻ tệp
+Add to favourites,Thêm vào mục yêu thích
+Delete File,Xóa tệp
+Reading,Đọc
+Editing,Sửa
+Suggesting,Đề xuất
+Back,Quay lại
+Copied link,Đã sao chép liên kết
+Clipboard permission denied,Quyền của bảng nhớ tạm bị từ chối
+Moving,Di chuyển
+Show Info,Hiển thị thông tin
+Hide Info,Ẩn thông tin
+Information,Thông tin
+Access,Quyền truy cập
+This file has no tags,Tệp này không có thẻ
+Manage,Quản lý
+No tags found,Không tìm thấy thẻ
+Properties,Thuộc tính
+Type,Thể loại
+Modified,Đã sửa đổi
+Created,Đã tạo
+No file selected,Không có tệp được chọn
+items selected,mục đã chọn
+Favourite,Yêu thích
+Unfavourite,Không yêu thích
+Set Color,Đặt màu
+Move to Trash,Chuyển vào thùng rác
+Upload File,Tải tệp lên
+New Document,Tài liệu mới
+Upload,Tải lên
+New,Mới
+Upload Videos,Tải video lên
+Video With GPS,Video kèm GPS
+Video Without GPS,Video không kèm GPS
+Files,Tệp
+The video and gps file names must be the same to be able to extract information,Tên tệp video và gps phải giống nhau để có thể trích xuất thông tin
+Select video files to extract information,Chọn các tập tin video để trích xuất thông tin
+upload,tải lên
+uploads,tải lên
+complete,hoàn thành
+failed,lỗi
+In Progress,Đang tiến hành
+Completed,Đã hoàn thành
+Failed,Đã lỗi
+Upload Failed,Tải lên không thành công
+Untrack file uploads,Hủy theo dõi tệp lên
+Are you sure you want to untrack file uploads?,Bạn có chắc chắn muốn bỏ theo dõi việc tải tệp lên không?
+No uploads in progress,Không có tải lên nào đang tiến hành
+No uploads completed,Không có nội dung tải lên nào được hoàn tất
+No failed uploads,Không tải lên thất bại
+File Size,Kích thước tệp
+Type Analysis,Loại phân tích
+PUPV(Process Unit Per's Video),Đơn vị xử lý video
+Uploaded Time,Thời gian tải lên
+Start Processing Time,Thời gian bắt đầu xử lý
+End Processing Time,Thời gian kết thúc xử lý
+Copy successfully,Sao chép thành công
+Pending,Đang chờ
+Processing,Đang xử lý
+Night basemap,Bản đồ đêm
+Bright basemap,Bản đồ sáng
+Basemap Standard,Bản đồ tiêu chuẩn
+Satellite,Vệ tinh
+2D display,Hiển thị 2D
+3D map,Bản đồ 3D
+3D display,Hiển thị 3D
+Link,Liên kết
+Acreage(m),Diện tích(m)
+Acreage(pixel),Diện tích(pixel)
+Image,Ảnh
+Words,Từ
+Characters,Ký tự
+Reading Time,Thời gian đọc
+mins,phút
+min,phút
+Versions,Phiên bản
+No previous versions available for the current document,Không có phiên bản trước đó nào có sẵn cho tài liệu hiện tại
+created this,đã tạo
+uploaded this,đã tải lên
+renamed this,đã sửa tên
+edited this,đã sửa
+deleted this,đã xóa
+shared this,đã chia sẻ
+updated permissions on this, đã cập nhật quyền trên
+restricted this,đã giới hạn
+moved this,đã di chuyển
+folder,thư mục
+file,tệp
+You,Bạn
+Style,Trình bày
+TITLE,TIÊU ĐỀ
+CONTENT,NỘI DUNG
+Annotations,Chú thích
+Open,Mở
+Unanchored,Unanchored
+Resolved,Đã được giải quyết
+Mark as Resolved,Đánh dấu đã giải quyết
+Mark as Open,Đánh dấu mở
+There are annotations for the current document or category,Có chú thích cho tài liệu hoặc danh mục hiện tại
+GROUPS,NHÓM
+DECORATIONS,TRANG TRÍ
+TEXT COLOR,MÀU CHỮ
+Text Color,Màu chữ
+Background Color,Màu nền
+BACKGROUND COLOR,MÀU NỀN
+FONT,KIỂU CHỮ
+Media,Phương tiện truyền thông
+Break,Phân tách
+Rule,Kẻ ngang
+Page Break,Ngắt trang
+New Table,Bảng mới
+Small Text,Chữ nhỏ
+Spellcheck,Kiểm tra chính tả
+Full Width,Chiều rộng đủ
+Default Font,Kiểu chữ mặc định
+Transform,Chuyển đổi
+Import DOCX,Nhập DOCX
+Import,Nhập
+Export PDF,Xuất PDF
+New Version,Phiên bản mới
+Set Link,Đặt liên kết
+Edit Link,Sửa liên kết
+New Annotation,Chú thích mới
+Post,Tải lên
+New Comment,Bình luận mới
+Add comment,Thêm bình luận
+Created on,Được tạo vào
+by,bởi
+Highlight changes,Đánh dấu những thay đổi
+Insert Column Left,Chèn cột bên trái
+Insert Column Right,Chèn cột bên phải
+Merge Cells,Gộp ô
+Split Cells,Tách ô
+Delete Column,Xóa cột
+Add Row Above,Chèn hàng bên trên
+Add Row Below,Chèn hàng bên dưới
+Delete Row,Xóa hàng
+Yesterday,Hôm qua
+This week,Tuần này
+Last week,Tuần trước
+This month,Tháng này
+This year,Năm này
+Older than a year,Hơn một năm
+Your account was created successfully. Please activate account and,Tài khoản bạn đã tạo thành công. Vui lòng kích hoạt tài khoản và
+to use the service,để sử dụng dịch vụ
+Register Account Successfully,Đăng ký tài khoản thành công
+Account not activated,Tài khoản chưa kích hoạt
+Thank you for joining the RoadAI Drive,Cảm ơn bạn đã tham gia RoadAI Drive
+Welcome to RoadAI Drive,Chào mừng tới RoadAI Drive
+These are your account credentials you registered with,Đây là thông tin tài khoản bạn đã đăng ký
+Your name,Tên của bạn
+Your username,Tên tài khoản
+You are almost ready to start analysis video - simply validate your RoadAI account by clicking the button below,Bạn gần như đã sẵn sàng để bắt đầu phân tích video - chỉ cần xác thực tài khoản RoadAI của bạn bằng cách nhấp vào nút bên dưới
+Activate my account,Kích hoạt tài khoản
+If you’re having trouble clicking the “Activate my account” button, copy and paste the URL below into your web browser,Nếu bạn gặp sự cố khi nhấp vào nút "Kích hoạt tài khoản", hãy sao chép và dán URL bên dưới vào trình duyệt web của bạn
+
+

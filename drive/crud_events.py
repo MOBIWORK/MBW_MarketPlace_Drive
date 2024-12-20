@@ -8,3 +8,4 @@ def after_insert_user(doc, method=None):
         doc_service_package_used.user = doc.name
         doc_service_package_used.service_package = name_doc_service_package
         doc_service_package_used.insert(ignore_permissions=True)
+        #send email welcome

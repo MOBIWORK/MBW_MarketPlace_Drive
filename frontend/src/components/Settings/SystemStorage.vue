@@ -10,7 +10,7 @@
     <div class="flex w-full mt-2">
       <div class="w-9/12">
         <div class="flex items-center w-full mb-2 justify-between">
-          <span class="text-base font-medium text-gray-900">Used {{ formatSize(usedSpace) }} {{__('out of')}}
+          <span class="text-base font-medium text-gray-900">{{__('Used')}} {{ formatSize(usedSpace) }} {{__('out of')}}
             {{ base2BlockSize(planSizeLimit) }}</span>
         </div>
         <div v-if="usedSpace > 0"
@@ -29,7 +29,7 @@
           />
         </div>
         <div class="w-full flex justify-center">
-          <span class="text-base font-medium text-gray-900">{{renderPUPVUsed(pupvUsed)}} of {{pupvLimit}} {{__('PUPV used')}}</span>
+          <span class="text-base font-medium text-gray-900">{{renderPUPVUsed(pupvUsed)}} {{__('of')}} {{pupvLimit}} {{__('PUPV used')}}</span>
         </div>
       </div>
     </div>

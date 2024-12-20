@@ -236,7 +236,7 @@ const tabs = [
 
 const tabIndex = ref(0)
 const folderContents = ref()
-const breadcrumbs = ref([{ name: store.state.homeFolderID, title: "Home" }])
+const breadcrumbs = ref([{ name: store.state.homeFolderID, title: __("Home") }])
 
 const folderPermissions = createResource({
   url: "drive.api.permissions.get_entity_with_permissions",

@@ -5,7 +5,7 @@
       class="px-5 pb-2 gap-x-2"
     >
       <span class="text-base text-gray-600 font-medium leading-6">
-        {{ i }}
+        {{ __(i) }}
       </span>
       <div
         v-for="activity in group"
@@ -103,9 +103,9 @@ const showInfoSidebar = computed(() => {
 
 const entityText = computed(() => {
   if (entity.value.is_group) {
-    return "folder"
+    return __("folder")
   }
-  return "file"
+  return __("file")
 })
 
 const currentUserEmail = computed(() => {
@@ -134,11 +134,12 @@ watch([entity, showInfoSidebar], ([newEntity, newShowInfoSidebar]) => {
 })
 
 function generateMessage(activity) {
-  const user = activity.full_name ? activity.full_name : activity.owner
+  let user = activity.full_name ? activity.full_name : activity.owner
+  if(user == "You") user = __(user)
   const creationText =
     entity.value.is_group || entity.value.document
-      ? "created this"
-      : "uploaded this"
+      ? __("created this")
+      : __("uploaded this")
 
   switch (activity.action_type) {
     case "create":

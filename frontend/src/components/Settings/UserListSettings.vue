@@ -99,7 +99,7 @@
               v-model="emailsTxt"
               type="text"
               autocomplete="off"
-              placeholder="Enter email address"
+              :placeholder="__('Enter email address')"
               class="h-7 w-full rounded border-none bg-gray-100 py-1.5 pl-2 pr-2 text-base text-gray-800 placeholder-gray-500 transition-colors focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
               @keydown.enter.capture.stop="extractEmails(`${emailsTxt} `)"
             />
@@ -127,14 +127,14 @@
                   class="flex items-center justify-between px-1 text-base line-clamp-1 py-1 gap-1 hover:bg-gray-100 w-full rounded-[6px] cursor-pointer"
                   @click=";(NewUserRole = 'Drive Guest'), close()"
                 >
-                  {{__('Guest')}}
+                  Guest
                   <Check v-if="NewUserRole === 'Drive Guest'" class="h-3" />
                 </li>
                 <li
                   class="flex items-center justify-between px-1 text-base line-clamp-1 py-1 gap-1 hover:bg-gray-100 w-full rounded-[6px] cursor-pointer"
                   @click=";(NewUserRole = 'Drive User'), close()"
                 >
-                  {{__('User')}}
+                  User
                   <Check v-if="NewUserRole === 'Drive User'" class="h-3" />
                 </li></ul
             ></PopoverPanel>
@@ -260,7 +260,7 @@ export default {
           },
         },
         {
-          label: "Remove",
+          label: __("Remove"),
           class: "text-red-500",
           enabled: false,
           component: (props) =>
@@ -272,7 +272,7 @@ export default {
                 ],
                 onClick: () => (this.showRemoveUserDialog = true),
               },
-              "Remove"
+              __("Remove")
             ),
           onClick: () => {
             console.log("User has been removed")

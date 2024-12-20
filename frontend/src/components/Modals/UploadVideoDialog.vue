@@ -1,7 +1,7 @@
 <template>
     <Dialog v-model="open" :options="{
         size: '3xl',
-        title: 'Upload Videos',
+        title: __('Upload Videos'),
     }" @after-leave="onCleanData">
         <template #body-content>
             <div class="flex items-center mt-3">

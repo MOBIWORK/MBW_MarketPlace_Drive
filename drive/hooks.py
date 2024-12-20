@@ -152,6 +152,7 @@ fixtures = [{"dt": "Role", "filters": [["role_name", "like", "Drive %"]]}]
 scheduler_events = {
     "daily": ["drive.api.files.auto_delete_from_trash"],
     "daily": ["drive.api.permissions.auto_delete_expired_docshares"],
+    "hourly": ["drive.drive.doctype.drive_activate_account.drive_activate_account.expire_activates"]
 }
 
 # Testing

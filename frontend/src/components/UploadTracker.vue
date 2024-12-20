@@ -164,8 +164,8 @@
       v-if="showCancelDialog"
       v-model="showCancelDialog"
       :options="{
-        title: __('Cancel uploads'),
-        message: __('Are you sure you want to cancel all ongoing uploads?'),
+        title: __('Untrack file uploads'),
+        message: __('Are you sure you want to untrack file uploads?'),
         size: 'sm',
         actions: [
           {

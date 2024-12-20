@@ -55,8 +55,8 @@ const realtime = inject("realtime")
 
 const formatedString = computed(() => {
   return (
-    formatSize(usedStorage.value) +
-    __(" used out of ") +
+    formatSize(usedStorage.value) + " " +
+    __("used out of") + " " +
     base2BlockSize(storageMax.value)
   )
 })

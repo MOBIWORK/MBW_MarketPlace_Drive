@@ -14,7 +14,7 @@
         v-model="setLinkDialog.url"
         type="text"
         class="mt-1"
-        placeholder="Link"
+        :placeholder="__('Link')"
         @keydown.enter="(e) => setLink(e.target.value)"
       />
       <Button
@@ -22,7 +22,7 @@
         class="w-full mt-6"
         @click="setLink(setLinkDialog.url)"
       >
-        Save
+        {{__('Save')}}
       </Button>
     </template>
   </Dialog>
@@ -46,7 +46,7 @@ export default {
   },
   data() {
     return {
-      setLinkDialog: { title: "Set Link", url: "", show: false },
+      setLinkDialog: { title: __("Set Link"), url: "", show: false },
     }
   },
   computed: {
@@ -62,7 +62,7 @@ export default {
       let existingURL = this.editor.getAttributes("link").href
       if (existingURL) {
         this.setLinkDialog.url = existingURL
-        this.setLinkDialog.title = "Edit Link"
+        this.setLinkDialog.title = __("Edit Link")
       }
       this.setLinkDialog.show = true
     },

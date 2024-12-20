@@ -23,7 +23,7 @@
                             showTooltip: true,
                             resizeColumn: true,
                             emptyState: {
-                                title: 'There are no records'
+                                title: __('There are no records')
                             },
                             onRowClick: (row) => onActiveRow(row)
                         }" row-key="ID">
@@ -33,7 +33,7 @@
                                     v-slot="{ idx, column, item }" :row="row">
                                     <template v-if="column.key == 'image'">
                                         <a href="javascript:;" @click="openFullscreen(row.image)" class="z-50 w-full"
-                                            style="text-decoration: underline;color: rgb(14 165 233);">Link</a>
+                                            style="text-decoration: underline;color: rgb(14 165 233);">{{__('Link')}}</a>
                                     </template>
                                     <template v-else>
                                         {{ row[column.key] }}
@@ -225,7 +225,7 @@ function initMap() {
     let btn3D = new ekmapplf.control.Button({
         className: "btn-ctl-group " + cl,
         icon: "none",
-        tooltip: tl,
+        tooltip: __(tl),
     });
     btn3D.on("click", (btn) => {
         is3DMap = !is3DMap;
@@ -234,13 +234,13 @@ function initMap() {
                 "maplibregl-terrain3d-control",
                 "maplibregl-terrain2d-control"
             );
-            btn._div.title = "2D display";
+            btn._div.title = __("2D display");
         } else {
             btn._div.className = btn._div.className.replaceAll(
                 "maplibregl-terrain2d-control",
                 "maplibregl-terrain3d-control"
             );
-            btn._div.title = "3D display";
+            btn._div.title = __("3D display");
         }
         if (is3DMap) {
             mapPreview.value.easeTo({ pitch: 60 });

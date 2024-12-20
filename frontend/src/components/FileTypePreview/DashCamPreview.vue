@@ -252,7 +252,7 @@ function initMap() {
     let btn3D = new ekmapplf.control.Button({
         className: "btn-ctl-group " + cl,
         icon: "none",
-        tooltip: tl,
+        tooltip: __(tl),
     });
     btn3D.on("click", (btn) => {
         is3DMap = !is3DMap;
@@ -261,13 +261,13 @@ function initMap() {
                 "maplibregl-terrain3d-control",
                 "maplibregl-terrain2d-control"
             );
-            btn._div.title = "2D display";
+            btn._div.title = __("2D display");
         } else {
             btn._div.className = btn._div.className.replaceAll(
                 "maplibregl-terrain2d-control",
                 "maplibregl-terrain3d-control"
             );
-            btn._div.title = "3D display";
+            btn._div.title = __("3D display");
         }
         if (is3DMap) {
             mapRef.value.easeTo({ pitch: 60 });

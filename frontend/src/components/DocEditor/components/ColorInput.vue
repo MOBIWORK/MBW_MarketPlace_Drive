@@ -21,7 +21,7 @@
           <Input
             type="text"
             class="rounded-md text-sm text-gray-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:focus:bg-zinc-700"
-            placeholder="Set Color"
+            :placeholder="__('Set Color')"
             input-class="pl-8 pr-6"
             :value="value"
             @change="

@@ -2,6 +2,7 @@ import frappe
 from frappe import _
 from frappe.utils import escape_html
 from frappe.website.utils import is_signup_disabled
+
 @frappe.whitelist(allow_guest=True)
 def sign_up(email: str, full_name: str, pwd: str, redirect_to:str) -> tuple[int, str]:
     if is_signup_disabled():
@@ -28,9 +29,10 @@ def sign_up(email: str, full_name: str, pwd: str, redirect_to:str) -> tuple[int,
                 "doctype": "User",
                 "email": email,
                 "first_name": escape_html(full_name),
-                "enabled": 1,
+                "enabled": 0,
                 "new_password": pwd,
-                "user_type": "Website User"
+                "user_type": "Website User",
+                "send_welcome_email": 0
             }
         )
         user.flags.ignore_permissions = True
@@ -39,9 +41,26 @@ def sign_up(email: str, full_name: str, pwd: str, redirect_to:str) -> tuple[int,
         user.add_roles("Drive User")
         if redirect_to:
             frappe.cache.hset("redirect_after_login", user.name, redirect_to)
-        
-        if user.flags.email_sent:
-            return 1, _("Register account successfully")
-        else:
-            return 2, _("Please ask your administrator to verify your sign-up")
-            
+        doc_activate = frappe.new_doc('Drive Activate Account')
+        doc_activate.email = email
+        doc_activate.key = frappe.generate_hash(length=12)
+        doc_activate.status = "Pending"
+        doc_activate.email_sent_at = frappe.utils.now()
+        doc_activate.save(ignore_permissions=True)
+        send_email_welcome(full_name, email, pwd, doc_activate.key)
+        return 1, _("Register account successfully. Please activate account to use")
+
+def send_email_welcome(full_name, email, pwd, key_activate):
+    activate_link = frappe.utils.get_url(f"/api/method/drive.api.activate_account?key={key_activate}")
+    template = "activate_account"
+    frappe.sendmail(
+        recipients=email,
+        subject=_("Welcome to RoadAI Drive"),
+        template=template,
+        args={"full_name": full_name, "email": email, "activate_link": activate_link},
+        now=True
+    )
+
+@frappe.whitelist(allow_guest=True)
+def login():
+    frappe.local.login_manager.login()

@@ -1,0 +1,23 @@
+<h3>{{_('Hello')}} {{full_name}}</h3>
+<div style="margin-bottom: 10px;">{{_('Thank you for joining the RoadAI Drive')}}</div>
+
+<div style="margin-bottom: 5px;">{{_('These are your account credentials you registered with')}}:</div>
+<div style="display: flex;margin-bottom: 3px;">
+    <span style="font-weight: bold;">{{_('Your name')}}:</span>&nbsp;
+    <span>{{full_name}}</span>
+</div>
+<div style="display: flex;margin-bottom: 15px;">
+    <span style="font-weight: bold;">{{_('Your username')}}:</span>&nbsp;
+    <span>{{email}}</span>
+</div>
+<div style="margin-bottom: 15px;">{{_('You are almost ready to start analysis video - simply validate your RoadAI account by clicking the button below')}}</div>
+
+<p>
+    <a class="btn btn-primary" href="{{ activate_link }}">{{_('Activate my account')}}</a>
+</p>
+
+<div style="margin-top: 20px;">{{_('If you’re having trouble clicking the “Activate my account” button, copy and paste the URL below into your web browser')}}:</div>
+<a href="{{ activate_link }}" style="margin-top: 15px;">
+   {{activate_link}} 
+</a>
+  

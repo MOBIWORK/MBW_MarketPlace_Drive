@@ -51,7 +51,7 @@
         </div>
         <div class="space-y-6.5">
           <div v-if="entity.owner === 'You'">
-            <div class="text-base font-medium mb-4">Access</div>
+            <div class="text-base font-medium mb-4">{{__('Access')}}</div>
             <div class="flex items-center justify-start">
               <Avatar
                 size="md"
