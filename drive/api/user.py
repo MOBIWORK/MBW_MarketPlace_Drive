@@ -60,7 +60,3 @@ def send_email_welcome(full_name, email, pwd, key_activate):
         args={"full_name": full_name, "email": email, "activate_link": activate_link},
         now=True
     )
-
-@frappe.whitelist(allow_guest=True)
-def login():
-    frappe.local.login_manager.login()

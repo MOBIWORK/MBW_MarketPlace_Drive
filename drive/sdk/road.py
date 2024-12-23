@@ -122,3 +122,7 @@ class RoadSDK:
         response = requests.get(url, stream=True)
         response.raise_for_status()
         return response
+    
+    def delete_task(self, task_id: str):
+        url_delete_task = f"{self.base_url}/delete-result/{task_id}"
+        requests.delete(url_delete_task)

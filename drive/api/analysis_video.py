@@ -59,16 +59,16 @@ def analytic_with_geometry(name_file, parent):
                 frappe.publish_realtime('event_analytic_video_job', message=doc_task_queue.name, user=frappe.session.user)
                 return
             #Triển khai code
-            #url_file_video = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={doc_video.name}")
-            #url_file_gps = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={doc_gpx.name}")
-            #hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_result_detect")
-            #status_hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_status_tasking")
+            url_file_video = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={doc_video.name}")
+            url_file_gps = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={doc_gpx.name}")
+            hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_result_detect")
+            status_hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_status_tasking")
             
             #Trên local
-            url_file_video = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={doc_video.name}"
-            url_file_gps = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={doc_gpx.name}"
-            hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_result_detect"
-            status_hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_status_tasking"
+            #url_file_video = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={doc_video.name}"
+            #url_file_gps = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={doc_gpx.name}"
+            #hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_result_detect"
+            #status_hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_status_tasking"
 
             sdk = RoadSDK(BASE_URL_AI)
             response = sdk.process_video_gpx(doc_task_queue.name, url_file_video, url_file_gps, hook_url, status_hook_url)
@@ -142,14 +142,14 @@ def analytic_without_geometry(name_file, parent):
             return
         
         #Triển khai code
-        #video_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_file}")
-        #hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_result_detect")
-        #status_hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_status_tasking")
+        video_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_file}")
+        hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_result_detect")
+        status_hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_status_tasking")
 
         #Trên local
-        video_url = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={name_file}"
-        hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_result_detect"
-        status_hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_status_tasking"
+        #video_url = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={name_file}"
+        #hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_result_detect"
+        #status_hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_status_tasking"
 
         #BASE_URL_AI
         sdk = RoadSDK(BASE_URL_AI)
@@ -184,8 +184,10 @@ def send_status_tasking(result):
 ###result: Kết quả của phép phân tích
 @frappe.whitelist(methods=["POST"], allow_guest=True)
 def send_result_detect(result):
+    print("Dòng 187 ", result)
     task_id = result["task_id"]
     doc_setting = frappe.get_single('Drive Instance Settings')
+    aws_endpoint_url = doc_setting.aws_end_point
     aws_access_key = doc_setting.aws_access_key
     aws_secret_access_key = doc_setting.get_password('aws_secret_key')
     doc_task_queue = frappe.get_doc('Drive Task Queue', task_id)
@@ -194,13 +196,14 @@ def send_result_detect(result):
     try:
         if task_metadata["type"] == "video_with_gps":
             #Tạo dữ liệu không gian và ảnh
-            #save_result_analysis_video_with_gps_job(task_metadata["name_file"], task_metadata["parent"], aws_access_key, aws_secret_access_key, result, task_metadata["name_gpx"])
+            #save_result_analysis_video_with_gps_job(task_metadata["name_file"], task_metadata["parent"], aws_endpoint_url, aws_access_key, aws_secret_access_key, result, task_metadata["name_gpx"])
             frappe.enqueue(
                 save_result_analysis_video_with_gps_job,
                 queue="long",
                 timeout=None,
                 name_fvideo=task_metadata["name_file"],
                 parent=task_metadata["parent"],
+                aws_endpoint_url=aws_endpoint_url,
                 aws_access_key=aws_access_key,
                 aws_secret_access_key=aws_secret_access_key,
                 result=result,
@@ -209,13 +212,14 @@ def send_result_detect(result):
             )
         else:
             #Tạo dữ liệu phi không gian excel và ảnh
-            #save_result_analysis_with_velocity_job(task_metadata["name_file"], task_metadata["parent"], aws_access_key, aws_secret_access_key, result)
+            #save_result_analysis_with_velocity_job(task_metadata["name_file"], task_metadata["parent"], aws_endpoint_url, aws_access_key, aws_secret_access_key, result)
             frappe.enqueue(
                 save_result_analysis_with_velocity_job,
                 queue="long",
                 timeout=None,
                 name_fvideo=task_metadata["name_file"],
                 parent=task_metadata["parent"],
+                aws_endpoint_url=aws_endpoint_url,
                 aws_access_key=aws_access_key,
                 aws_secret_access_key=aws_secret_access_key,
                 result=result,
@@ -256,7 +260,7 @@ def list_tasks():
     return tasks_response
 
 
-def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key, aws_secret_access_key, result, name_gpx, base_url):
+def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_endpoint_url, aws_access_key, aws_secret_access_key, result, name_gpx, base_url):
     try:
         #BASE_URL_AI
         sdk = RoadSDK(BASE_URL_AI)
@@ -270,7 +274,7 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key,
             frappe.publish_realtime('event_analytic_video_job', message=doc_task_queue.name, user=frappe.session.user)
             return
         metadata_result = result["process_result"]["metadata"]
-        connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
+        connect_s3 = get_connect_s3(aws_endpoint_url, aws_access_key, aws_secret_access_key)
         timestamp = datetime.timestamp(datetime.now())
         title_folder = f"Result_{int(timestamp)}_{doc_video.title}"
         new_folder = create_folder(title_folder, parent)
@@ -324,9 +328,9 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key,
             # )
 
             #Triển khai code
-            #image_url = base_url + f"/api/method/drive.api.files.get_file_content?entity_name={name}"
+            image_url = base_url + f"/api/method/drive.api.files.get_file_content?entity_name={name}"
             #Trên local
-            image_url = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={name}"
+            #image_url = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={name}"
             if item["gps"]["longitude"] is not None and item["gps"]["longitude"] != 0 and item["gps"]["latitude"] is not None and item["gps"]["latitude"] != 0:
                 spatial_data = {
                     "type": "Feature",
@@ -339,9 +343,12 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key,
                         "area_real": item["area_real"],
                         "image": image_url,
                         "longitude": item["gps"]["longitude"],
-                        "latitude": item["gps"]["latitude"]
+                        "latitude": item["gps"]["latitude"],
+                        "type_object": item["object"]
                     }
                 }
+                if item["weather"] is not None:
+                    spatial_data["properties"]["weather"] = item["weather"]
                 spatial_datas.append(spatial_data)
         file_name_geojson = secure_filename(f"{doc_video.name}_object.geojson")
         key_object_geojson = f"{_get_user_directory_name()}/{new_folder.name}/{file_name_geojson}"
@@ -423,13 +430,14 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_access_key,
         doc_task_queue.status = "Success"
         doc_task_queue.end_processing_time = datetime.now()
         doc_task_queue.save(ignore_permissions=True)
+        sdk.delete_task(result["task_id"])
         frappe.publish_realtime('event_analytic_video_job', message=result["task_id"], user=frappe.session.user)
         frappe.publish_realtime('event_load_entities', user=frappe.session.user)
     except Exception as err:
         update_doc_task_queue(result["task_id"], "Error", str(err))
         frappe.publish_realtime('event_analytic_video_job', message=result["task_id"], user=frappe.session.user)
 
-def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_access_key, aws_secret_access_key, result, base_url):
+def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_endpoint_url, aws_access_key, aws_secret_access_key, result, base_url):
     try:
         #BASE_URL_AI
         sdk = RoadSDK(BASE_URL_AI)
@@ -443,13 +451,13 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_access_key, 
             frappe.publish_realtime('event_analytic_video_job', message=doc_task_queue.name, user=frappe.session.user)
             return
         metadata_result = result["process_result"]["metadata"]
-        connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
+        connect_s3 = get_connect_s3(aws_endpoint_url, aws_access_key, aws_secret_access_key)
         timestamp = datetime.timestamp(datetime.now())
         title_folder = f"Result_{int(timestamp)}_{doc_video.title}"
         new_folder = create_folder(title_folder, parent)
         new_folder_image = create_folder(f"Images_{int(timestamp)}", new_folder.name)
         data_xlsx = []
-        headers = ["S_Real (m)", "S_pixel (pixel)", "Image"]
+        headers = ["S_Real (m)", "S_pixel (pixel)", "Image", "Type Object"]
         data_xlsx.append(headers)
         for item in metadata_result:
             image_response = sdk.get_stream_by_url(item["image"])
@@ -498,14 +506,15 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_access_key, 
             # )
 
             #Triển khai code
-            #image_url = base_url + f"/api/method/drive.api.files.get_file_content?entity_name={name}"
+            image_url = base_url + f"/api/method/drive.api.files.get_file_content?entity_name={name}"
 
             #Trên local
-            image_url = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={name}"
+            #image_url = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={name}"
             item_xlsx = [
                 item["area_real"],
                 item["area_pixel"],
-                image_url
+                image_url,
+                item["object"]
             ]
             data_xlsx.append(item_xlsx)
         byte_xlsx = make_xlsx(data_xlsx, "Data Export")
@@ -584,6 +593,7 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_access_key, 
         doc_task_queue.status = "Success"
         doc_task_queue.end_processing_time = datetime.now()
         doc_task_queue.save(ignore_permissions=True)
+        sdk.delete_task(result["task_id"])
         frappe.publish_realtime('event_analytic_video_job', message=doc_task_queue.name, user=frappe.session.user)
         frappe.publish_realtime('event_load_entities', user=frappe.session.user)
     except Exception as err:

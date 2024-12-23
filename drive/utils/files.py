@@ -208,9 +208,10 @@ def create_thumbnail_by_object(entity_name, object_id, mime_type):
     else:
         # Tải tệp từ S3 về tệp tạm thời
         doc_setting = frappe.get_single('Drive Instance Settings')
+        aws_endpoint_url = doc_setting.aws_end_point
         aws_access_key = doc_setting.aws_access_key
         aws_secret_access_key = doc_setting.get_password('aws_secret_key')
-        connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
+        connect_s3 = get_connect_s3(aws_endpoint_url, aws_access_key, aws_secret_access_key)
         bucket_name = frappe.db.get_single_value("Drive Instance Settings", "aws_bucket")
         # Lấy object từ S3
         response = connect_s3.get_object(Bucket=bucket_name, Key=object_id)

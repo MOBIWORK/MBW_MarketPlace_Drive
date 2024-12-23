@@ -143,9 +143,10 @@ def handle_tus_request(fileID=None):
             #Lưu dữ liệu trên S3, thay vì lưu trên ổ đĩa disk
             #os.rename(temp_path, save_path)
             doc_setting = frappe.get_single('Drive Instance Settings')
+            aws_endpoint_url = doc_setting.aws_end_point
             aws_access_key = doc_setting.aws_access_key
             aws_secret_access_key = doc_setting.get_password('aws_secret_key')
-            connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
+            connect_s3 = get_connect_s3(aws_endpoint_url, aws_access_key, aws_secret_access_key)
             upload_file_with_connect(connect_s3, temp_path, save_path)
 
             #Tạo entity lưu trữ với save_path là object_id tương ứng trong s3

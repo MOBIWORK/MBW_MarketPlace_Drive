@@ -14,6 +14,7 @@
   "enable_user_storage_quota",
   "column_break_ekip",
   "aws_s3_tab",
+  "aws_end_point",
   "aws_access_key",
   "aws_secret_key",
   "aws_bucket",
@@ -210,11 +211,16 @@
    "fieldname": "bucket_name_minio",
    "fieldtype": "Data",
    "label": "Bucket Name"
+  },
+  {
+   "fieldname": "aws_end_point",
+   "fieldtype": "Data",
+   "label": "EndPoint"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-12-03 16:08:48.159045",
+ "modified": "2024-12-23 08:34:46.648559",
  "modified_by": "Administrator",
  "module": "Drive",
  "name": "Drive Instance Settings",

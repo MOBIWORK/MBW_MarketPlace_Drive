@@ -231,10 +231,11 @@ def _finalize_upload(temp_path, save_path, form_dict, title, parent, last_modifi
 
     #Save file in S3
     doc_setting = frappe.get_single('Drive Instance Settings')
+    aws_endpoint_url = doc_setting.aws_end_point
     aws_access_key = doc_setting.aws_access_key
     aws_secret_access_key = doc_setting.get_password('aws_secret_key')
     key_object = f"{_get_user_directory_name()}/{parent}/{secure_filename(title)}"
-    connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
+    connect_s3 = get_connect_s3(aws_endpoint_url, aws_access_key, aws_secret_access_key)
 
     #Lưu vào redis cache
     with open(path, 'rb') as f:
@@ -486,9 +487,10 @@ def get_file_content_with_s3(entity_name, trigger_download=0):  #
     else:
         #Kết nối S3 và lấy object
         doc_setting = frappe.get_single('Drive Instance Settings')
+        aws_endpoint_url = doc_setting.aws_end_point
         aws_access_key = doc_setting.aws_access_key
         aws_secret_access_key = doc_setting.get_password('aws_secret_key')
-        connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
+        connect_s3 = get_connect_s3(aws_endpoint_url, aws_access_key, aws_secret_access_key)
         response = get_object_with_connect(connect_s3, drive_entity.path)
         content = response["Body"].read()
 
@@ -569,11 +571,13 @@ def get_file_content(entity_name, trigger_download=0):  #
         )
 
     doc_setting = frappe.get_single('Drive Instance Settings')
+    aws_endpoint_url = doc_setting.aws_end_point
     aws_access_key = doc_setting.aws_access_key
     aws_secret_access_key = doc_setting.get_password('aws_secret_key')
     bucket_name = doc_setting.aws_bucket
     s3_client = boto3.client(
         "s3",
+        endpoint_url=aws_endpoint_url,
         aws_access_key_id=aws_access_key,
         aws_secret_access_key=aws_secret_access_key
     )
@@ -630,11 +634,13 @@ def get_file_content_preview(entity_name, trigger_download=0):
     if not metadata_cache:
         # Fetch file metadata from S3
         doc_setting = frappe.get_single("Drive Instance Settings")
+        aws_end_point = doc_setting.aws_end_point
         aws_access_key = doc_setting.aws_access_key
         aws_secret_access_key = doc_setting.get_password("aws_secret_key")
         bucket_name = doc_setting.aws_bucket
         s3_client = boto3.client(
             "s3",
+            endpoint_url=aws_end_point,
             aws_access_key_id=aws_access_key,
             aws_secret_access_key=aws_secret_access_key
         )
@@ -657,6 +663,7 @@ def get_file_content_preview(entity_name, trigger_download=0):
         bucket_name = doc_setting.aws_bucket
         s3_client = boto3.client(
             "s3",
+            endpoint_url=doc_setting.aws_end_point,
             aws_access_key_id=doc_setting.aws_access_key,
             aws_secret_access_key=doc_setting.get_password("aws_secret_key")
         )
@@ -711,6 +718,7 @@ def get_file_gps(entity_name):
         # Kết nối S3 từ Drive Instance Settings
         s3_client = boto3.client(
                 "s3",
+                endpoint_url=doc_setting.aws_end_point,
                 aws_access_key_id=doc_setting.aws_access_key,
                 aws_secret_access_key=doc_setting.get_password("aws_secret_key")
             )
@@ -1197,9 +1205,9 @@ def unshare_entities(entity_names, move=False):
         doc.unshare(frappe.session.user)
 
 
-def delete_background_job(entity, ignore_permissions, aws_access_key, aws_secret_access_key):
+def delete_background_job(entity, ignore_permissions, aws_endpoint_url, aws_access_key, aws_secret_access_key):
     #Xóa dữ liệu trong S3
-    connect_s3 = get_connect_s3(aws_access_key, aws_secret_access_key)
+    connect_s3 = get_connect_s3(aws_endpoint_url, aws_access_key, aws_secret_access_key)
     doc_entity = frappe.get_doc('Drive Entity', entity)
     delete_object_with_connect(connect_s3, doc_entity.path)
     frappe.delete_doc("Drive Entity", entity, ignore_permissions=ignore_permissions)
@@ -1239,11 +1247,12 @@ def delete_entities(entity_names=None, clear_all=None):
         )
         ignore_permissions = owns_root_entity or has_write_access
         doc_setting = frappe.get_single('Drive Instance Settings')
+        aws_endpoint_url = doc_setting.aws_end_point
         aws_access_key = doc_setting.aws_access_key
         aws_secret_access_key = doc_setting.get_password('aws_secret_key')
-        delete_entity_recursive(entity, aws_access_key, aws_secret_access_key, ignore_permissions)
+        delete_entity_recursive(entity, aws_endpoint_url, aws_access_key, aws_secret_access_key, ignore_permissions)
 
-def delete_entity_recursive(entity_name, aws_access_key, aws_secret_access_key, ignore_permissions):
+def delete_entity_recursive(entity_name, aws_endpoint_url, aws_access_key, aws_secret_access_key, ignore_permissions):
     doc_entity = frappe.get_doc("Drive Entity", entity_name)
     if doc_entity.is_group == 1 or doc_entity.is_group == True:
         doc_entity_childs = frappe.db.get_list("Drive Entity",
@@ -1254,7 +1263,7 @@ def delete_entity_recursive(entity_name, aws_access_key, aws_secret_access_key, 
         )
         frappe.db.set_value("Drive Entity", entity_name, "is_active", -1)
         for doc_entity_child in doc_entity_childs:
-            delete_entity_recursive(doc_entity_child.name, aws_access_key, aws_secret_access_key, ignore_permissions)
+            delete_entity_recursive(doc_entity_child.name, aws_endpoint_url, aws_access_key, aws_secret_access_key, ignore_permissions)
     else:
         frappe.db.set_value("Drive Entity", entity_name, "is_active", -1)
         frappe.enqueue(
@@ -1263,6 +1272,7 @@ def delete_entity_recursive(entity_name, aws_access_key, aws_secret_access_key, 
             timeout=None,
             entity=entity_name,
             ignore_permissions=ignore_permissions,
+            aws_endpoint_url=aws_endpoint_url,
             aws_access_key=aws_access_key,
             aws_secret_access_key=aws_secret_access_key
         )
@@ -1819,81 +1829,3 @@ def get_shared_breadcrumbs(share_name):
             )
         )
     return share_breadcrumbs[::-1]
-
-@frappe.whitelist(methods=["POST"])
-def upload_file_test_boto(src_file):
-    doc_setting = frappe.get_single('Drive Instance Settings')
-    aws_access_key = doc_setting.aws_access_key
-    aws_secret_access_key = doc_setting.get_password('aws_secret_key')
-    start_time = time.time()
-    connect_s3 = boto3.client(
-        "s3",
-        aws_access_key_id = aws_access_key,
-        aws_secret_access_key = aws_secret_access_key
-    )
-    connect_s3.upload_file(src_file, "eov-geoviz", "xxxxxx/abcd.mp4")
-    end_time = time.time()
-    excution_time = end_time - start_time
-    return {'excution_time': excution_time, 'key': "xxxxxx/abcd.mp4"}
-
-@frappe.whitelist(allow_guest=True)
-def get_file_from_s3_with_cache():
-    """
-    Lấy file từ Amazon S3 với Redis Cache tích hợp.
-    """
-    object_key = "xxxxxx/abcd.mp4"
-    cache_key = f"s3_cache:{object_key}"
-
-    # 1. Kiểm tra trong cache
-    cached_value = frappe.cache().get(cache_key)
-    if cached_value:
-        # Chuyển đổi bytes thành file-like object
-        file_like_object = io.BytesIO(cached_value)
-        return send_file(
-            file_like_object,
-            mimetype="video/mp4",
-            as_attachment=0,
-            conditional=True,
-            max_age=3600,
-            download_name=object_key.split("/")[-1],
-            environ=frappe.request.environ,
-        )
-
-    # 2. Không có cache, lấy từ S3
-    frappe.logger().info(f"Cache miss for {object_key}, fetching from S3...")
-    doc_setting = frappe.get_single('Drive Instance Settings')
-    aws_access_key = doc_setting.aws_access_key
-    aws_secret_access_key = doc_setting.get_password('aws_secret_key')
-
-    try:
-        start_time = time.time()
-        s3_client = boto3.client(
-            "s3",
-            aws_access_key_id=aws_access_key,
-            aws_secret_access_key=aws_secret_access_key
-        )
-        response = s3_client.get_object(Bucket="eov-geoviz", Key=object_key)
-        file_content = response["Body"].read()  # Đọc nội dung file từ S3
-        end_time = time.time()
-        # 3. Lưu vào Redis Cache
-        frappe.cache().setex(cache_key, 3600, file_content)  # TTL = 1 h
-
-        # 4. Trả dữ liệu cho người dùng
-        file_like_object = io.BytesIO(file_content)
-        return send_file(
-            file_like_object,
-            mimetype="video/mp4",
-            as_attachment=0,
-            conditional=True,
-            max_age=3600,
-            download_name=object_key.split("/")[-1],
-            environ=frappe.request.environ,
-        )
-    except Exception as e:
-        frappe.throw(f"Error fetching file from S3: {str(e)}")
-
-@frappe.whitelist(allow_guest=True)
-def clear_cache():
-    object_key = "xxxxxx/abcd.mp4"
-    cache_key = f"s3_cache:{object_key}"
-    frappe.cache.delete_value(cache_key)

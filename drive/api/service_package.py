@@ -25,3 +25,10 @@ def package_used():
         doc_service_package_used.insert(ignore_permissions=True)
         package_code_used = name
     return package_code_used
+
+@frappe.whitelist(allow_guest=True)
+def package_free():
+    storage_volume, pupv =  frappe.db.get_value("Drive Service Package", {"unit_price": 0}, ["storage_volume", "pupv"])
+    if storage_volume is not None and pupv is not None:
+        return {"storage_volumn": storage_volume, "pupv": pupv}
+    return None
