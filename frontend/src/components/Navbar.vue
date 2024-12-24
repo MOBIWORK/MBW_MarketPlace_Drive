@@ -95,7 +95,8 @@
             {{__('Empty Trash')}}
           </Button>
           <template v-else>
-            <Button v-if="$route.name === 'Home' || $route.name === 'Folder'" :variant="'outline'" theme="gray" size="sm" class="mr-3" @click="showMonitorTaskingDialog=true">
+            <Button v-if="$route.name === 'Home' || $route.name === 'Folder'" :variant="'outline'" theme="gray" 
+              size="sm" class="mr-3" @click="showMonitorTaskingDialog=true">
                 <template #prefix>
                   <FeatherIcon name="monitor" class="w-4" />
                 </template>

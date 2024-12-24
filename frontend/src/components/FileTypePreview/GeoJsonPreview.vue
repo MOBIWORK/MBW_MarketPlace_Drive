@@ -3,7 +3,7 @@
         <div id="mapPreviewID" class="relative w-full h-3/5 lg:h-full lg:w-8/12">
             <LoadingIndicator v-if="loading" class="w-10 h-full text-neutral-100 mx-auto z-50" />
         </div>
-        <div class="w-full h-auto bg-white lg:h-full lg:w-4/12">
+        <div class="w-full h-full bg-white lg:h-full lg:w-4/12">
             <Tabs v-model="tabIndex" :tabs="tabsContent" class="w-full h-full">
                 <template #default="{ tab }">
                     <div class="p-0 w-full h-full" v-if="tab.name == 'json'">
@@ -17,8 +17,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="p-1 h-full" v-if="tab.name == 'table'">
-                        <ListView class="h-full" :columns="columns" :rows="dataProperties" :options="{
+                    <div class="p-1 h-full flex flex-col" v-if="tab.name == 'table'">
+                        <ListView class="h-full flex-1 overflow-auto" :columns="columns" :rows="dataProperties" :options="{
                             selectable: false,
                             showTooltip: true,
                             resizeColumn: true,
@@ -314,7 +314,6 @@ function onActiveRow(row){
         },
         properties: row
     }
-    onAddLayerActivateRow(feature)
     mapPreview.value.flyTo({
         center: [row.longitude, row.latitude]
     })
@@ -338,82 +337,6 @@ function onAddLayerSatellite(){
             "maxzoom": 22,
             "layout": {
                 "visibility": "none"
-            }
-        })
-    }
-}
-
-function onAddLayerActivateRow(feature) {
-    return
-    const sizeAnimateCircle = 100
-    const pulsingDot = {
-        width: sizeAnimateCircle,
-        height: sizeAnimateCircle,
-        data: new Uint8Array(sizeAnimateCircle * sizeAnimateCircle * 4),
-        onAdd() {
-            const canvas = document.createElement('canvas')
-            canvas.width = this.width
-            canvas.height = this.height
-            this.context = canvas.getContext('2d')
-        },
-        render() {
-            const duration = 1000
-            const t = (performance.now() % duration) / duration
-            const radius = (sizeAnimateCircle / 2) * 0.3
-            const outerRadius = (sizeAnimateCircle / 2) * 0.7 * t + radius
-            const context = this.context
-            // draw outer circle
-            context.clearRect(0, 0, this.width, this.height)
-            context.beginPath()
-            context.arc(
-                this.width / 2,
-                this.height / 2,
-                outerRadius,
-                0,
-                Math.PI * 2
-            )
-            context.fillStyle = `rgba(153, 196, 219,${1 - t})`
-            context.fill()
-            // draw inner circle
-            context.beginPath()
-            context.arc(
-                this.width / 2,
-                this.height / 2,
-                radius,
-                0,
-                Math.PI * 2
-            )
-            context.fillStyle = 'rgba(0, 124, 191, 1)'
-            context.strokeStyle = 'white'
-            context.lineWidth = 2 + 4 * (1 - t)
-            context.fill()
-            context.stroke()
-            this.data = context.getImageData(
-                0,
-                0,
-                this.width,
-                this.height
-            ).data
-            // continuously repaint the map, resulting in the smooth animation of the dot
-            mapPreview.value.triggerRepaint()
-            // return `true` to let the map know that the image was updated
-            return true
-        }
-    }
-    if (mapPreview.value.getSource("s_object_detect_activate")) {
-        mapPreview.value.getSource("s_object_detect_activate").setData(feature)
-    } else {
-        if (!mapPreview.value.getImage("pulsing-dot")) mapPreview.value.addImage('pulsing-dot', pulsingDot, { pixelRatio: 2 })
-        mapPreview.value.addSource("s_object_detect_activate", {
-            'type': "geojson",
-            'data': feature
-        })
-        mapPreview.value.addLayer({
-            'id': "l_object_detect_activate",
-            'type': "symbol",
-            'source': "s_object_detect_activate",
-            'layout': {
-                'icon-image': "pulsing-dot"
             }
         })
     }
