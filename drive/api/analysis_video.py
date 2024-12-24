@@ -347,8 +347,8 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_endpoint_ur
                         "type_object": item["object"]
                     }
                 }
-                if item["weather"] is not None:
-                    spatial_data["properties"]["weather"] = item["weather"]
+                # if item["weather"] is not None:
+                #     spatial_data["properties"]["weather"] = item["weather"]
                 spatial_datas.append(spatial_data)
         file_name_geojson = secure_filename(f"{doc_video.name}_object.geojson")
         key_object_geojson = f"{_get_user_directory_name()}/{new_folder.name}/{file_name_geojson}"

@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full bg-login relative">
+  <div class="h-full bg-login relative flex items-center justify-center">
     <svg width="1072" height="1079" viewBox="0 0 1072 1079" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g opacity="0.5">
         <mask id="mask0_114_46407" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="-30" y="0" width="1102"
@@ -47,7 +47,7 @@
         </radialGradient>
       </defs>
     </svg>
-    <div class="login-box">
+    <div class="login-form-container">
       <LoginBox :title="__('Log in')" :class="{ 'pointer-events-none': loading }">
         <form class="flex flex-col" @submit.prevent="">
           <Input v-model="email" class="mb-2" label="Email" name="email" autocomplete="email"
@@ -176,11 +176,8 @@ html {
   /* SVG sẽ nằm bên dưới */
 }
 
-.login-box {
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-40%, -50%);
-  z-index: 2;
+.login-form-container {
+    position: absolute; /* Keeps the form on top of the background */
+    z-index: 10; /* Ensures the form is above the SVG */
 }
 </style>

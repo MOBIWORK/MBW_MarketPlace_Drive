@@ -95,13 +95,26 @@
             {{__('Empty Trash')}}
           </Button>
           <template v-else>
-            <Button v-if="$route.name === 'Home' || $route.name === 'Folder'" :variant="'outline'" theme="gray" 
-              size="sm" class="mr-3" @click="showMonitorTaskingDialog=true">
-                <template #prefix>
-                  <FeatherIcon name="monitor" class="w-4" />
-                </template>
-                {{__('Tasking')}}
-            </Button>
+            <div v-if="$route.name === 'Home' || $route.name === 'Folder'">
+              <Button :variant="'outline'" theme="gray" v-if="isTabletOrDesktop"
+                size="sm" class="mr-3" @click="showMonitorTaskingDialog=true">
+                  <template #prefix>  
+                    <FeatherIcon name="monitor" class="w-4" />
+                  </template>
+                  {{__('Tasking')}}
+              </Button>
+              <!-- <Button 
+                v-else 
+                :variant="'ghost'" 
+                theme="gray" 
+                size="sm" 
+                class="mr-3" 
+                @click="showMonitorTaskingDialog=true"
+              >
+                <FeatherIcon name="monitor" class="w-4" />
+              </Button> -->
+            </div>
+            
             <Dropdown
               :options="newEntityOptions"
               placement="left"
@@ -285,7 +298,8 @@ export default {
           ],
         },
       ],
-      arrTassking: []
+      arrTassking: [],
+      windowWidth: window.innerWidth
     }
   },
   computed: {
@@ -466,6 +480,9 @@ export default {
       }
       return true
     },
+    isTabletOrDesktop() {
+      return this.windowWidth >= 768; // Tablet và Desktop có kích thước lớn hơn hoặc bằng 768px
+    }
   },
   methods: {
     handleSelectedEntity() {
@@ -475,6 +492,9 @@ export default {
           this.$store.state.currentFolder
         )
       }
+    },
+    handleResize() {
+      this.windowWidth = window.innerWidth;
     }
   },
   resources: {
@@ -510,5 +530,11 @@ export default {
       }
     },
   },
+  mounted() {
+    window.addEventListener('resize', this.handleResize);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.handleResize);
+  }
 }
 </script>

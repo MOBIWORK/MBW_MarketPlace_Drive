@@ -67,15 +67,3 @@ def get_setting_api():
         'account_name_banking': account_name_banking,
         'account_number_banking': account_number_banking
     }
-
-@frappe.whitelist()
-def test_get_content_gpx():
-    # Gọi API để lấy nội dung
-    url = "https://eov-test.mbwnext.com/api/method/drive.api.files.get_file_content?entity_name=1ca177ee456e4d9c912e39b65df98444"
-    response = requests.get(url, stream=True, timeout=300)
-    with open("geotesst.gpx", "wb") as file:
-        shutil.copyfileobj(response.raw, file)
-
-    with open("geotesst.gpx", "r") as file:
-        print("80 ", file)   
-    print("Dữ liệu GPX đã được ghi vào file: test_output.gpx")
