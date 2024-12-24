@@ -5,7 +5,7 @@
         <div class="w-full max-h-full relative" id="map" v-show="isDashcam">
             <div class="absolute z-10 bg-white h-[280px] w-[489px] left-1 bottom-1">
                 <video :key="src" ref="mediaRef" class="h-full w-full" autoplay muted preload="none"
-                    controlslist="nodownload noremoteplayback noplaybackrate disablepictureinpicture" controls draggable="false"
+                    controlslist="nodownload noremoteplayback playbackrate disablepictureinpicture" controls draggable="false"
                     @loadedmetadata="handleMediaReady" @timeupdate="onTimeUpdate">
                     <source :src="src" :type="type" />
                 </video>
@@ -144,7 +144,10 @@ function onTimeUpdate(evt) {
             'properties': {}
         }
         let coordinateActive = feature.geometry.coordinates
-        alongPath.value = alongPath.value.concat([coordinateActive])
+        alongPath.value = []
+        for(let i = 0; i <= currentFrame; i++){
+            alongPath.value.push([dataGPSRef.value[i].lon, dataGPSRef.value[i].lat])
+        }
         if (dataGPSRef.value[currentFrame - 1] != null) {
             let coordinate_last = [dataGPSRef.value[currentFrame - 1].lon, dataGPSRef.value[currentFrame - 1].lat]
             var bearing = turf.bearing(
