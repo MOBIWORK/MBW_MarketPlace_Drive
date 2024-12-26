@@ -185,7 +185,6 @@ def send_status_tasking(result):
 ###result: Kết quả của phép phân tích
 @frappe.whitelist(methods=["POST"], allow_guest=True)
 def send_result_detect(result):
-    print("Dòng 187 ", result)
     task_id = result["task_id"]
     doc_setting = frappe.get_single('Drive Instance Settings')
     aws_endpoint_url = doc_setting.aws_end_point
@@ -470,7 +469,7 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_endpoint_url
         new_folder = create_folder(title_folder, parent)
         new_folder_image = create_folder(f"Images_{int(timestamp)}", new_folder.name)
         data_xlsx = []
-        headers = ["S_Real (m)", "S_pixel (pixel)", "Image", "Type Object"]
+        headers = ["S_pixel (pixel)", "Image", "Type Object"]
         data_xlsx.append(headers)
         for item in metadata_result:
             image_response = sdk.get_stream_by_url(item["image"])
@@ -527,7 +526,6 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_endpoint_url
             #Trên local
             #image_url = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={name}"
             item_xlsx = [
-                item["area_real"],
                 item["area_pixel"],
                 image_url,
                 item["object"]
