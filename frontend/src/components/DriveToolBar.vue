@@ -115,7 +115,7 @@
               />
             </Button>
             <Button class="text-sm h-7 rounded-l-none flex-1 md:block">
-              {{ orderByLabel }}
+              {{ __(orderByLabel) }}
             </Button>
           </div>
         </Dropdown>

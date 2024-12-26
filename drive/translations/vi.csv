@@ -21,7 +21,6 @@ OR,Hoặc
 Don't have an account?,Bạn chưa có tài khoản?
 SIGN UP,Đăng ký
 Register an account,Đăng ký tài khoản
-Name,Tên
 Already have an account?,Bạn đã có tài khoản?
 LOG IN,Đăng nhập
 Profile,Hồ sơ
@@ -82,7 +81,6 @@ Search,Tìm kiếm
 Unread,Chưa đọc
 Mark all as Read,Đánh dấu tất cả đã đọc
 No Notifications,Không có thông báo
-New,Thêm mới
 Tasking,Tác vụ xử lý
 Last Modified,Sửa lần cuối
 Size,Dung lượng
@@ -134,7 +132,6 @@ Move to Trash,Chuyển vào thùng rác
 Upload File,Tải tệp lên
 New Document,Tài liệu mới
 Upload,Tải lên
-New,Mới
 Upload Videos,Tải video lên
 Video With GPS,Video kèm GPS
 Video Without GPS,Video không kèm GPS
@@ -259,5 +256,36 @@ Your username,Tên tài khoản
 You are almost ready to start analysis video - simply validate your RoadAI account by clicking the button below,Bạn gần như đã sẵn sàng để bắt đầu phân tích video - chỉ cần xác thực tài khoản RoadAI của bạn bằng cách nhấp vào nút bên dưới
 Activate my account,Kích hoạt tài khoản
 If you’re having trouble clicking the “Activate my account” button, copy and paste the URL below into your web browser,Nếu bạn gặp sự cố khi nhấp vào nút "Kích hoạt tài khoản", hãy sao chép và dán URL bên dưới vào trình duyệt web của bạn
-
-
+Delete forever,Xóa vĩnh viễn
+Empty Trash,Làm mới thùng rác
+Delete Forever?,Xóa vĩnh viễn
+All items in your Trash will be deleted forever. This is an irreversible process.,Tất cả các mục trong Thùng rác của bạn sẽ bị xóa vĩnh viễn. Đây là một quá trình không thể đảo ngược.
+All your favourited items will be marked as unfavourite.,Tất cả các mục bạn yêu thích sẽ được đánh dấu là không yêu thích.
+All your recently viewed files will be cleared,Tất cả các tập tin bạn đã xem gần đây sẽ bị xóa
+Clear Recents?,Làm mới gần đây?
+Folder is Empty,Thư mục trống
+files,tệp
+Uploaded Failed,Tải lên không thành công
+Close tracking uploads,Đóng theo dõi tải lên
+Are you sure you want to close tracking uploads?,Bạn có chắc chắn muốn đóng theo dõi tải lên?
+No upload in progress,Không có quá trình tải lên
+No upload completed,Chưa tải lên xong
+No upload analysis,Không có phân tích tải lên
+{0} days ago,{0} ngày trước
+just now,bây giờ
+{0} minutes ago, {0} phút trước
+No Recent Files,Không có tập tin gần đây
+Shared with You,Đã chia sẻ với bạn
+Shared by You,Được chia sẻ bởi bạn
+Folders,Thư mục
+Clear Recents,Làm mới gần đây
+Last Accessed,Truy cập lần cuối
+Clear Favourites,Xóa mục yêu thích
+No Favourite Files,Không có tệp tin yêu thích
+Trash is Empty,Thùng rác rỗng
+No Shared Files,Không có tệp tin được chia sẻ
+Sign up for ROAD AI to get special offers,Đăng ký ROAD AI để được hưởng ưu đãi
+Free storage,Dung lượng lưu trữ miễn phí
+Process Unit Per's Video,Đơn vị phân tích video
+Register an account,Đăng ký một tài khoản
+Log in,Đăng nhập

@@ -18,12 +18,13 @@ import translationPlugin from './translation'
 
 setConfig("resourceFetcher", frappeRequest)
 const app = createApp(App)
+app.use(translationPlugin)
 app.config.unwrapInjectedRef = true
 app.config.globalProperties.emitter = emitter
 app.provide("emitter", emitter)
 app.use(router)
 app.use(store)
-app.use(translationPlugin)
+
 
 app.use(FrappeUI, { socketio: false })
 const socket = initSocket()
@@ -54,4 +55,7 @@ setConfig("resourceFetcher", (options) => {
   })
 })
 app.component("Button", Button)
-app.mount("#app")
+setTimeout(()=>{
+  app.mount("#app")
+}, 200)
+

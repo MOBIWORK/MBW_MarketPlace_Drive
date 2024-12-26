@@ -158,7 +158,7 @@ export default {
           label: __("Home"),
           route: "/home",
           icon: Home,
-          highlight: this.$store.state.currentBreadcrumbs[0].label === __("Home"),
+          highlight: this.$store.state.currentBreadcrumbs[0].label === "Home",
         },
         {
           enabled: true,
@@ -166,7 +166,7 @@ export default {
           route: "/recents",
           icon: Recent,
           highlight:
-            this.$store.state.currentBreadcrumbs[0].label === __("Recents"),
+            this.$store.state.currentBreadcrumbs[0].label === "Recents",
         },
         {
           enabled: true,
@@ -174,21 +174,21 @@ export default {
           route: "/favourites",
           icon: Star,
           highlight:
-            this.$store.state.currentBreadcrumbs[0].label === __("Favourites"),
+            this.$store.state.currentBreadcrumbs[0].label === "Favourites",
         },
         {
           enabled: true,
           label: __("Shared"),
           route: "/shared",
           icon: Users,
-          highlight: this.$store.state.currentBreadcrumbs[0].label === __("Shared"),
+          highlight: this.$store.state.currentBreadcrumbs[0].label === "Shared",
         },
         {
           enabled: true,
           label: __("Trash"),
           route: "/trash",
           icon: Trash,
-          highlight: this.$store.state.currentBreadcrumbs[0].label === __("Trash"),
+          highlight: this.$store.state.currentBreadcrumbs[0].label === "Trash",
         },
       ].filter((item) => item.enabled)
     },
@@ -211,6 +211,6 @@ export default {
         this.$store.state.notifCount = data
       },
     },
-  },
+  }
 }
 </script>

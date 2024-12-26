@@ -31,7 +31,7 @@
         class="flex items-center w-full py-1.5 pr-2"
       >
         <span class="text-base text-gray-600 font-medium leading-6 pl-1.5">
-          {{ i }}
+          {{ __(i) }}
         </span>
       </div>
 
@@ -107,13 +107,13 @@
               class="-relative mr-2"
               size="sm"
             />
-            {{ entity.owner }}
+            {{ __(entity.owner) }}
           </div>
           <div
             :title="entity.modified"
             class="hidden sm:flex items-center justify-end text-gray-700 text-base truncate"
           >
-            {{ entity.relativeModified }}
+            {{ localizeRelativeModified(entity.relativeModified) }}
           </div>
           <div class="flex w-full justify-end text-base text-gray-700">
             {{ entity.file_size }}
@@ -292,6 +292,17 @@ export default {
       }
       this.$emit("showEntityContext", event)
     },
+    localizeRelativeModified(modifiTime){
+      if (typeof modifiTime === "string" && modifiTime.trim() !== "") {
+          const arrMatch = modifiTime.trim().match(/^(\d+)\s*(.*)$/);
+          if(arrMatch){
+            let number = parseInt(arrMatch[1], 10)
+            let text = arrMatch[2]
+            return __(`{0} ${text}`, [number])
+          }
+      } 
+      return __(modifiTime)
+    }
   },
 }
 </script>

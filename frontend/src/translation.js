@@ -38,6 +38,7 @@ function translate(message, replace, context = null) {
 function fetchTranslations(lang) {
   createResource({
     url: 'drive.api.get_translations',
+    cache: "drive_translation",
     auto: true,
     transform: (data) => {
       window.translatedMessages = data

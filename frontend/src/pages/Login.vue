@@ -1,6 +1,6 @@
 <template>
   <div class="h-full bg-login relative flex items-center justify-center">
-    <svg width="1072" height="1079" viewBox="0 0 1072 1079" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg class="w-full h-full"  fill="none" xmlns="http://www.w3.org/2000/svg">
       <g opacity="0.5">
         <mask id="mask0_114_46407" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="-30" y="0" width="1102"
           height="1080">

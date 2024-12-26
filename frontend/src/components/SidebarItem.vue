@@ -31,7 +31,7 @@
           :class="
             isCollapsed
               ? 'ml-0 w-0 overflow-hidden opacity-0'
-              : 'ml-2 w-auto opacity-100'
+              : 'ml-2 w-max opacity-100'
           "
         >
           {{ label }}

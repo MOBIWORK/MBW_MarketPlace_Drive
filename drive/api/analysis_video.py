@@ -18,6 +18,7 @@ from drive.utils.using_quota import exist_pupv
 from pathlib import Path
 from drive.api.files import get_user_uploads_directory
 from drive.utils.const import BASE_URL_AI
+from drive.utils import calculate_content_length
 
 #API trích xuất dữ liệu geojson và ảnh đối tượng từ một video
 # Với mỗi 1MB xử lý thì tương ứng với 1PPUV  
@@ -59,16 +60,16 @@ def analytic_with_geometry(name_file, parent):
                 frappe.publish_realtime('event_analytic_video_job', message=doc_task_queue.name, user=frappe.session.user)
                 return
             #Triển khai code
-            url_file_video = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={doc_video.name}")
-            url_file_gps = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={doc_gpx.name}")
-            hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_result_detect")
-            status_hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_status_tasking")
+            #url_file_video = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={doc_video.name}")
+            #url_file_gps = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={doc_gpx.name}")
+            #hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_result_detect")
+            #status_hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_status_tasking")
             
             #Trên local
-            #url_file_video = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={doc_video.name}"
-            #url_file_gps = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={doc_gpx.name}"
-            #hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_result_detect"
-            #status_hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_status_tasking"
+            url_file_video = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={doc_video.name}"
+            url_file_gps = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={doc_gpx.name}"
+            hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_result_detect"
+            status_hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_status_tasking"
 
             sdk = RoadSDK(BASE_URL_AI)
             response = sdk.process_video_gpx(doc_task_queue.name, url_file_video, url_file_gps, hook_url, status_hook_url)
@@ -142,14 +143,14 @@ def analytic_without_geometry(name_file, parent):
             return
         
         #Triển khai code
-        video_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_file}")
-        hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_result_detect")
-        status_hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_status_tasking")
+        #video_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_file}")
+        #hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_result_detect")
+        #status_hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_status_tasking")
 
         #Trên local
-        #video_url = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={name_file}"
-        #hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_result_detect"
-        #status_hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_status_tasking"
+        video_url = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={name_file}"
+        hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_result_detect"
+        status_hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_status_tasking"
 
         #BASE_URL_AI
         sdk = RoadSDK(BASE_URL_AI)
@@ -300,8 +301,11 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_endpoint_ur
             #         file.write(chunk)
             
             name = str(uuid.uuid4().hex)
+            content_length_image = image_response.headers.get('Content-Length')
+            if content_length_image is None:
+                content_length_image = calculate_content_length(item["image"])
             create_drive_entity(
-                name, title_image, new_folder_image.name, save_path, image_response.headers.get('Content-Length'), ".jpg", "image/jpeg", None
+                name, title_image, new_folder_image.name, save_path, content_length_image, ".jpg", "image/jpeg", None
             )
             #Tạo thumbnail dựa theo S3
             frappe.enqueue(
@@ -328,9 +332,9 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_endpoint_ur
             # )
 
             #Triển khai code
-            image_url = base_url + f"/api/method/drive.api.files.get_file_content?entity_name={name}"
+            #image_url = base_url + f"/api/method/drive.api.files.get_file_content?entity_name={name}"
             #Trên local
-            #image_url = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={name}"
+            image_url = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={name}"
             if item["gps"]["longitude"] is not None and item["gps"]["longitude"] != 0 and item["gps"]["latitude"] is not None and item["gps"]["latitude"] != 0:
                 spatial_data = {
                     "type": "Feature",
@@ -344,11 +348,17 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_endpoint_ur
                         "image": image_url,
                         "longitude": item["gps"]["longitude"],
                         "latitude": item["gps"]["latitude"],
-                        "type_object": item["object"]
+                        "type_object": item["object"],
+                        "weather": None,
+                        "road_route_info": None
                     }
                 }
-                # if item["weather"] is not None:
-                #     spatial_data["properties"]["weather"] = item["weather"]
+                weather = item.get("weather", None)
+                road_route_info = item.get("road_route_info", None)
+                if weather is not None:
+                    spatial_data["properties"]["weather"] = weather
+                if road_route_info is not None:
+                    spatial_data["properties"]["road_route_info"] = road_route_info
                 spatial_datas.append(spatial_data)
         file_name_geojson = secure_filename(f"{doc_video.name}_object.geojson")
         key_object_geojson = f"{_get_user_directory_name()}/{new_folder.name}/{file_name_geojson}"
@@ -400,9 +410,12 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_endpoint_ur
             upload_file_with_connect(connect_s3, temp_path, key_object_video_output)
 
             name_output_video = str(uuid.uuid4().hex)
+            content_length_video = video_stream.headers.get('Content-Length')
+            if content_length_video is None:
+                content_length_video = calculate_content_length(output_video_link)
             #thay temp_path bằng key_object_video_output nếu thay S3
             create_drive_entity(
-                name_output_video, title_output_video, new_folder.name, key_object_video_output, video_stream.headers.get('Content-Length'), ".mp4", "video/mp4", None, name_gpx
+                name_output_video, title_output_video, new_folder.name, key_object_video_output, content_length_video, ".mp4", "video/mp4", None, name_gpx
             )
             #Tạo thumb bằng S3
             frappe.enqueue(
@@ -430,7 +443,7 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_endpoint_ur
         doc_task_queue.status = "Success"
         doc_task_queue.end_processing_time = datetime.now()
         doc_task_queue.save(ignore_permissions=True)
-        sdk.delete_task(result["task_id"])
+        #sdk.delete_task(result["task_id"])
         frappe.publish_realtime('event_analytic_video_job', message=result["task_id"], user=frappe.session.user)
         frappe.publish_realtime('event_load_entities', user=frappe.session.user)
     except Exception as err:
@@ -478,8 +491,11 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_endpoint_url
             #         file.write(chunk)
 
             name = str(uuid.uuid4().hex)
+            content_length_image = image_response.headers.get('Content-Length')
+            if content_length_image is None:
+                content_length_image = calculate_content_length(item["image"])
             create_drive_entity(
-                name, title_image, new_folder_image.name, save_path, image_response.headers.get('Content-Length'), ".jpg", "image/jpeg", None
+                name, title_image, new_folder_image.name, save_path, content_length_image, ".jpg", "image/jpeg", None
             )
             #Tạo thumb với object S3
             frappe.enqueue(
@@ -506,10 +522,10 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_endpoint_url
             # )
 
             #Triển khai code
-            image_url = base_url + f"/api/method/drive.api.files.get_file_content?entity_name={name}"
+            #image_url = base_url + f"/api/method/drive.api.files.get_file_content?entity_name={name}"
 
             #Trên local
-            #image_url = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={name}"
+            image_url = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={name}"
             item_xlsx = [
                 item["area_real"],
                 item["area_pixel"],
@@ -564,8 +580,11 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_endpoint_url
             upload_file_with_connect(connect_s3, key_object_video_output, key_object_video_output)
 
             name_output_video = str(uuid.uuid4().hex)
+            content_length_video = video_stream.headers.get('Content-Length')
+            if content_length_video is None:
+                content_length_video = calculate_content_length(output_video_link)
             create_drive_entity(
-                name_output_video, title_output_video, new_folder.name, key_object_video_output, video_stream.headers.get('Content-Length'), ".mp4", "video/mp4", None
+                name_output_video, title_output_video, new_folder.name, key_object_video_output, content_length_video, ".mp4", "video/mp4", None
             )
             #Tạo thumb dựa trên object S3
             frappe.enqueue(
@@ -607,3 +626,4 @@ def update_doc_task_queue(taskId, status, errorMessage=None):
     doc_task_queue.pupv = 0
     doc_task_queue.end_processing_time = datetime.now()
     doc_task_queue.save(ignore_permissions=True)
+

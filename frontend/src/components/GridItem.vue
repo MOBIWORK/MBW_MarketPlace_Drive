@@ -29,7 +29,7 @@
       </span>
       <p :title="modified" class="truncate text-sm text-gray-600 mt-2">
         {{ file_size ? file_size + " ∙ " : "" }}
-        {{ relativeModified }}
+        {{ localizeRelativeModified(relativeModified) }}
       </p>
     </div>
   </div>
@@ -74,7 +74,7 @@
       </span>
       <div class="flex items-center justify-start mt-2">
         <p :title="modified" class="truncate text-xs text-gray-600">
-          {{ file_size }} {{ file_size ? "∙" : null }} {{ relativeModified }}
+          {{ file_size }} {{ file_size ? "∙" : null }} {{ localizeRelativeModified(relativeModified) }}
         </p>
       </div>
     </div>
@@ -133,6 +133,17 @@ export default {
       )
       this.link = result
     },
+    localizeRelativeModified(modifiTime){
+      if (typeof modifiTime === "string" && modifiTime.trim() !== "") {
+          const arrMatch = modifiTime.trim().match(/^(\d+)\s*(.*)$/);
+          if(arrMatch){
+            let number = parseInt(arrMatch[1], 10)
+            let text = arrMatch[2]
+            return __(`{0} ${text}`, [number])
+          }
+      } 
+      return __(modifiTime)
+    }
   },
 }
 </script>
