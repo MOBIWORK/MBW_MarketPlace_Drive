@@ -60,16 +60,16 @@ def analytic_with_geometry(name_file, parent):
                 frappe.publish_realtime('event_analytic_video_job', message=doc_task_queue.name, user=frappe.session.user)
                 return
             #Triển khai code
-            #url_file_video = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={doc_video.name}")
-            #url_file_gps = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={doc_gpx.name}")
-            #hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_result_detect")
-            #status_hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_status_tasking")
+            url_file_video = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={doc_video.name}")
+            url_file_gps = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={doc_gpx.name}")
+            hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_result_detect")
+            status_hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_status_tasking")
             
             #Trên local
-            url_file_video = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={doc_video.name}"
-            url_file_gps = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={doc_gpx.name}"
-            hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_result_detect"
-            status_hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_status_tasking"
+            #url_file_video = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={doc_video.name}"
+            #url_file_gps = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={doc_gpx.name}"
+            #hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_result_detect"
+            #status_hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_status_tasking"
 
             sdk = RoadSDK(BASE_URL_AI)
             response = sdk.process_video_gpx(doc_task_queue.name, url_file_video, url_file_gps, hook_url, status_hook_url)
@@ -143,14 +143,14 @@ def analytic_without_geometry(name_file, parent):
             return
         
         #Triển khai code
-        #video_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_file}")
-        #hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_result_detect")
-        #status_hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_status_tasking")
+        video_url = frappe.utils.get_url(f"/api/method/drive.api.files.get_file_content?entity_name={name_file}")
+        hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_result_detect")
+        status_hook_url = frappe.utils.get_url("/api/method/drive.api.analysis_video.send_status_tasking")
 
         #Trên local
-        video_url = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={name_file}"
-        hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_result_detect"
-        status_hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_status_tasking"
+        #video_url = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={name_file}"
+        #hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_result_detect"
+        #status_hook_url = "http://10.0.1.85:8005/api/method/drive.api.analysis_video.send_status_tasking"
 
         #BASE_URL_AI
         sdk = RoadSDK(BASE_URL_AI)
@@ -332,9 +332,9 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_endpoint_ur
             # )
 
             #Triển khai code
-            #image_url = base_url + f"/api/method/drive.api.files.get_file_content?entity_name={name}"
+            image_url = base_url + f"/api/method/drive.api.files.get_file_content?entity_name={name}"
             #Trên local
-            image_url = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={name}"
+            #image_url = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={name}"
             if item["gps"]["longitude"] is not None and item["gps"]["longitude"] != 0 and item["gps"]["latitude"] is not None and item["gps"]["latitude"] != 0:
                 spatial_data = {
                     "type": "Feature",
@@ -522,10 +522,10 @@ def save_result_analysis_with_velocity_job(name_fvideo, parent, aws_endpoint_url
             # )
 
             #Triển khai code
-            #image_url = base_url + f"/api/method/drive.api.files.get_file_content?entity_name={name}"
+            image_url = base_url + f"/api/method/drive.api.files.get_file_content?entity_name={name}"
 
             #Trên local
-            image_url = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={name}"
+            #image_url = f"http://10.0.1.85:8005/api/method/drive.api.files.get_file_content?entity_name={name}"
             item_xlsx = [
                 item["area_real"],
                 item["area_pixel"],
