@@ -7,7 +7,8 @@
     :show-sort="true"
     :icon="Home"
     :primary-message="__('Home is empty')"
-    :secondary-message="__('Add files by dropping them here')"
+    :secondary-message="__('Upload video to detect road defects')"
+    :isHome="true"
   />
 </template>
 

@@ -95,8 +95,8 @@
             {{__('Empty Trash')}}
           </Button>
           <template v-else>
-            <div v-if="$route.name === 'Home' || $route.name === 'Folder'">
-              <Button :variant="'outline'" theme="gray" v-if="isTabletOrDesktop"
+            <div v-if="$route.name === 'Home' || $route.name === 'Folder' || $route.name === 'IntrodutionApp'">
+              <Button :variant="'outline'" theme="gray" v-if="isTabletOrDesktop" id="btn-tasking"
                 size="sm" class="mr-3" @click="showMonitorTaskingDialog=true">
                   <template #prefix>  
                     <FeatherIcon name="monitor" class="w-4" />
@@ -123,6 +123,7 @@
               <Button
                 variant="solid"
                 :disabled="canUpload || $store.state.elementExists"
+                id="btn-upload-video"
               >
                 <template #prefix>
                   <FeatherIcon name="upload" class="w-4" />
@@ -247,7 +248,7 @@ export default {
           group: __("Upload"),
           items: [
             {
-              label: __("Upload File"),
+              label: __("Upload Videos"),
               icon: FileUpload,
               onClick: () => (this.showNewVideoDialog = true),   //this.emitter.emit("uploadFile"),
             },
@@ -466,6 +467,9 @@ export default {
       return this.$store.state.currentViewEntites
     },
     canUpload() {
+      if(this.$route.name == "IntrodutionApp"){
+        return false
+      }
       if (
         (this.$route.name === "Home" || this.$route.name === "Notifications") &&
         this.$store.state.currentFolderID === this.$store.state.homeFolderID

@@ -4,13 +4,13 @@
         title: __('Upload Videos'),
     }" @after-leave="onCleanData">
         <template #body-content>
-            <div class="flex items-center mt-3">
+            <!-- <div class="flex items-center mt-3">
                 <input type="radio" value="video_gps" v-model="typeInput" id="video_gps" />
                 <label for="video_gps" class="ml-2 text-sm">{{__('Video With GPS')}}</label>
                 <input class="ml-10" type="radio" value="video_without_gps" v-model="typeInput"
                     id="video_without_gps" />
                 <label for="video_without_gps" class="ml-2 text-base">{{__('Video Without GPS')}}</label>
-            </div>
+            </div> -->
             <div v-if="typeInput == 'video_gps'" class="grid mt-3 grid-cols-1">
                 <div class="text-sm text-gray-600 mb-1">{{__('Files')}}</div>
                 <div class="h-28 border-2 border-dashed rounded-lg flex cursor-pointer items-center justify-center"

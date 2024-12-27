@@ -19,11 +19,43 @@
     </svg>
     <p class="text-base text-gray-600 font-medium">{{ primaryMessage }}</p>
     <p class="text-sm text-gray-600">{{ secondaryMessage }}</p>
+    <div class="flex mt-3" v-if="isHomePage">
+      <Button
+        :variant="'solid'"
+        theme="gray"
+        size="sm"
+        @click="onUploadVideos()"
+      >{{__('UPLOAD VIDEOS')}}</Button>
+      <Button
+        class="ml-3"
+        :variant="'outline'"
+        theme="gray"
+        size="sm"
+        @click="onShowMeAround()"
+      >
+        {{__('SHOW ME AROUND')}}
+        <template #suffix>
+          <FeatherIcon name="arrow-right" class="w-4" />
+        </template>
+      </Button>
+    </div>
+    <UploadVideoDialog
+    v-if="showNewVideoDialog"
+    v-model="showNewVideoDialog"
+    :parent="$route.params.entityName"
+  />
   </div>
 </template>
 <script>
+import { Button, FeatherIcon } from 'frappe-ui'
+import UploadVideoDialog from "@/components/Modals/UploadVideoDialog.vue"
 export default {
   name: "NoFilesSection",
+  components: {
+    Button,
+    UploadVideoDialog,
+    FeatherIcon
+  },
   props: {
     icon: {
       type: Object,
@@ -37,6 +69,25 @@ export default {
       type: String,
       default: "Drop files here",
     },
+    isHomePage: {
+      type: Boolean,
+      default: false
+    }
   },
+  data(){
+    return {
+      showNewVideoDialog: false
+    }
+  },
+  methods: {
+    onUploadVideos(){
+      this.showNewVideoDialog = true
+    },
+    onShowMeAround(){
+      this.$router.push({
+        name: "IntrodutionApp",
+      })
+    }
+  }
 }
 </script>

@@ -23,6 +23,7 @@
       :icon="icon"
       :primary-message="primaryMessage"
       :secondary-message="secondaryMessage"
+      :isHomePage="isHome"
     />
     <GridView
       v-else-if="folderItems && $store.state.view === 'grid'"
@@ -314,6 +315,11 @@ export default {
       required: false,
       default: false,
     },
+    isHome: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
   },
   data: () => ({
     folderItems: null,
@@ -359,6 +365,7 @@ export default {
       } else {
         output = { "All Files": this.folderItems }
       }
+      console.log(output)
       return output
     },
     selectedEntities: {
@@ -418,7 +425,7 @@ export default {
     emptyActionItems() {
       return [
         {
-          label: __("Upload File"),
+          label: __("Upload Videos"),
           icon: FileUpload,
           handler: () => (this.showNewVideoDialog = true),  //this.emitter.emit("uploadFile"),
           isEnabled: () => this.selectedEntities.length === 0,
