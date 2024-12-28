@@ -111,8 +111,8 @@ const columns = ref(
             width: '100px'
         },
         {
-            label: __('Address'),
-            key: 'address'
+            label: __('Chainage'),
+            key: 'chainage'
         },
         {
             label: `${__('Temperature')}(°C)`,
@@ -396,7 +396,7 @@ function onAddLayer() {
         }
         if(contentGeoJson.value.features[i]["properties"]["road_route_info"] != null){
             let roadRouteInfo = contentGeoJson.value.features[i]["properties"]["road_route_info"]
-            if(roadRouteInfo["road_route"] != null) properties["address"] = roadRouteInfo["road_route"]
+            if(roadRouteInfo["details"] != null && roadRouteInfo["details"]["m"] != null) properties["chainage"] = roadRouteInfo["road_route"]
         }
         if(contentGeoJson.value.features[i]["properties"]["weather"] != null){
             let weather = contentGeoJson.value.features[i]["properties"]["weather"]
