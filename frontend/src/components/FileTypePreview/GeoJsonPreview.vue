@@ -391,7 +391,7 @@ function onAddLayer() {
             'longitude': contentGeoJson.value.features[i]["properties"]["longitude"],
             'latitude': contentGeoJson.value.features[i]["properties"]["latitude"],
             'type_object': contentGeoJson.value.features[i]["properties"]["type_object"],
-            'address': "",
+            'chainage': "",
             'temperature_2m': ""
         }
         if(contentGeoJson.value.features[i]["properties"]["road_route_info"] != null){
