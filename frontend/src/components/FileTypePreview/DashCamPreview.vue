@@ -1,15 +1,15 @@
 <template>
     <LoadingIndicator v-show="loading" class="w-10 h-full text-neutral-100 mx-auto" />
     <div class="flex w-full" v-show="!loading">
-        
-        <div class="w-full max-h-full relative" id="map" v-show="isDashcam">
-            <div class="absolute z-10 bg-white h-[280px] w-[489px] left-1 bottom-1">
-                <video :key="src" ref="mediaRef" class="h-full w-full" autoplay muted preload="none"
+        <div class="w-full h-full flex" v-show="isDashcam">
+            <div class="w-8/12 h-full bg-gray-600 flex items-center justify-center">
+                <video :key="src" ref="mediaRef" autoplay muted preload="none" class="h-full w-full object-contain bg-gray-700"
                     controlslist="nodownload noremoteplayback playbackrate disablepictureinpicture" controls draggable="false"
                     @loadedmetadata="handleMediaReady" @timeupdate="onTimeUpdate">
                     <source :src="src" :type="type" />
                 </video>
             </div>
+            <div class="w-4/12 max-h-full" id="map"></div>
         </div>
         <video :key="src" ref="mediaRef" class="max-h-full w-full" autoplay muted preload="none"
             controlslist="nodownload noremoteplayback noplaybackrate disablepictureinpicture" controls draggable="false"

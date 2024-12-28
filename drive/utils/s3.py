@@ -89,17 +89,6 @@ def get_object_by_key(bucket_name, key_object):
     return content
 
 @frappe.whitelist()
-def post_object_to_s3(src_file):
-    doc_setting = frappe.get_single('Drive Instance Settings')
-    aws_endpoint_url = doc_setting.aws_end_point
-    aws_access_key = doc_setting.aws_access_key
-    aws_secret_access_key = doc_setting.get_password('aws_secret_key')
-    connect_s3 = get_connect_s3(aws_endpoint_url, aws_access_key, aws_secret_access_key)
-    connect_s3.upload_file(src_file, "eov-geoviz", "/test/objs3.jpg")
-    return "ok"
-    
-
-@frappe.whitelist()
 def list_objects(bucket_name):
     doc_setting = frappe.get_single('Drive Instance Settings')
     aws_endpoint_url = doc_setting.aws_end_point
@@ -126,7 +115,7 @@ def delete_objects(bucket_name):
     aws_access_key = doc_setting.aws_access_key
     aws_secret_access_key = doc_setting.get_password('aws_secret_key')
     connect_s3 = get_connect_s3(aws_endpoint_url, aws_access_key, aws_secret_access_key)
-    response = connect_s3.list_objects_v2(Bucket=bucket_name)
+    response = connect_s3.list_objects_v2(Bucket="eov-geoviz")
     
     # Kiểm tra xem có đối tượng nào trong bucket không
     if 'Contents' in response:

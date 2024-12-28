@@ -276,7 +276,7 @@ export default {
             })
         })
         introduction.onbeforechange(function(targetElement){
-            console.log("Dòng 52 ", targetElement.id)
+            //console.log("Dòng 52 ", targetElement.id)
         })
     },
     methods: {

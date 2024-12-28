@@ -64,7 +64,7 @@ const store = useStore()
 const loading = ref(true)
 const mapPreview = ref(true)
 const contentGeoJson = ref(null)
-const tabIndex = ref(0)
+const tabIndex = ref(1)
 const tabsContent = ref([
     {
         name: "json",
@@ -97,15 +97,27 @@ const columns = ref(
         },
         {
             label: __('Acreage(m)'),
-            key: 'area_real'
+            key: 'area_real',
+            width: '100px'
         },
         {
             label: __('Acreage(pixel)'),
-            key: 'area_pixel'
+            key: 'area_pixel',
+            width: '100px'
         },
         {
             label: __('Image'),
-            key: 'image'
+            key: 'image',
+            width: '100px'
+        },
+        {
+            label: __('Address'),
+            key: 'address'
+        },
+        {
+            label: `${__('Temperature')}(°C)`,
+            key: 'temperature_2m',
+            width: '150px'
         }
     ]
 )
@@ -372,7 +384,24 @@ function onAddLayer() {
     let arrProperties = []
     for (let i = 0; i < contentGeoJson.value.features.length; i++) {
         let geometry = contentGeoJson.value.features[i]["geometry"]
-        let properties = contentGeoJson.value.features[i]["properties"]
+        let properties = {
+            'area_pixel': contentGeoJson.value.features[i]["properties"]["area_pixel"],
+            'area_real': contentGeoJson.value.features[i]["properties"]["area_real"].toFixed(3),
+            'image': contentGeoJson.value.features[i]["properties"]["image"],
+            'longitude': contentGeoJson.value.features[i]["properties"]["longitude"],
+            'latitude': contentGeoJson.value.features[i]["properties"]["latitude"],
+            'type_object': contentGeoJson.value.features[i]["properties"]["type_object"],
+            'address': "",
+            'temperature_2m': ""
+        }
+        if(contentGeoJson.value.features[i]["properties"]["road_route_info"] != null){
+            let roadRouteInfo = contentGeoJson.value.features[i]["properties"]["road_route_info"]
+            if(roadRouteInfo["road_route"] != null) properties["address"] = roadRouteInfo["road_route"]
+        }
+        if(contentGeoJson.value.features[i]["properties"]["weather"] != null){
+            let weather = contentGeoJson.value.features[i]["properties"]["weather"]
+            if(weather["temperature_2m"] != null) properties["temperature_2m"] = weather["temperature_2m"].toFixed(1)
+        }
         arrLine.push(geometry["coordinates"])
         properties["ID"] = i + 1
         arrProperties.push(properties)

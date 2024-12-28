@@ -186,6 +186,9 @@ def send_status_tasking(result):
 @frappe.whitelist(methods=["POST"], allow_guest=True)
 def send_result_detect(result):
     task_id = result["task_id"]
+    doc_task = frappe.get_doc("Drive Task Queue", task_id)
+    if doc_task.status == "Success" or doc_task.status == "Error":
+        return None
     doc_setting = frappe.get_single('Drive Instance Settings')
     aws_endpoint_url = doc_setting.aws_end_point
     aws_access_key = doc_setting.aws_access_key
@@ -284,27 +287,32 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_endpoint_ur
             image_response = sdk.get_stream_by_url(item["image"])
             title_image = os.path.basename(item["image"])
             file_name_image = secure_filename(f"{title_image}")
-            save_path = f"{_get_user_directory_name()}/{new_folder.name}/{file_name_image}"
+            save_path_disk = f"{_get_user_directory_name()}/{new_folder.name}/{file_name_image}"
+            key_object_s3 = f"{_get_user_directory_name()}/{new_folder.name}/{file_name_image}"
             #Dữ liệu lưu trên S3
-            cache_key = f"s3_cache:{save_path}"
+            cache_key = f"s3_cache:{key_object_s3}"
             frappe.cache().setex(cache_key, 3600, image_response.content)
-            upload_object_from_stream(connect_s3, image_response, save_path, image_response.headers.get('Content-Type'))
+
+            #upload_object_from_stream(connect_s3, image_response, save_path, image_response.headers.get('Content-Type'))
 
             #Dữ liệu lưu trên disk
-            #directory = os.path.dirname(save_path)
+            directory = os.path.dirname(save_path_disk)
             # Tạo thư mục nếu chưa tồn tại
-            # if not os.path.exists(directory):
-            #     os.makedirs(directory)
-            # with open(save_path, "wb") as file:
-            #     for chunk in image_response.iter_content(chunk_size=8192):
-            #         file.write(chunk)
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            with open(save_path_disk, "wb") as file:
+                for chunk in image_response.iter_content(chunk_size=8192):
+                    file.write(chunk)
+            
+            #Đẩy dữ liệu lên S3 lưu trữ
+            upload_file_with_connect(connect_s3, save_path_disk, key_object_s3)
             
             name = str(uuid.uuid4().hex)
             content_length_image = image_response.headers.get('Content-Length')
             if content_length_image is None:
                 content_length_image = calculate_content_length(item["image"])
             create_drive_entity(
-                name, title_image, new_folder_image.name, save_path, content_length_image, ".jpg", "image/jpeg", None
+                name, title_image, new_folder_image.name, key_object_s3, content_length_image, ".jpg", "image/jpeg", None
             )
             #Tạo thumbnail dựa theo S3
             frappe.enqueue(
@@ -314,7 +322,7 @@ def save_result_analysis_video_with_gps_job(name_fvideo, parent, aws_endpoint_ur
                 now=True,
                 at_front=True,
                 entity_name=name,
-                object_id=save_path,
+                object_id=key_object_s3,
                 mime_type="image/jpeg"
             )
 

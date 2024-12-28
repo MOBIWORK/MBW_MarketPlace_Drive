@@ -112,11 +112,6 @@ const routes = [
     component: () => import("@/pages/Signup.vue")
   },
   {
-    path: "/test_tutorial",
-    name: "TestTutorial",
-    component: () => import("@/pages/TestTutorial.vue")
-  },
-  {
     path: "/introdution",
     name: "IntrodutionApp",
     component: () => import("@/pages/IntrodutionApp.vue")
