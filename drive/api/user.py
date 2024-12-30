@@ -32,13 +32,13 @@ def sign_up(email: str, full_name: str, pwd: str, redirect_to:str) -> tuple[int,
                 "enabled": 0,
                 "new_password": pwd,
                 "user_type": "Website User",
-                "send_welcome_email": 0
+                "send_welcome_email": 0,
+                "roles": [{"role": "Drive User"}]
             }
         )
         user.flags.ignore_permissions = True
         user.flags.ignore_password_policy = True
         user.insert()
-        user.add_roles("Drive User")
         if redirect_to:
             frappe.cache.hset("redirect_after_login", user.name, redirect_to)
         doc_activate = frappe.new_doc('Drive Activate Account')
