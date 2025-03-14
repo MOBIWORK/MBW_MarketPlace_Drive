@@ -13,6 +13,7 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "src"),
       "tailwind.config.js": path.resolve(__dirname, "tailwind.config.js"),
+      "highlight.js/lib/core": path.resolve(__dirname, "highlight-fix.js"),
     },
   },
   build: {
@@ -25,7 +26,7 @@ export default defineConfig({
     },
   },
   server: {
-    allowedHosts: ["drive.localhost"],
+    allowedHosts: ["phongdrive.dev"],
   },
   optimizeDeps: {
     esbuildOptions: { target: "esnext" },
@@ -36,6 +37,7 @@ export default defineConfig({
       "prosemirror",
       "tiptap",
       "engine.io-client",
+      "highlight.js",
       "tailwind.config.js",
     ],
   },
