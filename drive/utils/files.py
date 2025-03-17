@@ -122,12 +122,14 @@ def create_user_directory():
 
 
 def get_home_folder(team):
+    print('========================= team: ', team, flush=True)
     ls = (
         frappe.qb.from_(DriveFile)
-        .where(((DriveFile.team == team) & DriveFile.parent_entity == ''))
+        .where(((DriveFile.team == team)))
         .select(DriveFile.name, DriveFile.path)
         .run(as_dict=True)
     )
+    print('========================= ls: ', ls, flush=True)
     if not ls:
         frappe.throw("Team doesn't exist - please create in Desk.")
     return ls[0]

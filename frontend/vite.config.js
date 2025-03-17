@@ -26,7 +26,7 @@ export default defineConfig({
     },
   },
   server: {
-    allowedHosts: ["phongdrive.dev"],
+    allowedHosts: ["drivephong.dev"],
   },
   optimizeDeps: {
     esbuildOptions: { target: "esnext" },
