@@ -401,13 +401,19 @@ const columnHeaders = [
 ]
 
 async function newLink() {
-  if (!document.hasFocus()) return
-  const text = await navigator.clipboard.readText()
-  if (localStorage.getItem("prevClip") === text) return
+  if (!document.hasFocus()) return;
+
+  if (!navigator.clipboard) {
+    console.warn("Clipboard API in not available");
+    return;
+  }
 
   try {
-    new URL(text)
-    localStorage.setItem("prevClip", text)
+    const text = await navigator.clipboard.readText();
+    if (localStorage.getItem("prevClip") === text) return;
+
+    new URL(text); // Kiểm tra xem text có phải URL hợp lệ không
+    localStorage.setItem("prevClip", text);
     toast({
       title: "Link detected",
       text,
@@ -415,13 +421,13 @@ async function newLink() {
         {
           label: "Add",
           action: () => {
-            dialog.value = "l"
-            link.value = text
+            dialog.value = "l";
+            link.value = text;
           },
         },
       ],
-    })
-  } catch (_) {}
+    });
+  } catch (error) {}
 }
 
 // Hacky but performant way to track links - when the user loads page, copies on page, or comes to page
