@@ -1,10 +1,10 @@
 <template>
-  <Dialog v-model="open" :options="{ title: 'New Folder', size: 'xs' }">
+  <Dialog v-model="open" :options="{ title: __('New Folder'), size: 'xs' }">
     <template #body-content>
       <Input
         ref="input"
         v-model="folderName"
-        placeholder="folder name..."
+        :placeholder="__('folder name...')"
         type="text"
         @keyup.enter="submit"
         @keydown="createFolder.error = null"
@@ -13,7 +13,7 @@
         v-if="createFolder.error"
         class="pt-4 text-base font-sm text-red-500"
       >
-        This folder already exists.
+        {{__('This folder already exists.')}}
       </div>
       <div class="flex" :class="createFolder.error ? 'mt-5' : 'mt-8'">
         <Button
@@ -22,7 +22,7 @@
           :loading="createFolder.loading"
           @click="submit"
         >
-          Create
+          {{__('Create')}}
         </Button>
       </div>
     </template>

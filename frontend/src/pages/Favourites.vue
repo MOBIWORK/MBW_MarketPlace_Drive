@@ -2,7 +2,7 @@
   <GenericPage
     :getEntities="getFavourites"
     :icon="Star"
-    :primaryMessage="'No Favourite Files'"
+    :primaryMessage="__('No Favourite Files')"
     :secondaryMessage="''"
   />
 </template>

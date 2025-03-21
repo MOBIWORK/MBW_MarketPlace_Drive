@@ -23,7 +23,7 @@
               :disabled="true"
               class="text-gray-900"
             />
-            <div>{{ selectedEntities.length }} selected</div>
+            <div>{{ selectedEntities.length }} {{__('selected')}}</div>
           </div>
           <div>
             <Button
@@ -33,7 +33,7 @@
               variant="ghost"
               @click="Download()"
             >
-              Download
+              {{__('Download')}}
             </Button>
             <Button
               v-if="selectedEntities.length < 2"
@@ -41,14 +41,14 @@
               class="flex items-center text-gray-700"
               variant="ghost"
             >
-              Get Link
+              {{__('Get Link')}}
             </Button>
             <Button
               icon-left="star"
               class="flex items-center text-gray-700"
               variant="ghost"
             >
-              Favourite
+              {{__('Favourite')}}
             </Button>
           </div>
         </div>
@@ -57,7 +57,7 @@
           class="flex items-center text-red-500"
           variant="ghost"
         >
-          Delete
+          {{__('Delete')}}
         </Button>
         <Button icon="x" variant="ghost" />
       </div>

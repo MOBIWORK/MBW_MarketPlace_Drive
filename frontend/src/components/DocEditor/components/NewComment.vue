@@ -2,7 +2,7 @@
   <slot v-bind="{ onClick: openDialog }"></slot>
   <Dialog
     v-model="showNewCommentDialog"
-    :options="{ title: 'New Comment', size: 'sm' }"
+    :options="{ title: __('New Comment'), size: 'sm' }"
     @after-leave="reset"
   >
     <template #body-content>
@@ -22,7 +22,7 @@
         class="w-full mt-6"
         @click="setComment(commentText)"
       >
-        Save
+        {{__('Save')}}
       </Button>
     </template>
     <!-- //https://github.com/ueberdosis/tiptap/issues/369 -->

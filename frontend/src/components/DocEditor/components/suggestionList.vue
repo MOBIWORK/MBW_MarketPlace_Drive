@@ -31,7 +31,7 @@
         </button>
       </div>
     </template>
-    <div v-else class="item">No result</div>
+    <div v-else class="item">{{__('No result')}}</div>
   </div>
 </template>
 

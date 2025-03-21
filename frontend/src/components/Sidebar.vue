@@ -11,7 +11,7 @@
       ondrop="return false;"
     >
       <SidebarItem
-        :label="'Search'"
+        :label="('Search')"
         class="mb-0.5"
         :is-collapsed="!isExpanded"
         @click="() => emitter.emit('showSearchPopup', true)"
@@ -31,7 +31,7 @@
         </template>
       </SidebarItem>
       <SidebarItem
-        :label="'Notifications'"
+        :label="('Notifications')"
         icon="inbox"
         class="mb-0.5"
         :is-collapsed="!isExpanded"
@@ -61,7 +61,7 @@
     <div class="mt-auto">
       <StorageBar :is-expanded="isExpanded" />
       <SidebarItem
-        :label="!isExpanded ? 'Expand' : 'Collapse'"
+        :label="!isExpanded ? __('Expand') : __('Collapse')"
         :is-collapsed="!isExpanded"
         class="mt-auto py-4"
         @click="toggleExpanded"
@@ -90,7 +90,7 @@ import SidebarItem from "@/components/SidebarItem.vue"
 import Team from "./EspressoIcons/Organization.vue"
 import StorageBar from "./StorageBar.vue"
 import { notifCount } from "@/resources/permissions"
-import { computed } from "vue"
+import { computed, onMounted } from "vue"
 import { useStore } from "vuex"
 import Users from "./EspressoIcons/Users.vue"
 import { getTeams } from "@/resources/files"
@@ -104,36 +104,47 @@ const team = localStorage.getItem("recentTeam") || getTeams.data[0]
 
 const sidebarItems = [
   {
-    label: "Home",
+    label: __('Home'),
     route: `/${team}/`,
     icon: Home,
   },
   {
-    label: "Team",
+    label: __('Team'),
     route: `/${team}/team`,
     icon: Team,
   },
   {
-    label: "Recents",
+    label: __('Recents'),
     route: `/${team}/recents`,
     icon: Recent,
   },
   {
-    label: "Favourites",
+    label: __('Favourites'),
     route: `/${team}/favourites`,
     icon: Star,
   },
   {
-    label: "Shared",
+    label: __('Share'),
     route: `/shared/`,
     icon: Users,
   },
   {
-    label: "Trash",
+    label: __('Trash'),
     route: `/${team}/trash`,
     icon: Trash,
   },
 ]
+
+function toggleSidebar() {
+  store.commit('setIsSidebarExpanded', false);
+  setTimeout(() => {
+    store.commit('setIsSidebarExpanded', true);
+  }, 300);
+}
+
+onMounted(() => {
+  toggleSidebar();
+});
 
 const toggleExpanded = () =>
   store.commit("setIsSidebarExpanded", isExpanded.value ? false : true)

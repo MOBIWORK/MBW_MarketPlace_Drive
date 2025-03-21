@@ -7,8 +7,8 @@
         >
           <span class="font-semibold text-2xl truncate"
             ><template v-if="!getUsersWithAccess.data?.length"
-              >Sharing </template
-            ><template v-else>Permissions - </template>"{{ entity?.title }}"
+              >{{__('Sharing')}} </template
+            ><template v-else>{{__('Permissions')}} - </template>"{{ entity?.title }}"
           </span>
           <Button
             class="ml-auto"
@@ -24,7 +24,7 @@
           <div class="flex flex-col space-y-4">
             <div>
               <span class="mb-0.5 block text-sm leading-4 text-gray-700"
-                >Preferences</span
+                >{{__('Preferences')}}</span
               >
               <!-- <Switch v-model="allowComments" label="Allow Comments" /> -->
             </div>
@@ -32,20 +32,20 @@
               <DatePicker
                 v-model="invalidAfter"
                 variant="subtle"
-                label="Access Until"
+                :label="__('Access Until')"
               ></DatePicker>
               <span
                 v-if="invalidAfter"
                 class="block text-xs leading-4 text-gray-700 px-0.5 py-1.5"
               >
-                Selected documents will remain shared until
+                {{__('Selected documents will remain shared until')}}
                 {{ useDateFormat(invalidAfter, "YY-MM-DD") }}
               </span>
               <span
                 v-else
                 class="block text-xs leading-4 text-gray-700 px-0.5 py-1.5"
               >
-                Selected documents will remain shared indefinitely
+                {{__('Selected documents will remain shared indefinitely')}}
               </span>
             </div>
           </div>
@@ -54,7 +54,7 @@
         <div v-else-if="!getUsersWithAccess.loading">
           <!-- General Access -->
           <div class="overflow-y-auto max-h-96 px-4 sm:px-6">
-            <div class="mb-3 font-medium text-base">Share:</div>
+            <div class="mb-3 font-medium text-base">{{__('Share')}}:</div>
             <div class="flex mt-3">
               <TextInput
                 type="email"
@@ -62,18 +62,18 @@
                 size="sm"
                 variant="subtle"
                 v-model="share.name"
-                placeholder="share with..."
+                :placeholder="__('share with...')"
               />
               <div class="ms-3 w-20">
                 <Autocomplete
                   :options="
                     filteredAccess.map((k) => ({
                       value: k,
-                      label: k[0].toUpperCase() + k.slice(1),
+                      label: __(k[0].toUpperCase() + k.slice(1)),
                     }))
                   "
                   v-model="share.access"
-                  placeholder="Select people"
+                  :placeholder="__('Select people')"
                   :multiple="true"
                   :hideSearch="true"
                 ></Autocomplete>
@@ -88,7 +88,7 @@
                 class="ms-3"
                 @click="addShare"
               >
-                Share
+                {{__('Share')}}
               </Button>
             </div>
             <div
@@ -96,10 +96,10 @@
               class="text-base space-y-4 mb-5 mt-3"
             >
               <div class="mt-5 text-gray-600 font-medium text-base">
-                People with access:
+                {{__('People with access')}}:
               </div>
               <div v-if="!getUsersWithAccess.data?.length" class="ms-2">
-                <em>Yet to be shared.</em>
+                <em>{{__('Yet to be shared')}}.</em>
               </div>
               <div
                 v-for="(user, idx) in getUsersWithAccess.data"
@@ -120,7 +120,7 @@
                   v-if="user.user == $store.state.auth.user_id"
                   class="ml-auto flex items-center gap-1 text-gray-600"
                 >
-                  <em>You</em>
+                  <em>{{__('You')}}</em>
                 </span>
                 <AccessButton
                   v-else-if="user.user !== entity.owner"
@@ -148,14 +148,14 @@
                   v-else
                   class="ml-auto flex items-center gap-1 text-gray-600"
                 >
-                  Owner
+                  {{__('Owner')}}
                   <Diamond class="h-3.5" />
                 </span>
               </div>
             </div>
           </div>
           <div class="px-6 mb-3 mt-5 text-gray-600 font-medium text-base">
-            General access:
+            {{__('General access')}}:
           </div>
           <div
             class="grid grid-flow-col-dense grid-cols-10 items-start justify-start mb-5 px-4 sm:px-6"
@@ -169,8 +169,8 @@
               <Autocomplete
                 v-model="generalAccess.access"
                 :options="[
-                  { label: 'Restricted', value: 'restricted' },
-                  { label: 'Public', value: 'public' },
+                  { label: __('Restricted'), value: 'restricted' },
+                  { label: __('Public'), value: 'public' },
                 ]"
                 :hideSearch="true"
                 @update:model-value="
@@ -195,10 +195,10 @@
                 v-if="generalAccess.access.value === 'public'"
                 class="float-right"
                 :options="[
-                  { value: 'read', label: 'Read' },
-                  { value: 'comment', label: 'Comment' },
-                  { value: 'share', label: 'Share' },
-                  { value: 'write', label: 'Write' },
+                  { value: 'read', label: __('Read') },
+                  { value: 'comment', label: __('Comment') },
+                  { value: 'share', label: __('Share') },
+                  { value: 'write', label: __('Write') },
                 ]"
                 v-model="generalAccess.type"
                 :multiple="true"
@@ -245,7 +245,7 @@
             <template #prefix>
               <Link />
             </template>
-            Get Link
+            {{__('Get Link')}}
           </Button>
         </div>
       </div>
@@ -279,14 +279,14 @@ const entity = computed(() => store.state.activeEntity)
 const showSettings = ref(false)
 const invalidAfter = ref()
 const generalAccess = ref({
-  access: { value: "restricted", label: "Restricted" },
-  type: [{ value: "read", label: "Read" }],
+  access: { value: "restricted", label: __("Restricted") },
+  type: [{ value: "read", label: __("Read") }],
 })
 const share = ref({
   name: "",
   access: [
-    { value: "read", label: "Read" },
-    { value: "comment", label: "Comment" },
+    { value: "read", label: __("Read") },
+    { value: "comment", label: __("Comment") },
   ],
 })
 const openDialog = computed({
@@ -300,14 +300,14 @@ const openDialog = computed({
 
 const accessMessage = computed(() => {
   if (generalAccess.value.access.value === "restricted")
-    return "Limited to people with access."
+    return __("Limited to people with access.")
   let modifiers = generalAccess.value.type.map((k) => k.value)
   let modifier =
     (modifiers.length === 1
       ? modifiers[0]
       : modifiers.slice(0, -1).join(", ") +
-        ` and ${modifiers[modifiers.length - 1]}`) + " this file."
-  return "Anyone on this planet can " + modifier
+        ` and ${modifiers[modifiers.length - 1]}`) + " " + __(" this file.")
+  return __("Anyone on this planet can") + " " + modifier
 })
 function addShare() {
   let r = {

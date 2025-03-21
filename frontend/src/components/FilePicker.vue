@@ -233,7 +233,7 @@ const open = computed({
 
 const tabs = [
   {
-    label: "Home",
+    label: __("Home"),
     icon: h(Home, { class: "w-4 h-4" }),
     component: NoFilesSection,
   },

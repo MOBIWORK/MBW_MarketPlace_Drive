@@ -8,53 +8,53 @@
             open ? 'bg-slate-100' : 'bg-white-200',
           ]"
         >
-          File
+          {{__('File')}}
         </button>
       </template>
     </Dropdown>
     <Dropdown
       :options="[
         {
-          group: 'New',
+          group: __('New'),
           hideLabel: true,
           items: [
             {
-              label: 'Undo',
-              handler: () => alert('New File'),
+              label: __('Undo'),
+              handler: () => alert(__('New File')),
             },
             {
-              label: 'Redo',
-              handler: () => alert('New Window'),
+              label: __('Redo'),
+              handler: () => alert(__('New Window')),
               // show/hide option based on condition function
               condition: () => true,
             },
             {
-              label: 'Cut',
-              handler: () => alert('New File'),
+              label: __('Cut'),
+              handler: () => alert(__('New File')),
             },
             {
-              label: 'Copy',
-              handler: () => alert('New Window'),
+              label: __('Copy'),
+              handler: () => alert(__('New Window')),
               // show/hide option based on condition function
               condition: () => true,
             },
             {
-              label: 'Paste',
-              handler: () => alert('New File'),
+              label: __('Paste'),
+              handler: () => alert(__('New File')),
             },
             {
-              label: 'Paste without Formatting',
-              handler: () => alert('New Window'),
+              label: __('Paste without Formatting'),
+              handler: () => alert(__('New Window')),
               // show/hide option based on condition function
               condition: () => true,
             },
             {
-              label: 'Select All',
-              handler: () => alert('New File'),
+              label: __('Select All'),
+              handler: () => alert(__('New File')),
             },
             {
-              label: 'Find and Replace',
-              handler: () => alert('New Window'),
+              label: __('Find and Replace'),
+              handler: () => alert(__('New Window')),
               // show/hide option based on condition function
               condition: () => true,
             },
@@ -69,35 +69,35 @@
             open ? 'bg-slate-100' : 'bg-white-200',
           ]"
         >
-          Edit
+          {{__('Edit')}}
         </button>
       </template>
     </Dropdown>
     <Dropdown
       :options="[
         {
-          group: 'New',
+          group: __('New'),
           hideLabel: true,
           items: [
             {
-              label: 'Mode',
-              handler: () => alert('New File'),
+              label: __('Mode'),
+              handler: () => alert(__('New File')),
             },
             {
-              label: 'Text Width',
-              handler: () => alert('New Window'),
+              label: __('Text Width'),
+              handler: () => alert(__('New Window')),
               // show/hide option based on condition function
               condition: () => true,
             },
             {
-              label: 'Focus Mode',
-              handler: () => alert('New Window'),
+              label: __('Focus Mode'),
+              handler: () => alert(__('New Window')),
               // show/hide option based on condition function
               condition: () => true,
             },
             {
-              label: 'Full screen',
-              handler: () => alert('New Window'),
+              label: __('Full screen'),
+              handler: () => alert(__('New Window')),
               // show/hide option based on condition function
               condition: () => true,
             },
@@ -112,43 +112,43 @@
             open ? 'bg-slate-100' : 'bg-white-200',
           ]"
         >
-          View
+          {{__('View')}}
         </button>
       </template>
     </Dropdown>
     <Dropdown
       :options="[
         {
-          group: 'Insert',
+          group: __('Insert'),
           hideLabel: true,
           items: [
             {
-              label: 'Image',
-              handler: () => alert('New File'),
+              label: __('Image'),
+              handler: () => alert(__('New File')),
             },
             {
-              label: 'Video',
-              handler: () => alert('New File'),
+              label: __('Video'),
+              handler: () => alert(__('New File')),
             },
             {
-              label: 'Table',
-              handler: () => alert('New File'),
+              label: __('Table'),
+              handler: () => alert(__('New File')),
             },
             {
-              label: 'Link',
-              handler: () => alert('New File'),
+              label: __('Link'),
+              handler: () => alert(__('New File')),
             },
             {
-              label: 'Horizontal Line',
-              handler: () => alert('New File'),
+              label: __('Horizontal Line'),
+              handler: () => alert(__('New File')),
             },
             {
-              label: 'Emoji',
-              handler: () => alert('New File'),
+              label: __('Emoji'),
+              handler: () => alert(__('New File')),
             },
             {
-              label: 'Blockquote',
-              handler: () => alert('New File'),
+              label: __('Blockquote'),
+              handler: () => alert(__('New File')),
             },
           ],
         },
@@ -161,43 +161,43 @@
             open ? 'bg-slate-100' : 'bg-white-200',
           ]"
         >
-          Insert
+          {{__('Insert')}}
         </button>
       </template>
     </Dropdown>
     <Dropdown
       :options="[
         {
-          group: 'New',
+          group: __('New'),
           hideLabel: true,
           items: [
             {
-              label: 'Text',
-              handler: () => alert('New File'),
+              label: __('Text'),
+              handler: () => alert(__('New File')),
             },
             {
-              label: 'Style',
-              handler: () => alert('New File'),
+              label: __('Style'),
+              handler: () => alert(__('New File')),
             },
             {
-              label: 'Alignment',
-              handler: () => alert('New File'),
+              label: __('Alignment'),
+              handler: () => alert(__('New File')),
             },
             {
-              label: 'Line Height',
-              handler: () => alert('New File'),
+              label: __('Line Height'),
+              handler: () => alert(__('New File')),
             },
             {
-              label: 'Horizontal Line',
-              handler: () => alert('New File'),
+              label: __('Horizontal Line'),
+              handler: () => alert(__('New File')),
             },
             {
-              label: 'List and Numbering',
-              handler: () => alert('New File'),
+              label: __('List and Numbering'),
+              handler: () => alert(__('New File')),
             },
             {
-              label: 'Table',
-              handler: () => alert('New File'),
+              label: __('Table'),
+              handler: () => alert(__('New File')),
             },
           ],
         },
@@ -210,7 +210,7 @@
             open ? 'bg-slate-100' : 'bg-white-200',
           ]"
         >
-          Format
+          {{__('Format')}}
         </button>
       </template>
     </Dropdown>
@@ -290,7 +290,7 @@ export default {
           ],
         }, */
         {
-          group: "Current File",
+          group: __("Current File"),
           hideLabel: true,
           items: [
             /* Look into making a modal/dialog/portal for this and opening a file from the current file view*/
@@ -305,23 +305,23 @@ export default {
             }, */
             {
               icon: "share-2",
-              label: "Share File",
+              label: __("Share File"),
               handler: () => (this.showShareDialog = true),
             },
             {
               icon: "star",
-              label: "Add to favourites",
-              handler: () => alert("Open File"),
+              label: __("Add to favourites"),
+              handler: () => alert(__("Open File")),
             },
           ],
         },
         {
-          group: "Delete",
+          group: __("Delete"),
           hideLabel: true,
           items: [
             {
               icon: "trash-2",
-              label: "Delete File",
+              label: __("Delete File"),
               handler: () => (this.showRemoveDialog = true),
             },
           ],
@@ -329,26 +329,26 @@ export default {
       ],
       modeMenuOptions: [
         {
-          group: "Mode",
+          group: __("Mode"),
           hideLabel: true,
           items: [
             {
               icon: "eye",
-              label: "Reading",
+              label: __("Reading"),
               handler: () => {
                 this.emitter.emit("toggleReadMode")
               },
             },
             {
               icon: "edit-3",
-              label: "Editing",
+              label: __("Editing"),
               handler: () => {
                 this.emitter.emit("toggleEditMode")
               },
             },
             {
               icon: "message-square",
-              label: "Suggesting",
+              label: __("Suggesting"),
               handler: () => {
                 this.emitter.emit("toggleCommentMode")
               },
@@ -362,13 +362,13 @@ export default {
     modeButtonText() {
       if (this.editable) {
         this.modeButtonIcon = "edit-3"
-        return "Editing"
+        return __("Editing")
       } else if (this.isReadOnly) {
         this.modeButtonIcon = "eye"
-        return "Reading"
+        return __("Reading")
       } else if (this.isCommentModeOn) {
         this.modeButtonIcon = "message-square"
-        return "Suggesting"
+        return __("Suggesting")
       }
     },
   },

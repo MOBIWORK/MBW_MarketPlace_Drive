@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-center mb-4">
-    <h1 class="font-semibold">Users</h1>
+    <h1 class="font-semibold">{{__('Users')}}</h1>
     <Button
       v-if="isAdmin?.data"
       variant="solid"
@@ -12,7 +12,7 @@
         }
       "
     >
-      Invite
+      {{__('Invite')}}
     </Button>
   </div>
   <div class="flex flex-col items-stretch justify-start overflow-y-auto">
@@ -36,14 +36,14 @@
           class="ml-auto text-base text-gray-600"
         >
           <Button variant="ghost" @click="selectedUser = user"
-            >{{ user.role == "admin" ? "Manager" : "User" }}
+            >{{ user.role == "admin" ? __("Manager") : __("User") }}
             <template #suffix>
               <ChevronDown :class="{ '[transform:rotateX(180deg)]': open }" />
             </template>
           </Button>
         </Dropdown>
         <span v-else class="ml-auto text-base text-gray-600">{{
-          user.role == "admin" ? "Manager" : "User"
+          user.role == "admin" ? __("Manager") : __("User")
         }}</span>
       </div>
     </div>
@@ -53,16 +53,16 @@
     class="h-1/2 w-full flex flex-col items-center justify-center my-auto"
   >
     <FeatherIcon class="h-8 stroke-1 text-gray-600" name="users" />
-    <span class="text-gray-800 text-sm mt-2">No Users</span>
+    <span class="text-gray-800 text-sm mt-2">{{__('No Users')}}</span>
   </div>
   <Dialog
     v-model="showInvite"
     :options="{
-      title: 'Invite people to ' + getTeams.data[team].title,
+      title: __('Invite people to') + ' ' + getTeams.data[team].title,
       size: 'lg',
       actions: [
         {
-          label: 'Send Invitation',
+          label: __('Send Invitation'),
           variant: 'solid',
           disabled: !emailTest().length && !invited.length,
           loading: inviteUsers.loading,
@@ -101,7 +101,7 @@
               v-model="emailInput"
               type="text"
               autocomplete="off"
-              placeholder="Enter email address"
+              :placeholder="__('Enter email address')"
               class="h-7 w-full rounded border-none bg-gray-100 py-1.5 pl-2 pr-2 text-base text-gray-800 placeholder-gray-500 transition-colors focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
               @keydown="isValidEmail"
               @keydown.enter.capture.stop="extractEmails"
@@ -116,15 +116,15 @@
     v-if="showRemove"
     v-model="showRemove"
     :options="{
-      title: 'Are you sure?',
+      title: __('Are you sure?'),
       size: 'md',
-      message: `Removing ${selectedUser.full_name} will completely revoke their access to your team. You can always add them back using the same email ID.`,
+      message: `${__('Removing')} ${selectedUser.full_name} ${__('will completely revoke their access to your team. You can always add them back using the same email ID')}.`,
       actions: [
         {
           variant: 'solid',
           theme: 'red',
           label:
-            'I confirm that I want to remove ' + selectedUser.full_name + '.',
+            __('I confirm that I want to remove') + ' ' + selectedUser.full_name + '.',
           loading: removeUser.loading,
           onClick: () => {
             removeUser.submit({
@@ -167,7 +167,7 @@ const showRemove = ref(false)
 
 const roleOptions = [
   {
-    label: "Manager",
+    label: __("Manager"),
     onClick: () => {
       selectedUser.value.role = "admin"
       updateUserRole.submit({
@@ -178,7 +178,7 @@ const roleOptions = [
     },
   },
   {
-    label: "User",
+    label: __("User"),
     onClick: () => {
       selectedUser.value.role = "user"
       updateUserRole.submit({
@@ -189,7 +189,7 @@ const roleOptions = [
     },
   },
   {
-    label: "Remove",
+    label: __("Remove"),
     class: "text-red-500",
     component: () =>
       h(
@@ -200,7 +200,7 @@ const roleOptions = [
           ],
           onClick: () => (showRemove.value = true),
         },
-        "Remove"
+        __("Remove")
       ),
   },
 ]

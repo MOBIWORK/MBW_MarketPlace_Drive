@@ -5,11 +5,11 @@
     @click="handleClick"
   >
     <div
-      class="flex w-full items-center justify-between duration-300 ease-in-out p-2"
+      class="flex w-full items-center justify-between duration-300 ease-in-out p-2 whitespace-nowrap"
     >
       <div class="flex items-center">
         <Tooltip
-          :text="label"
+          :text="__(label)"
           placement="right"
           arrow-class="fill-gray-900"
           :disabled="!isCollapsed"
@@ -34,7 +34,7 @@
               : 'ml-2 w-auto opacity-100'
           "
         >
-          {{ label }}
+          {{ __(label) }}
         </span>
       </div>
       <slot name="right" />

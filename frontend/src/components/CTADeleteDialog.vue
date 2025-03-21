@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model="open" :options="{ title: 'Are you sure?', size: 'sm' }">
+  <Dialog v-model="open" :options="{ title: __('Are you sure?'), size: 'sm' }">
     <template #body-content>
       <p class="text-gray-600">
         {{ current.message }}
@@ -48,22 +48,22 @@ const route = useRoute()
 const dialogConfigs = [
   {
     route: "Recents",
-    message: "All your recently viewed files will be cleared.",
-    buttonText: "Clear",
+    message: __("All your recently viewed files will be cleared."),
+    buttonText: __("Clear"),
     resource: clearRecent,
   },
   {
     route: "Favourites",
-    message: "All your favourite items will be cleared.",
-    buttonText: "Clear",
+    message: __("All your favourite items will be cleared."),
+    buttonText: __("Clear"),
     resource: toggleFav,
   },
   {
     route: "Trash",
     message:
-      "All items in your Trash will be deleted forever. This is an irreversible process.",
+      __("All items in your Trash will be deleted forever. This is an irreversible process."),
     buttonVariant: "solid",
-    buttonText: "Delete",
+    buttonText: __("Delete"),
     resource: clearTrash,
   },
 ]

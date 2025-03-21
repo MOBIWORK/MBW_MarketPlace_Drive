@@ -70,11 +70,11 @@ export default {
             highlight: () => {},
           }, */
         {
-          label: "Home",
+          label: __("Home"),
           route: "/home",
           icon: "home",
           highlight: () => {
-            return this.$store.state.breadcrumbs[0].label === "Home"
+            return this.$store.state.breadcrumbs[0].label === __("Home")
           },
         },
         {

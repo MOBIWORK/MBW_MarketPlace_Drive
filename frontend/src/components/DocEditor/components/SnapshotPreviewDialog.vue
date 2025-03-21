@@ -8,14 +8,14 @@
           </h3>
           <div class="flex items-center justify-start mt-1 mb-4">
             <span class="text-gray-700 text-sm"
-              >Created on {{ snapshotData.creation }} by
+              >{{__('Created on')}} {{ snapshotData.creation }} {{__('by')}}
               {{ snapshotData.owner }}</span
             >
             <div
               class="ml-auto flex items-center justify-end rounded cursor-pointer hover:bg-gray-200 pl-2 pr-1 py-1.5"
             >
               <span class="font-medium text-gray-800 text-sm mr-2"
-                >Highlight changes</span
+                >{{__('Highlight changes')}}</span
               >
               <Switch v-model="showChanges" />
             </div>
@@ -37,7 +37,7 @@
         </div>
         <div class="flex">
           <Button class="ml-auto" :variant="'solid'" @click="applySnapshot"
-            >Restore</Button
+            >{{__('Restore')}}</Button
           >
         </div>
       </div>

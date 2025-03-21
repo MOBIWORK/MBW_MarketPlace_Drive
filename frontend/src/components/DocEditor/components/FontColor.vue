@@ -7,7 +7,7 @@
     </template>
     <template #body-main>
       <div class="p-2">
-        <div class="text-sm text-gray-700">Text Color</div>
+        <div class="text-sm text-gray-700">{{__('Text Color')}}</div>
         <div class="mt-1 grid grid-cols-8 gap-1">
           <Tooltip
             v-for="color in foregroundColors"
@@ -27,7 +27,7 @@
             </button>
           </Tooltip>
         </div>
-        <div class="mt-2 text-sm text-gray-700">Background Color</div>
+        <div class="mt-2 text-sm text-gray-700">{{__('Background Color')}}</div>
         <div class="mt-1 grid grid-cols-8 gap-1">
           <Tooltip
             v-for="color in backgroundColors"

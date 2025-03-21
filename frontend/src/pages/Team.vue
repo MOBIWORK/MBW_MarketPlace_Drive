@@ -2,8 +2,8 @@
   <GenericPage
     :get-entities="getHome"
     :icon="Home"
-    :primary-message="'Home is empty'"
-    :secondary-message="'Add files by dropping them here'"
+    :primary-message="__('Home is empty')"
+    :secondary-message="__('Add files by dropping them here')"
   />
 </template>
 

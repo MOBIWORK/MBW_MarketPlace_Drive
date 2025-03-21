@@ -46,7 +46,7 @@
             v-if="$route.name === 'Shared'"
             class="font-medium text-base leading-none"
           >
-            Shared
+            {{__('Shared')}}
           </div>
         </div>
         <div
@@ -119,12 +119,12 @@ const settingsItems = computed(() => {
         },
         {
           icon: Docs,
-          label: "Documentation",
+          label: __("Documentation"),
           onClick: () => window.open("https://docs.frappe.io/drive", "_blank"),
         },
         {
           icon: "life-buoy",
-          label: "Support",
+          label: __("Support"),
           onClick: () => window.open("https://t.me/frappedrive", "_blank"),
         },
       ],
@@ -135,12 +135,12 @@ const settingsItems = computed(() => {
       items: [
         {
           icon: "settings",
-          label: "Settings",
+          label: __("Settings"),
           onClick: () => (showSettings.value = true),
         },
         {
           icon: "log-out",
-          label: "Log out",
+          label: __("Log out"),
           onClick: logout,
         },
       ],

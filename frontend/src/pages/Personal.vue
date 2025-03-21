@@ -2,7 +2,7 @@
   <GenericPage
     :getEntities="getPersonal"
     :icon="Home"
-    :primaryMessage="'No personal files'"
+    :primaryMessage="__('No personal files')"
     :secondaryMessage="''"
   />
 </template>

@@ -2,7 +2,7 @@
   <GenericPage
     :getEntities="getShared"
     :icon="Users"
-    :primaryMessage="'No Shared Files'"
+    :primaryMessage="__('No Shared Files')"
   />
 </template>
 

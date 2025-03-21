@@ -19,7 +19,7 @@
         @keydown="createLink.error = null"
       />
       <div v-if="createLink.error" class="pt-4 text-base font-sm text-red-500">
-        This file already exists.
+        {{__('This file already exists.')}}
       </div>
       <div class="flex" :class="createLink.error ? 'mt-5' : 'mt-8'">
         <Button
@@ -28,7 +28,7 @@
           :loading="createLink.loading"
           @click="createLink.submit"
         >
-          Create
+          {{__('Create')}}
         </Button>
       </div>
     </template>
@@ -64,7 +64,7 @@ const createLink = createResource({
   },
   validate(params) {
     if (!params?.title) {
-      return "Folder name is required"
+      return __("Folder name is required")
     }
   },
   onSuccess(data) {

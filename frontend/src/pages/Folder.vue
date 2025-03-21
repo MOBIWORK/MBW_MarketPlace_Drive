@@ -33,7 +33,7 @@ getFolderContents.reset()
 getFolderContents.update({
   params: {
     entity_name: props.entityName,
-    personal: store.state.breadcrumbs[0].label === "Home" ? 1 : 0,
+    personal: store.state.breadcrumbs[0].label === __("Home") ? 1 : 0,
   },
   cache: ["folder", props.entityName],
 })
