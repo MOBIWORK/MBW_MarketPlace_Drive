@@ -46,7 +46,7 @@
             v-if="$route.name === 'Shared'"
             class="font-medium text-base leading-none"
           >
-            {{__('Shared')}}
+            {{ __("Shared") }}
           </div>
         </div>
         <div
@@ -82,9 +82,11 @@ import AppSwitcher from "@/components/AppSwitcher.vue"
 import TeamSwitcher from "@/components/TeamSwitcher.vue"
 import { getTeams } from "@/resources/files"
 import emitter from "@/emitter"
-import { ref, computed } from "vue"
+import { ref, computed, watch } from "vue"
 import { useStore } from "vuex"
 import { useRouter, useRoute } from "vue-router"
+import { showLanguage } from "@/composables/language.js"
+import { transformLanguage } from "@/translation.js"
 
 const route = useRoute()
 const router = useRouter()
@@ -105,8 +107,10 @@ const teamName = computed(() => {
 })
 const fullName = computed(() => store.state.user.fullName)
 
-const settingsItems = computed(() => {
-  return [
+const settingsItems = ref([])
+
+const setDropdown = () => {
+  settingsItems.value = [
     {
       group: "Manage",
       hideLabel: true,
@@ -116,6 +120,11 @@ const settingsItems = computed(() => {
         },
         {
           component: markRaw(AppSwitcher),
+        },
+        {
+          icon: "globe",
+          label: __("Language"),
+          onClick: () => (showLanguage.value = true),
         },
         {
           icon: Docs,
@@ -146,6 +155,58 @@ const settingsItems = computed(() => {
       ],
     },
   ]
+}
+
+// const settingsItems = computed(() => {
+//   return [
+//     {
+//       group: "Manage",
+//       hideLabel: true,
+//       items: [
+//         {
+//           component: markRaw(TeamSwitcher),
+//         },
+//         {
+//           component: markRaw(AppSwitcher),
+//         },
+//         {
+//           icon: "globe",
+//           label: __("Language"),
+//           onClick: () => (showLanguage.value = true),
+//         },
+//         {
+//           icon: Docs,
+//           label: __("Documentation"),
+//           onClick: () => window.open("https://docs.frappe.io/drive", "_blank"),
+//         },
+//         {
+//           icon: "life-buoy",
+//           label: __("Support"),
+//           onClick: () => window.open("https://t.me/frappedrive", "_blank"),
+//         },
+//       ],
+//     },
+//     {
+//       group: "Others",
+//       hideLabel: true,
+//       items: [
+//         {
+//           icon: "settings",
+//           label: __("Settings"),
+//           onClick: () => (showSettings.value = true),
+//         },
+//         {
+//           icon: "log-out",
+//           label: __("Log out"),
+//           onClick: logout,
+//         },
+//       ],
+//     },
+//   ]
+// })
+
+watch(transformLanguage, (val) => {
+  setDropdown()
 })
 
 emitter.on("showSettings", (val) => {

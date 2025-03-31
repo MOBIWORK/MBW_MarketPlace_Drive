@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe import _
 from frappe.model.document import Document
 from frappe.model.document import Document
 from frappe.utils import (
@@ -10,6 +11,7 @@ from frappe.utils import (
     now,
     validate_email_address,
 )
+from drive.api.language import get_language
 
 EXPIRY_DAYS = 1
 
@@ -25,10 +27,17 @@ class DriveUserInvitation(Document):
         self.invite_via_email()
 
     def invite_via_email(self):
+        lang = get_language()
+        lang = lang if lang in ['vi', 'en'] else 'vi'
+
+        title = 'Frappe Drive'
+        subject = _("{0} - Invitation").format(title)
+        template = f"{lang}_" + "drive_invitation"
+
         frappe.sendmail(
             recipients=self.email,
-            subject=f"Frappe Drive - Invitation",
-            template="drive_invitation",
+            subject=subject,
+            template=template,
             args={
                 "invite_link": frappe.utils.get_url(
                     f"/api/method/drive.utils.users.accept_invitation?key={self.name}"

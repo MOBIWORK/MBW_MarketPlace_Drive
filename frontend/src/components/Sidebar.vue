@@ -11,7 +11,7 @@
       ondrop="return false;"
     >
       <SidebarItem
-        :label="('Search')"
+        label="Search"
         class="mb-0.5"
         :is-collapsed="!isExpanded"
         @click="() => emitter.emit('showSearchPopup', true)"
@@ -31,7 +31,7 @@
         </template>
       </SidebarItem>
       <SidebarItem
-        :label="('Notifications')"
+        label="Notifications"
         icon="inbox"
         class="mb-0.5"
         :is-collapsed="!isExpanded"
@@ -61,7 +61,7 @@
     <div class="mt-auto">
       <StorageBar :is-expanded="isExpanded" />
       <SidebarItem
-        :label="!isExpanded ? __('Expand') : __('Collapse')"
+        :label="!isExpanded ? 'Expand' : 'Collapse'"
         :is-collapsed="!isExpanded"
         class="mt-auto py-4"
         @click="toggleExpanded"
@@ -76,10 +76,12 @@
         </template>
       </SidebarItem>
     </div>
+    <ChangeLanguageDialog />
   </div>
 </template>
 <script setup>
 import PrimaryDropDown from "./PrimaryDropdown.vue"
+import ChangeLanguageDialog from "@/components/Settings/ChangeLanguageDialog.vue"
 import { ArrowLeftFromLine } from "lucide-vue-next"
 import Search from "./EspressoIcons/Search.vue"
 import Recent from "./EspressoIcons/Recent.vue"
@@ -90,7 +92,7 @@ import SidebarItem from "@/components/SidebarItem.vue"
 import Team from "./EspressoIcons/Organization.vue"
 import StorageBar from "./StorageBar.vue"
 import { notifCount } from "@/resources/permissions"
-import { computed, onMounted } from "vue"
+import { computed } from "vue"
 import { useStore } from "vuex"
 import Users from "./EspressoIcons/Users.vue"
 import { getTeams } from "@/resources/files"
@@ -104,47 +106,36 @@ const team = localStorage.getItem("recentTeam") || getTeams.data[0]
 
 const sidebarItems = [
   {
-    label: __('Home'),
+    label: "Home",
     route: `/${team}/`,
     icon: Home,
   },
   {
-    label: __('Team'),
+    label: "Team",
     route: `/${team}/team`,
     icon: Team,
   },
   {
-    label: __('Recents'),
+    label: "Recents",
     route: `/${team}/recents`,
     icon: Recent,
   },
   {
-    label: __('Favourites'),
+    label: "Favourites",
     route: `/${team}/favourites`,
     icon: Star,
   },
   {
-    label: __('Share'),
+    label: "Share",
     route: `/shared/`,
     icon: Users,
   },
   {
-    label: __('Trash'),
+    label: "Trash",
     route: `/${team}/trash`,
     icon: Trash,
   },
 ]
-
-function toggleSidebar() {
-  store.commit('setIsSidebarExpanded', false);
-  setTimeout(() => {
-    store.commit('setIsSidebarExpanded', true);
-  }, 300);
-}
-
-onMounted(() => {
-  toggleSidebar();
-});
 
 const toggleExpanded = () =>
   store.commit("setIsSidebarExpanded", isExpanded.value ? false : true)

@@ -1,4 +1,8 @@
-import { createResource } from 'frappe-ui'
+import { createResource } from "frappe-ui"
+import { defaultLanguage } from "./composables/language"
+import { ref } from "vue"
+
+export const transformLanguage = ref(false)
 
 export default function translationPlugin(app) {
   app.config.globalProperties.__ = translate
@@ -8,13 +12,13 @@ export default function translationPlugin(app) {
 
 function format(message, replace) {
   return message.replace(/{(\d+)}/g, function (match, number) {
-    return typeof replace[number] != 'undefined' ? replace[number] : match
+    return typeof replace[number] != "undefined" ? replace[number] : match
   })
 }
 
 function translate(message, replace, context = null) {
   let translatedMessages = window.translatedMessages || {}
-  let translatedMessage = ''
+  let translatedMessage = ""
 
   if (context) {
     let key = `${message}:${context}`
@@ -36,12 +40,15 @@ function translate(message, replace, context = null) {
 }
 
 function fetchTranslations(lang) {
+  let language = lang || defaultLanguage.value || "vi"
   createResource({
-    url: 'drive.api.get_translations',
-    cache: 'translations',
+    url: "drive.api.get_translations",
+    params: { lang: language },
+    cache: `${language}_` + "translations",
     auto: true,
     transform: (data) => {
       window.translatedMessages = data
+      transformLanguage.value = !transformLanguage.value
     },
   })
 }
