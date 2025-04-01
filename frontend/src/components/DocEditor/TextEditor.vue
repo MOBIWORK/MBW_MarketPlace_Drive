@@ -588,14 +588,14 @@ export default {
       const { author, author_image, author_id } = data
       if (author_id === this.$realtime.socket.id) {
         toast({
-          title: "You changed the document version",
+          title: __("You changed the document version"),
           position: "bottom-right",
           timeout: 2,
         })
         return
       }
       toast({
-        title: `Document version changed`,
+        title: `${__('Document version changed')}`,
         position: "bottom-right",
         avatarURL: author_image,
         avatarLabel: author,
@@ -678,7 +678,7 @@ export default {
         }
       } else {
         toast({
-          title: "Not a valid DOCX file!",
+          title: __("Not a valid DOCX file!"),
           position: "bottom-right",
           icon: "alert-triangle",
           iconClasses: "text-red-500",
@@ -698,7 +698,7 @@ export default {
         this.$emit("saveDocument")
       }
       toast({
-        title: "Document saved",
+        title: __("Document saved"),
       })
     },
     printHtml() {

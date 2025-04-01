@@ -415,11 +415,11 @@ async function newLink() {
     new URL(text); // Kiểm tra xem text có phải URL hợp lệ không
     localStorage.setItem("prevClip", text);
     toast({
-      title: "Link detected",
+      title: __("Link detected"),
       text,
       buttons: [
         {
-          label: "Add",
+          label: __("Add"),
           action: () => {
             dialog.value = "l";
             link.value = text;

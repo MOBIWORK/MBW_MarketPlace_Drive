@@ -30,12 +30,12 @@ const optionsLanguage = ref([
   {
     label: __("Vietnamese"),
     value: "vi",
-    image: "/assets/gameplan/images/icon_flag_vi.svg",
+    image: "/assets/drive/images/icon_flag_vi.svg",
   },
   {
     label: __("English"),
     value: "en",
-    image: "/assets/gameplan/images/icon_flag_en.svg",
+    image: "/assets/drive/images/icon_flag_en.svg",
   },
 ])
 const single = ref()

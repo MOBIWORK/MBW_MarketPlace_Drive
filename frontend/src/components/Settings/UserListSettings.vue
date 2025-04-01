@@ -229,7 +229,7 @@ const inviteUsers = createResource({
   url: "drive.utils.users.invite_users",
   onSuccess: () => {
     showInvite.value = false
-    toast("Invite sent!")
+    toast(__("Invite sent!"))
   },
 })
 const removeUser = createResource({
