@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model="open" :options="{ title: 'Edit Tag', size: 'sm' }">
+  <Dialog v-model="open" :options="{ title: __('Edit Tag'), size: 'sm' }">
     <template #body-content>
       <div class="flex flex-col items-stretch justify- gap-y-4">
         <TagColorInput
@@ -13,7 +13,7 @@
           type="text"
           clas="w-full"
           :placeholder="props.tag.title"
-          label="Title"
+          :label="__('Title')"
           @keyup.enter="submitTag"
         />
       </div>
@@ -21,7 +21,7 @@
     </template>
     <template #actions>
       <Button variant="solid" class="w-full" @click="submitTag">
-        Confirm
+        {{__('Confirm')}}
       </Button>
     </template>
   </Dialog>

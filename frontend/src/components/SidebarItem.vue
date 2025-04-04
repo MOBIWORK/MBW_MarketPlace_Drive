@@ -9,7 +9,7 @@
     >
       <div class="flex items-center">
         <Tooltip
-          :text="label"
+          :text="labelItem"
           placement="right"
           arrow-class="fill-gray-900"
           :disabled="!isCollapsed"
@@ -34,7 +34,7 @@
               : 'ml-2 w-auto opacity-100',
           ]"
         >
-          {{ label }}
+          {{ labelItem }}
         </span>
       </div>
       <slot name="right" />
@@ -44,9 +44,10 @@
 
 <script setup>
 import { Tooltip, FeatherIcon } from "frappe-ui"
-import { computed } from "vue"
+import { computed, watch, ref } from "vue"
 import { useStore } from "vuex"
 import { useRouter } from "vue-router"
+import { transformLanguage } from "@/translation.js"
 
 const router = useRouter()
 const store = useStore()
@@ -68,6 +69,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+})
+
+const labelItem = ref("")
+
+watch(transformLanguage, (val) => {
+  labelItem.value = __(props.label)
 })
 
 function handleClick() {

@@ -19,7 +19,7 @@ export function getLink(entity, copy = true) {
 
   if (!copy) return link
   try {
-    copyToClipboard(link).then(() => toast("Copied link"))
+    copyToClipboard(link).then(() => toast(__("Copied link")))
   } catch (err) {
     if (err.name === "NotAllowedError") {
       toast({

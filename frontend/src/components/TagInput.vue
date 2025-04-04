@@ -20,9 +20,9 @@
               v-if="!entityTags.data?.length"
               class="text-gray-700 text-base"
             >
-              This file has no tags
+              {{__('This file has no tags')}}
             </span>
-            <Button class="ml-auto" @click="togglePopover()">Manage</Button>
+            <Button class="ml-auto" @click="togglePopover()">{{__('Manage')}}</Button>
           </div>
         </slot>
       </template>
@@ -92,7 +92,7 @@
             <span
               v-else
               class="rounded-md px-2.5 py-1.5 text-base text-gray-600"
-              >No tags found</span
+              >{{__('No tags found')}}</span
             >
           </div>
           <div class="flex items-center justify-end border-t p-1">
@@ -107,13 +107,13 @@
                   })
               "
             >
-              Create tag "{{ tagInputText }}"
+              {{__('Create tag')}} "{{ tagInputText }}"
             </Button>
             <Button
               class="px-2 py-1.5 hover:bg-gray-100 rounded cursor-pointer"
               @click="removeTag.submit()"
             >
-              Clear all
+              {{__('Clear all')}}
             </Button>
           </div>
         </div>

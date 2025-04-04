@@ -10,7 +10,7 @@
       <PopoverButton
         class="flex gap-1 px-2 focus:outline-none bg-gray-100 rounded h-7 items-center text-base"
       >
-        Manage
+        {{__('Manage')}}
         <span class="hidden">{{
           open ? disableScroll.on() : disableScroll.off()
         }}</span>
@@ -32,7 +32,7 @@
                   close()
               "
             >
-              Can {{ access }}
+              {{__('Can')}} {{ access }}
               <Check v-if="accessObj[access]" class="h-3" />
             </li>
             <li
@@ -40,7 +40,7 @@
               class="flex items-center justify-between px-1 text-base line-clamp-1 py-1 gap-x-0.5 hover:bg-gray-100 w-full rounded-[6px] cursor-pointer text-red-500"
               @click="$emit('removeAccess'), close()"
             >
-              Remove
+              {{__('Remove')}}
             </li>
           </ul>
         </div>

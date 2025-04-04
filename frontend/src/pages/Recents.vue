@@ -5,7 +5,7 @@
     :get-entities="getRecents"
     :show-sort="false"
     :icon="Recent"
-    primary-message="No recent files"
+    :primary-message="__('No Recent Files')"
   />
 </template>
 

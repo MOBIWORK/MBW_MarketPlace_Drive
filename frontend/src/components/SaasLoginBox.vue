@@ -56,7 +56,7 @@ export default {
 
     if (params.get("showRemoteLoginError")) {
       toast({
-        title: "Token Invalid or Expired",
+        title: __("Token Invalid or Expired"),
         color: "red",
         icon: "x",
       })

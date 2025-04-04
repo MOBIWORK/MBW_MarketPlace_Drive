@@ -12,7 +12,7 @@
     >
       <SidebarItem
         label="Search"
-        class="mb-1"
+        class="mb-1 whitespace-nowrap"
         :is-collapsed="!isExpanded"
         @click="() => emitter.emit('showSearchPopup', true)"
       >
@@ -81,10 +81,12 @@
         </template>
       </SidebarItem>
     </div>
+    <ChangeLanguageDialog />
   </div>
 </template>
 <script setup>
 import PrimaryDropDown from "./PrimaryDropdown.vue"
+import ChangeLanguageDialog from "@/components/Settings/ChangeLanguageDialog.vue"
 import { ArrowLeftFromLine } from "lucide-vue-next"
 import Search from "./EspressoIcons/Search.vue"
 import Recent from "./EspressoIcons/Recent.vue"

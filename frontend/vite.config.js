@@ -24,6 +24,7 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "src"),
       "tailwind.config.js": path.resolve(__dirname, "tailwind.config.js"),
+      "highlight.js/lib/core": path.resolve(__dirname, "highlight-fix.js"),
     },
   },
   build: {

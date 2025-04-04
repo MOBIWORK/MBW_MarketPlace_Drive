@@ -3,7 +3,7 @@
     :verify="currentFolder"
     :get-entities="getFolderContents"
     :icon="Folder"
-    :primary-message="'Folder is Empty'"
+    :primary-message="__('Folder is Empty')"
   />
 </template>
 

@@ -10,7 +10,7 @@
     <div v-if="entity" class="w-full border-b px-5 py-4">
       <div class="flex items-center">
         <div class="font-medium truncate text-lg">
-          {{ entity.title }}
+          {{ __(entity.title) }}
         </div>
       </div>
     </div>
@@ -20,11 +20,11 @@
         <span
           class="inline-flex items-center gap-2.5 mb-5 text-gray-800 font-medium text-lg w-full"
         >
-          Information
+          {{__('Information')}}
         </span>
         <div class="space-y-6.5 h-full flex-auto flex flex-col z-0">
           <div v-if="entity.owner === 'You'">
-            <div class="text-base font-medium mb-4">Access</div>
+            <div class="text-base font-medium mb-4">{{__('Access')}}</div>
             <div class="flex items-center justify-start">
               <Avatar
                 size="md"
@@ -62,36 +62,36 @@
           <div
             v-if="$resources.entityTags.data?.length || entity.owner === 'You'"
           >
-            <div class="text-base font-medium mb-4">Tags</div>
+            <div class="text-base font-medium mb-4">{{__('Tags')}}</div>
             <TagInput class="min-w-full" :entity="entity" />
           </div>
           <div>
-            <div class="text-base font-medium mb-4">Properties</div>
+            <div class="text-base font-medium mb-4">{{__('Properties')}}</div>
             <div class="text-base grid grid-flow-row grid-cols-2 gap-y-3">
-              <span class="col-span-1 text-gray-600">Type</span>
-              <span class="col-span-1">Frappe Doc</span>
-              <span class="col-span-1 text-gray-600">Size</span>
+              <span class="col-span-1 text-gray-600">{{__('Type')}}</span>
+              <span class="col-span-1">{{__('Frappe Doc')}}</span>
+              <span class="col-span-1 text-gray-600">{{__('Size')}}</span>
               <span class="col-span-1">{{ entity.file_size }}</span>
-              <span class="col-span-1 text-gray-600">Modified</span>
+              <span class="col-span-1 text-gray-600">{{__('Modified')}}</span>
               <span class="col-span-1">{{ entity.modified }}</span>
-              <span class="col-span-1 text-gray-600">Created</span>
+              <span class="col-span-1 text-gray-600">{{__('Created')}}</span>
               <span class="col-span-1">{{ entity.creation }}</span>
-              <span class="col-span-1 text-gray-600">Owner</span>
+              <span class="col-span-1 text-gray-600">{{__('Owner')}}</span>
               <span class="col-span-1">{{ entity.full_name }}</span>
             </div>
           </div>
           <div>
-            <div class="text-base font-medium mb-4">Stats</div>
+            <div class="text-base font-medium mb-4">{{__('Stats')}}</div>
             <div class="text-base grid grid-flow-row grid-cols-2 gap-y-3">
-              <span class="col-span-1 text-gray-600">Words</span>
+              <span class="col-span-1 text-gray-600">{{__('Words')}}</span>
               <span class="col-span-1">
                 {{ editor.storage.characterCount.words() }}
               </span>
-              <span class="col-span-1 text-gray-600">Characters</span>
+              <span class="col-span-1 text-gray-600">{{__('Characters')}}</span>
               <span class="col-span-1">
                 {{ editor.storage.characterCount.characters() }}
               </span>
-              <span class="col-span-1 text-gray-600">Reading Time</span>
+              <span class="col-span-1 text-gray-600">{{__('Reading Time')}}</span>
               <span class="col-span-1">
                 {{ Math.ceil(editor.storage.characterCount.words() / 200) }}
                 {{
@@ -121,8 +121,8 @@
         <span
           class="px-3 inline-flex items-center gap-2.5 text-gray-800 font-medium text-lg w-full"
         >
-          Versions
-          <Button class="ml-auto" @click="generateSnapshot">New</Button>
+          {{__('Versions')}}
+          <Button class="ml-auto" @click="generateSnapshot">{{__('New')}}</Button>
         </span>
         <div
           v-if="
@@ -148,7 +148,7 @@
           </div>
         </div>
         <div v-else class="text-gray-600 text-sm my-5 px-3">
-          No previous versions available for the current document
+          {{__('No previous versions available for the current document')}}
         </div>
       </div>
 
@@ -160,7 +160,7 @@
         <span
           class="inline-flex items-center gap-2.5 px-5 mb-5 text-gray-800 font-medium text-lg w-full"
         >
-          Activity
+          {{__('Activity')}}
         </span>
         <ActivityTree v-if="showActivity" />
       </div>
@@ -170,9 +170,9 @@
         <span
           class="inline-flex items-center gap-2.5 mb-5 text-gray-800 font-medium text-lg w-full"
         >
-          Style
+          {{__('Style')}}
         </span>
-        <span class="font-medium text-gray-600 text-xs my-2">TITLE</span>
+        <span class="font-medium text-gray-600 text-xs my-2">{{__('TITLE')}}</span>
         <div class="w-full flex justify-between gap-x-1.5 mb-6">
           <Button
             class="w-1/3 font-semibold"
@@ -186,7 +186,7 @@
                 .run()
             "
           >
-            Title
+            {{__('Title')}}
           </Button>
           <Button
             class="w-1/3 font-medium"
@@ -200,7 +200,7 @@
                 .run()
             "
           >
-            Subtitle
+            {{__('Subtitle')}}
           </Button>
           <Button
             class="w-1/3"
@@ -214,11 +214,11 @@
                 .run()
             "
           >
-            Heading
+            {{__('Heading')}}
           </Button>
         </div>
 
-        <span class="font-medium text-gray-600 text-xs my-2">CONTENT</span>
+        <span class="font-medium text-gray-600 text-xs my-2">{{__('CONTENT')}}</span>
         <div class="w-full flex justify-between gap-x-1.5 mb-6">
           <Button
             class="w-1/3 font-bold"
@@ -233,7 +233,7 @@
                 .run()
             "
           >
-            Strong
+            {{__('Strong')}}
           </Button>
           <Button
             class="w-1/3"
@@ -247,7 +247,7 @@
                 .run()
             "
           >
-            Body
+            {{__('Body')}}
           </Button>
           <Button
             class="w-1/3"
@@ -263,10 +263,10 @@
                 .run()
             "
           >
-            Caption
+            {{__('Caption')}}
           </Button>
         </div>
-        <span class="font-medium text-gray-600 text-xs my-2">GROUPS</span>
+        <span class="font-medium text-gray-600 text-xs my-2">{{__('GROUPS')}}</span>
         <div
           class="flex flex-row w-full bg-gray-100 justify-stretch items-stretch rounded p-0.5 space-x-0.5 h-8 mb-2"
         >
@@ -450,7 +450,7 @@
         </div>
 
         <span class="font-medium text-gray-600 text-xs my-2">
-          DECORATIONS
+          {{__('DECORATIONS')}}
         </span>
         <div class="w-full flex justify-between gap-x-1.5 mb-6">
           <Button
@@ -460,7 +460,7 @@
             <template #prefix>
               <Codeblock name="code" class="w-4" />
             </template>
-            Block
+            {{__('Block')}}
           </Button>
           <Button
             class="w-full"
@@ -469,12 +469,12 @@
             <template #prefix>
               <BlockQuote name="quote" class="w-4" />
             </template>
-            Focus
+            {{__('Focus')}}
           </Button>
         </div>
 
         <span class="font-medium text-gray-600 text-xs mt-2 mb-1">
-          TEXT COLOR
+          {{__('TEXT COLOR')}}
         </span>
         <ColorInput
           class="mt-0.5 mb-1"
@@ -482,7 +482,7 @@
           @change="(value) => editor.chain().focus().setColor(value).run()"
         />
         <span class="font-medium text-gray-600 text-xs mt-2 mb-1">
-          BACKGROUND COLOR
+          {{__('BACKGROUND COLOR')}}
         </span>
         <ColorInput
           class="mt-0.5 mb-6"
@@ -491,7 +491,7 @@
             (value) => editor.chain().focus().toggleHighlight(value).run()
           "
         />
-        <span class="font-medium text-gray-600 text-xs my-2">FONT</span>
+        <span class="font-medium text-gray-600 text-xs my-2">{{__('FONT')}}</span>
         <div class="w-full flex justify-between gap-x-1.5">
           <Button
             class="w-1/3"
@@ -502,7 +502,7 @@
             ]"
             @click="editor.chain().focus().setFontFamily('InterVar').run()"
           >
-            Sans
+            {{__('Sans')}}
           </Button>
           <Button
             class="w-1/3 font-['Lora']"
@@ -513,7 +513,7 @@
             ]"
             @click="editor.chain().focus().setFontFamily('Lora').run()"
           >
-            Serif
+            {{__('Serif')}}
           </Button>
           <Button
             class="w-1/3"
@@ -525,7 +525,7 @@
             ]"
             @click="editor.chain().focus().setFontFamily('Geist Mono').run()"
           >
-            Mono
+            {{__('Mono')}}
           </Button>
           <Button
             class="w-1/3 font-['Nunito']"
@@ -536,7 +536,7 @@
             ]"
             @click="editor.chain().focus().setFontFamily('Nunito').run()"
           >
-            Round
+            {{__('Round')}}
           </Button>
         </div>
       </div>
@@ -546,27 +546,27 @@
         <span
           class="inline-flex items-center gap-2.5 mb-5 text-gray-800 font-medium text-lg w-full"
         >
-          Insert
+          {{__('Insert')}}
         </span>
         <div>
-          <span class="font-medium text-gray-600 text-base mb-1">Media</span>
+          <span class="font-medium text-gray-600 text-base mb-1">{{__('Media')}}</span>
           <div class="w-full flex justify-between gap-x-1.5 mb-6">
             <Button class="w-full justify-start" @click="addImageDialog = true">
               <template #prefix>
                 <Image class="text-gray-700 w-4" />
-                Image
+                {{__('Image')}}
               </template>
             </Button>
 
             <Button class="w-full justify-start" @click="addVideoDialog = true">
               <template #prefix>
                 <Video class="text-gray-700 w-4" />
-                Video
+                {{__('Video')}}
               </template>
             </Button>
           </div>
         </div>
-        <span class="font-medium text-gray-600 text-base mb-1">Break</span>
+        <span class="font-medium text-gray-600 text-base mb-1">{{__('Break')}}</span>
         <div class="w-full flex justify-between gap-x-1.5 mb-6">
           <Button
             class="w-full px-2"
@@ -575,7 +575,7 @@
             <template #prefix>
               <Minus class="stroke-[1] text-gray-700" />
             </template>
-            Rule
+            {{__('Rule')}}
           </Button>
 
           <Button
@@ -621,10 +621,10 @@
                 />
               </svg>
             </template>
-            Page Break
+            {{__('Page Break')}}
           </Button>
         </div>
-        <span class="font-medium text-gray-600 text-base">Table</span>
+        <span class="font-medium text-gray-600 text-base">{{__('Table')}}</span>
         <div class="flex space-x-2 my-2">
           <Button
             :disabled="editor.isActive('table')"
@@ -659,7 +659,7 @@
                 <path d="M16 19h6"></path>
                 <path d="M19 16v6"></path>
               </svg>
-              New Table
+              {{__('New Table')}}
             </template>
           </Button>
         </div>
@@ -670,14 +670,14 @@
         <span
           class="inline-flex items-center gap-2.5 mb-5 text-gray-800 font-medium text-lg w-full px-2"
         >
-          Settings
+          {{__('Settings')}}
         </span>
         <Switch v-model="settings.docSize" label="Small Text" />
         <Switch v-model="settings.docSpellcheck" label="Spellcheck" />
         <!-- <Switch v-model="settings.docSize" label="Highlight Check" /> -->
         <Switch v-model="settings.docWidth" label="Full Width" />
         <span class="font-medium text-gray-700 text-base my-2.5 px-2.5">
-          Default Font
+          {{__('Default Font')}}
         </span>
         <div class="w-full flex justify-between gap-1 px-3">
           <Button
@@ -689,7 +689,7 @@
             ]"
             @click="settings.docFont = 'font-fd-sans'"
           >
-            Sans
+            {{__('Sans')}}
           </Button>
           <Button
             class="w-1/3 font-['Lora']"
@@ -700,7 +700,7 @@
             ]"
             @click="settings.docFont = 'font-fd-serif'"
           >
-            Serif
+            {{__('Serif')}}
           </Button>
           <Button
             class="w-1/3"
@@ -712,7 +712,7 @@
             ]"
             @click="settings.docFont = 'font-fd-mono'"
           >
-            Mono
+            {{__('Mono')}}
           </Button>
           <Button
             class="w-1/3 font-['Nunito']"
@@ -723,7 +723,7 @@
             ]"
             @click="settings.docFont = 'font-fd-round'"
           >
-            Round
+            {{__('Round')}}
           </Button>
         </div>
       </div>
@@ -733,14 +733,14 @@
         <span
           class="inline-flex items-center gap-2.5 mb-5 text-gray-800 font-medium text-lg w-full"
         >
-          Transform
+          {{__('Transform')}}
         </span>
         <div>
           <span
             v-if="$route.meta.documentPage && $store.state.hasWriteAccess"
             class="font-medium text-gray-700 text-base"
           >
-            Import
+            {{__('Import')}}
           </span>
           <Button
             v-if="$route.meta.documentPage && $store.state.hasWriteAccess"
@@ -749,17 +749,17 @@
           >
             <template #prefix>
               <FileUp class="text-gray-700 w-4 stroke-[1.5]" />
-              Import DOCX
+              {{__('Import DOCX')}}
             </template>
           </Button>
-          <span class="font-medium text-gray-700 text-base">Export</span>
+          <span class="font-medium text-gray-700 text-base">{{__('Export')}}</span>
           <Button
             class="w-full justify-start"
             @click="() => emitter.emit('printFile')"
           >
             <template #prefix>
               <FileDown class="text-gray-700 w-4 stroke-[1.5]" />
-              Export PDF
+              {{__('Export PDF')}}
             </template>
           </Button>
           <!-- <Button class="w-full justify-start">
@@ -885,6 +885,7 @@ import Style from "../icons/Style.vue"
 import Image from "../icons/Image.vue"
 import Video from "../icons/Video.vue"
 import { useTimeAgo } from "@vueuse/core"
+import { timeAgo } from "@/utils/files"
 import * as Y from "yjs"
 import { TiptapTransformer } from "@hocuspocus/transformer"
 import { fromUint8Array, toUint8Array } from "js-base64"
@@ -1338,7 +1339,7 @@ export default {
         auto: this.entity.write === 1 && this.tab === 6,
         onSuccess(data) {
           data.forEach((element) => {
-            element.relativeTime = useTimeAgo(element.creation)
+            element.relativeTime = timeAgo(element.creation)
             element.creation = formatDate(element.creation)
             element.snapshot_data = toUint8Array(element.snapshot_data)
           })

@@ -17,8 +17,8 @@
         stroke="#454545"
       />
     </svg>
-    <p class="text-base text-gray-600 font-medium">{{ primaryMessage }}</p>
-    <p class="text-sm text-gray-600 mt-3">{{ secondaryMessage }}</p>
+    <p class="text-base text-gray-600 font-medium">{{ __(primaryMessage) }}</p>
+    <p class="text-sm text-gray-600 mt-3">{{ __(secondaryMessage) }}</p>
   </div>
 </template>
 <script>
@@ -31,11 +31,11 @@ export default {
     },
     primaryMessage: {
       type: String,
-      default: "You don't have any files yet",
+      default: () => __("You don't have any files yet"),
     },
     secondaryMessage: {
       type: String,
-      default: "Drop files here",
+      default: () => __("Drop files here"),
     },
   },
 }

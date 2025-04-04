@@ -70,6 +70,8 @@ import emitter from "@/emitter"
 import { ref, computed, watch } from "vue"
 import { useStore } from "vuex"
 import { useRouter, useRoute } from "vue-router"
+import { showLanguage } from "@/composables/language.js"
+import { transformLanguage } from "@/translation.js"
 
 const router = useRouter()
 const route = useRoute()
@@ -94,8 +96,10 @@ const suggestedTab = ref(0)
 
 const fullName = computed(() => store.state.user.fullName)
 
-const settingsItems = computed(() => {
-  return [
+const settingsItems = ref([])
+
+const setDropdown = () => {
+  settingsItems.value = [
     {
       group: "Manage",
       hideLabel: true,
@@ -104,13 +108,21 @@ const settingsItems = computed(() => {
           component: markRaw(TeamSwitcher),
         },
         {
+          component: markRaw(AppSwitcher),
+        },
+        {
+          icon: "globe",
+          label: __("Language"),
+          onClick: () => (showLanguage.value = true),
+        },
+        {
           icon: Docs,
-          label: "Documentation",
+          label: __("Documentation"),
           onClick: () => window.open("https://docs.frappe.io/drive", "_blank"),
         },
         {
           icon: "life-buoy",
-          label: "Support",
+          label: __("Support"),
           onClick: () => window.open("https://t.me/frappedrive", "_blank"),
         },
       ],
@@ -121,17 +133,69 @@ const settingsItems = computed(() => {
       items: [
         {
           icon: "settings",
-          label: "Settings",
+          label: __("Settings"),
           onClick: () => (showSettings.value = true),
         },
         {
           icon: "log-out",
-          label: "Log out",
+          label: __("Log out"),
           onClick: logout,
         },
       ],
     },
   ]
+}
+
+// const settingsItems = computed(() => {
+//   return [
+//     {
+//       group: "Manage",
+//       hideLabel: true,
+//       items: [
+//         {
+//           component: markRaw(TeamSwitcher),
+//         },
+//         {
+//           component: markRaw(AppSwitcher),
+//         },
+
+//         {
+//           icon: "globe",
+//           label: __("Language"),
+//           onClick: () => (showLanguage.value = true),
+//         },
+//         {
+//           icon: Docs,
+//           label: "Documentation",
+//           onClick: () => window.open("https://docs.frappe.io/drive", "_blank"),
+//         },
+//         {
+//           icon: "life-buoy",
+//           label: "Support",
+//           onClick: () => window.open("https://t.me/frappedrive", "_blank"),
+//         },
+//       ],
+//     },
+//     {
+//       group: "Others",
+//       hideLabel: true,
+//       items: [
+//         {
+//           icon: "settings",
+//           label: "Settings",
+//           onClick: () => (showSettings.value = true),
+//         },
+//         {
+//           icon: "log-out",
+//           label: "Log out",
+//           onClick: logout,
+//         },
+//       ],
+//     },
+//   ]
+// })
+watch(transformLanguage, (val) => {
+  setDropdown()
 })
 
 emitter.on("showSettings", (val) => {

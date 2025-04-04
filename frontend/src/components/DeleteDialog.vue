@@ -1,8 +1,8 @@
 <template>
-  <Dialog v-model="open" :options="{ title: 'Delete Forever?', size: 'sm' }">
+  <Dialog v-model="open" :options="{ title: __('Delete Forever?'), size: 'sm' }">
     <template #body-content>
       <p class="text-gray-600">
-        {{ entities.length === 1 ? `This item` : `${entities.length} items` }}
+        {{ entities.length === 1 ? `${__("This item")}` : `${entities.length} ${__("items")}` }}
         will be deleted forever. This is an irreversible process.
       </p>
       <div class="flex mt-5">
@@ -14,7 +14,7 @@
           :loading="deleteEntities.loading"
           @click="deleteEntities.submit()"
         >
-          Delete — forever.
+          {{__('Delete — forever')}}.
         </Button>
       </div>
     </template>

@@ -1,11 +1,11 @@
 <template>
-  <h1 class="font-semibold mb-4">Storage</h1>
+  <h1 class="font-semibold mb-4">{{__('Storage')}}</h1>
 
   <div class="flex items-center justify-between w-full mb-2">
     <span class="text-base font-medium text-gray-900"
-      >{{ showFileStorage ? "You have" : "Your team has" }} used
-      {{ formatSize(usedSpace) ? formatSize(usedSpace) + " out" : "none" }} of
-      {{ showFileStorage ? "your" : "" }} {{ base2BlockSize(spaceLimit) }} ({{
+      >{{ showFileStorage ? __("You have") : __("Your team has") }} {{__('used')}}
+      {{ formatSize(usedSpace) ? formatSize(usedSpace) + ' ' + __("out of") : "none" }} 
+      {{ showFileStorage ? __("your") : "" }} {{ base2BlockSize(spaceLimit) }} ({{
         formatPercent((usedSpace / spaceLimit) * 100)
       }})</span
     >
@@ -22,7 +22,7 @@
         ]"
         @click="showFileStorage = true"
       >
-        You
+        {{__('You')}}
       </Button>
       <Button
         variant="ghost"
@@ -34,7 +34,7 @@
         ]"
         @click="showFileStorage = false"
       >
-        Team
+        {{__('Team')}}
       </Button>
     </div>
   </div>
@@ -62,13 +62,13 @@
     class="w-full flex flex-col items-center justify-center my-10"
   >
     <Cloud class="h-7 stroke-1 text-gray-600" />
-    <span class="text-gray-800 text-sm mt-2">No Storage Used</span>
+    <span class="text-gray-800 text-sm mt-2">{{__('No Storage Used')}}</span>
   </div>
   <div
     class="mt-1 text-gray-800 text-base py-2"
     :class="storageBreakdown.data?.entities?.length ? 'border-b' : ''"
   >
-    Large Files:
+    {{__('Large Files')}}:
   </div>
   <div
     class="flex flex-col items-start justify-start w-full rounded full px-1.5 overflow-y-auto"
@@ -100,7 +100,7 @@
       v-if="!storageBreakdown.data?.entities?.length"
       class="py-4 text-center w-full text-sm text-italic"
     >
-      No files found.
+      {{__('No files found')}}.
     </div>
   </div>
 </template>

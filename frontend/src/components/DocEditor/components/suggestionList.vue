@@ -8,7 +8,7 @@
         <span
           v-if="item.type"
           class="flex w-full p-1 text-sm font-medium text-gray-600"
-          >{{ item.title }}</span
+          >{{ __(item.title) }}</span
         >
         <button
           v-else
@@ -18,7 +18,7 @@
           @mouseenter="selectedIndex = index"
         >
           <component :is="item.icon" class="mr-2 h-4 w-4 text-gray-600" />
-          {{ item.title }}
+          {{ __(item.title) }}
           <component
             :is="item.component"
             v-if="item.component"
@@ -26,12 +26,12 @@
             :is-open="item.isOpen"
             @toggle-is-open="toggleIsOpen(item)"
           >
-            {{ item.title }}
+            {{ __(item.title) }}
           </component>
         </button>
       </div>
     </template>
-    <div v-else class="item">No result</div>
+    <div v-else class="item">{{__('No result')}}</div>
   </div>
 </template>
 

@@ -2,7 +2,7 @@
   <GenericPage
     :getEntities="getTrash"
     :icon="Trash"
-    :primaryMessage="'Trash is Empty'"
+    :primaryMessage="__('Trash is Empty')"
   />
 </template>
 

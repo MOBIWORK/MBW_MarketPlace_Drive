@@ -43,7 +43,7 @@
               </span>
               <span class="text-gray-700 text-sm">{{ " ∙ " }}</span>
               <span class="text-gray-700 text-sm">
-                {{ useTimeAgo(comment.get("createdAt")) }}
+                {{ timeAgo(comment.get("createdAt")) }}
               </span>
             </div>
             <span class="text-sm text-gray-700">
@@ -91,7 +91,7 @@
               </span>
               <span class="text-gray-700 text-sm">{{ " ∙ " }}</span>
               <span class="text-gray-700 text-sm">
-                {{ useTimeAgo(reply.get("createdAt")) }}
+                {{ timeAgo(reply.get("createdAt")) }}
               </span>
               <Dropdown
                 v-if="
@@ -159,6 +159,7 @@ import {
 import { Avatar, Button, Dropdown, createResource } from "frappe-ui"
 import { v4 as uuidv4, v4 } from "uuid"
 import { useTimeAgo } from "@vueuse/core"
+import { timeAgo } from "@/utils/files"
 import * as Y from "yjs"
 import Filter from "@/components/EspressoIcons/Filter.vue"
 import TiptapInput from "@/components/TiptapInput.vue"

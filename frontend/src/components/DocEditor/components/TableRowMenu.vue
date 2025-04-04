@@ -89,27 +89,27 @@ function onDeleteRow() {
       class="flex flex-col h-full leading-none bg-white gap-0.5 p-0.5 rounded shadow-sm border border-border"
     >
       <Button
-        title="Add Row Above"
+        :title="__('Add Row Above')"
         variant="ghost"
         icon="arrow-up"
         @click="onAddRowBefore"
       />
 
       <Button
-        title="Add Row Below"
+        :title="__('Add Row Below')"
         variant="ghost"
         icon="arrow-down"
         @click="onAddRowAfter"
       />
       <Button
-        title="Merge Cells"
+        :title="__('Merge Cells')"
         variant="ghost"
         v-if="Selection?.cellCount! > 1"
         @click="() => emits('onMergeCell')"
         ><template #icon><TableCellsMerge class="w-4 stroke-[1.5]" /></template
       ></Button>
       <Button
-        title="Split Cells"
+        :title="__('Split Cells')"
         variant="ghost"
         v-if="Selection?.mergedCellCount! > 0"
         @click="() => emits('onSplitCell')"
@@ -117,7 +117,7 @@ function onDeleteRow() {
           <TableCellsSplit class="w-4 stroke-[1.5]" /> </template
       ></Button>
       <Button
-        title="Delete Row"
+        :title="__('Delete Row')"
         variant="ghost"
         @click="() => emits('onHeaderCell')"
         ><template #icon>

@@ -4,7 +4,7 @@
     @update:model-value="(value) => emit('change', value)"
   >
     <template #target="{ togglePopover }">
-      <span class="mb-2 block text-sm leading-4 text-gray-700"> Color </span>
+      <span class="mb-2 block text-sm leading-4 text-gray-700"> {{__('Color')}} </span>
       <div class="flex items-stretch">
         <div class="relative w-full">
           <div

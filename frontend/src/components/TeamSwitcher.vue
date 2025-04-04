@@ -11,7 +11,7 @@
         <div class="flex gap-2">
           <FeatherIcon name="user" class="size-4 text-gray-600" />
           <span class="whitespace-nowrap"
-            >{{ $route.params.team ? "Change" : "Go to" }} Team</span
+            >{{ $route.params.team ? __("Change") : __("Go to") }} {{__('Team')}}</span
           >
         </div>
         <FeatherIcon name="chevron-right" class="size-4 text-gray-600" />
@@ -37,7 +37,7 @@
           </router-link>
         </div>
         <div v-else class="w-100 text-center text-sm text-gray-700">
-          <em>No other teams</em>
+          <em>{{__('No other teams')}}</em>
         </div>
       </div>
     </template>

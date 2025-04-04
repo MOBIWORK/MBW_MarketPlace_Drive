@@ -5,12 +5,12 @@
     <div class="flex w-full justify-start items-center flex-wrap">
       <div class="flex flex-col">
         <Breadcrumbs
-          :items="$store.state.breadcrumbs"
+          :items="modifiedBreadcrumbs"
           :class="'select-none h-[12px]'"
         />
         <p v-if="selections.length" class="text-sm text-gray-800 px-0.5 pt-0.5">
           {{ selections.length }} item{{ selections.length === 1 ? "" : "s" }}
-          selected
+          {{__('selected')}}
         </p>
       </div>
       <div
@@ -68,7 +68,7 @@
           ]"
           @click="$store.commit('toggleShareView', 'with')"
         >
-          With you
+          {{__('With you')}}
         </Button>
         <Button
           variant="ghost"
@@ -80,7 +80,7 @@
           ]"
           @click="$store.commit('toggleShareView', 'by')"
         >
-          By you
+          {{__('By you')}}
         </Button>
       </div>
       <div
@@ -156,7 +156,7 @@
               />
             </Button>
             <Button class="text-sm h-7 rounded-l-none flex-1 md:block">
-              {{ sortOrder.label }}
+              {{ __(sortOrder.label) }}
             </Button>
           </div>
         </Dropdown>
@@ -199,7 +199,7 @@
 
         <div v-if="!$store.getters.isLoggedIn" class="ml-2">
           <Button variant="solid" @click="$router.push({ name: 'Login' })">
-            Sign In
+            {{__('Sign In')}}
           </Button>
         </div>
 
@@ -301,45 +301,63 @@ const orderByItems = computed(() => {
       }),
   }))
 })
+
+const modifiedBreadcrumbs = computed(() => {
+  return store.state.breadcrumbs.map((item) => ({
+    ...item,
+    label: __(item.label),
+  }));
+});
+
 const TYPES = [
   {
-    label: "Folder",
+    label: __("Folder"),
+    value: "Folder",
     icon: Folder,
   },
   {
-    label: "Image",
+    label: __("Image"),
+    value: "Image",
     icon: Image,
   },
   {
-    label: "Audio",
+    label: __("Audio"),
+    value: "Audio",
     icon: Audio,
   },
   {
-    label: "Video",
+    label: __("Video"),
+    value: "Video",
     icon: Video,
   },
   {
-    label: "PDF",
+    label: __("PDF"),
+    value: "PDF",
     icon: PDF,
   },
   {
-    label: "Document",
+    label: __("Document"),
+    value: "Document",
     icon: Document,
   },
   {
-    label: "Spreadsheet",
+    label: __("Spreadsheet"),
+    value: "Spreadsheet",
     icon: Spreadsheet,
   },
   {
-    label: "Archive",
+    label: __("Archive"),
+    value: "Archive",
     icon: Archive,
   },
   {
-    label: "Presentation",
+    label: __("Presentation"),
+    value: "Presentation",
     icon: Presentation,
   },
   {
-    label: "Unknown",
+    label: __("Unknown"),
+    value: "Unknown",
     icon: Unknown,
   },
 ]
@@ -363,16 +381,16 @@ const toggleAscending = () => {
 }
 
 const possibleButtons = [
-  { route: "Recents", label: "Clear", icon: "clock", entities: getRecents },
+  { route: "Recents", label: __("Clear"), icon: "clock", entities: getRecents },
   {
     route: "Favourites",
-    label: "Clear",
+    label: __("Clear"),
     icon: "star",
     entities: getFavourites,
   },
   {
     route: "Trash",
-    label: "Empty Trash",
+    label: __("Empty Trash"),
     icon: "trash",
     entities: getTrash,
     theme: "red",
@@ -396,36 +414,36 @@ const newDocument = async () => {
 }
 const newEntityOptions = [
   {
-    group: "Upload",
+    group: __("Upload"),
     items: [
       {
-        label: "Upload File",
+        label: __("Upload File"),
         icon: FileUpload,
         onClick: () => emitter.emit("uploadFile"),
       },
       {
-        label: "Upload Folder",
+        label: __("Upload Folder"),
         icon: FolderUpload,
         onClick: () => emitter.emit("uploadFolder"),
       },
     ],
   },
   {
-    group: "New...",
+    group: __("New..."),
     items: [
       {
-        label: "Document",
+        label: __("Document"),
         icon: NewFile,
         onClick: newDocument,
       },
       {
-        label: "Folder",
+        label: __("Folder"),
         icon: NewFolder,
         onClick: () => emitter.emit("newFolder"),
       },
 
       {
-        label: "New Link",
+        label: __("New Link"),
         icon: Link,
         onClick: () => emitter.emit("newLink"),
       },

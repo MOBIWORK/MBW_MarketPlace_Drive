@@ -1,8 +1,8 @@
 <template>
-  <Dialog v-model="open" :options="{ title: 'Open a file', size: '5xl' }">
+  <Dialog v-model="open" :options="{ title: __('Open a file'), size: '5xl' }">
     <template #body>
       <h3 class="text-2xl font-semibold leading-6 text-gray-900 px-6 pt-5">
-        Open a file
+        {{__('Open a file')}}
       </h3>
       <div class="px-2 pt-2">
         <div class="flex items-center justify-start px-4 my-2">
@@ -63,7 +63,7 @@
                 @click="emitter.emit('uploadFile')"
               >
                 <template #prefix><Upload class="w-4 stroke-1.5" /></template>
-                Upload
+                {{__('Upload')}}
               </Button>
               <!-- <span class="text-gray-700 text-base mt-2" >Or drag a file here to upload</span> -->
             </div>
@@ -80,7 +80,7 @@
                     v-if="folders.length > 0"
                     class="text-gray-600 font-medium text-base"
                   >
-                    Folders
+                    {{__('Folders')}}
                   </span>
                   <span v-else></span>
                   <Button
@@ -137,7 +137,7 @@
                 v-if="files.length > 0"
                 :class="folders.length > 0 ? 'mt-8' : 'mt-2'"
               >
-                <div class="text-gray-600 font-medium text-base">Files</div>
+                <div class="text-gray-600 font-medium text-base">{{__('Files')}}</div>
                 <div class="inline-flex flex-row flex-wrap gap-4 mt-0.5">
                   <div
                     v-for="file in files"
@@ -176,6 +176,7 @@ import NoFilesSection from "./NoFilesSection.vue"
 import GridItem from "./GridItem.vue"
 import { watch, defineEmits, computed, h, ref } from "vue"
 import { useTimeAgo } from "@vueuse/core"
+import { timeAgo } from "@/utils/files"
 import { createResource, Dialog, Button, Tabs, Dropdown } from "frappe-ui"
 import { Plus, Upload } from "lucide-vue-next"
 import Home from "./EspressoIcons/Home.vue"
@@ -233,24 +234,24 @@ const open = computed({
 
 const tabs = [
   {
-    label: "Home",
+    label: __("Home"),
     icon: h(Home, { class: "w-4 h-4" }),
     component: NoFilesSection,
   },
   {
-    label: "Recents",
+    label: __("Recents"),
     icon: h(Recent, { class: "w-4 h-4" }),
   },
   {
-    label: "Favourite",
+    label: __("Favourite"),
     icon: h(Star, { class: "w-4 h-4" }),
   },
   {
-    label: "Shared",
+    label: __("Shared"),
     icon: h(Users, { class: "w-4 h-4" }),
   },
   {
-    label: "Upload",
+    label: __("Upload"),
     icon: h(Plus, { class: "w-4 h-4 stroke-[1.5]" }),
   },
 ]
@@ -408,7 +409,7 @@ const fetchFolderContents = createResource({
     folderContents.value = []
     data.forEach((entity) => {
       entity.file_size = entity.is_group ? null : formatSize(entity.file_size)
-      entity.relativeModified = useTimeAgo(entity.modified)
+      entity.relativeModified = timeAgo(entity.modified)
       entity.modified = formatDate(entity.modified)
       entity.creation = formatDate(entity.creation)
     })
@@ -432,7 +433,7 @@ let sharedWithMe = createResource({
   onSuccess(data) {
     data.forEach((entity) => {
       entity.file_size = entity.is_group ? null : formatSize(entity.file_size)
-      entity.relativeModified = useTimeAgo(entity.modified)
+      entity.relativeModified = timeAgo(entity.modified)
       entity.modified = formatDate(entity.modified)
       entity.creation = formatDate(entity.creation)
     })

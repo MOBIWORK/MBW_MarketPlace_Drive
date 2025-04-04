@@ -20,7 +20,7 @@
       :icon="icon"
       :primary-message="primaryMessage"
       :secondary-message="
-        activeFilters.length ? 'Try changing filters, maybe?' : secondaryMessage
+        activeFilters.length ? __('Try changing filters, maybe?') : secondaryMessage
       "
     />
     <ListView
@@ -134,14 +134,14 @@ const actionItems = computed(() => {
   if (route.name === "Trash") {
     return [
       {
-        label: "Restore",
+        label: __("Restore"),
         icon: RotateCcw,
         onClick: () => (dialog.value = "restore"),
         multi: true,
         important: true,
       },
       {
-        label: "Delete forever",
+        label: __("Delete forever"),
         icon: Trash,
         onClick: () => (dialog.value = "d"),
         isEnabled: () => route.name === "Trash",
@@ -152,19 +152,19 @@ const actionItems = computed(() => {
   } else {
     return [
       {
-        label: "Preview",
+        label: __("Preview"),
         icon: Preview,
         onClick: ([entity]) => openEntity(team, entity),
         isEnabled: (e) => !e.is_link,
       },
       {
-        label: "Open",
+        label: __("Open"),
         icon: "external-link",
         onClick: ([entity]) => openEntity(team, entity),
         isEnabled: (e) => e.is_link,
       },
       {
-        label: "Download",
+        label: __("Download"),
         icon: Download,
         isEnabled: (e) => !e.is_link,
         onClick: (entities) => entitiesDownload(team, entities),
@@ -172,26 +172,26 @@ const actionItems = computed(() => {
         important: true,
       },
       {
-        label: "Share",
+        label: __("Share"),
         icon: Share,
         onClick: () => (dialog.value = "s"),
         isEnabled: (e) => e.share,
         important: true,
       },
       {
-        label: "Get Link",
+        label: __("Get Link"),
         icon: Link,
         onClick: ([entity]) => getLink(entity),
         important: true,
       },
       {
-        label: "Rename",
+        label: __("Rename"),
         icon: Rename,
         onClick: () => (dialog.value = "rn"),
         isEnabled: (e) => e.write,
       },
       {
-        label: "Move",
+        label: __("Move"),
         icon: Move,
         onClick: () => (dialog.value = "m"),
         isEnabled: (e) => e.write,
@@ -199,13 +199,13 @@ const actionItems = computed(() => {
         important: true,
       },
       {
-        label: "Move to Team",
+        label: __("Move to Team"),
         icon: Team,
         onClick: (entities) =>
           confirm(
-            `Are you sure you want to move ${entities.length} ${
-              entities.length === 1 ? "item" : "items"
-            } to the team?`
+            `${__('Are you sure you want to move')} ${entities.length} ${
+              entities.length === 1 ? __("item") : __("items")
+            } ${__('to the team?')}`
           ) &&
           entities.map((e) =>
             togglePersonal.submit({ entity_name: e.name, new_value: 0 })
@@ -215,19 +215,19 @@ const actionItems = computed(() => {
         important: true,
       },
       {
-        label: "Show Info",
+        label: __("Show Info"),
         icon: Info,
         onClick: () => store.commit("setShowInfo", true),
         isEnabled: () => !store.state.activeEntity || !store.state.showInfo,
       },
       {
-        label: "Hide Info",
+        label: __("Hide Info"),
         icon: Info,
         onClick: () => store.commit("setShowInfo", false),
         isEnabled: () => store.state.activeEntity && store.state.showInfo,
       },
       {
-        label: "Favourite",
+        label: __("Favourite"),
         icon: "star",
         onClick: (entities) => {
           entities = entities.map((e) => ({
@@ -242,7 +242,7 @@ const actionItems = computed(() => {
         multi: true,
       },
       {
-        label: "Unfavourite",
+        label: __("Unfavourite"),
         icon: "star",
         class: "stroke-amber-500 fill-amber-500",
         onClick: (entities) => {
@@ -258,7 +258,7 @@ const actionItems = computed(() => {
         multi: true,
       },
       {
-        label: "Remove from Recents",
+        label: __("Remove from Recents"),
         icon: "clock",
         onClick: (entities) => {
           clearRecent.submit({
@@ -271,7 +271,7 @@ const actionItems = computed(() => {
         multi: true,
       },
       {
-        label: "Unshare",
+        label: __("Unshare"),
         danger: true,
         icon: "trash-2",
         onClick: () => (dialog.value = "unshare"),
@@ -279,7 +279,7 @@ const actionItems = computed(() => {
           e.owner != "You" && e.user_doctype === "User" && e.everyone !== 1,
       },
       {
-        label: "Move to Trash",
+        label: __("Move to Trash"),
         icon: Trash,
         onClick: () => (dialog.value = "remove"),
         isEnabled: (e) => e.write,
@@ -304,23 +304,23 @@ function handleListMutate({ data: newData, new: _new, delete: _delete, all }) {
 
 const columnHeaders = [
   {
-    label: "Name",
+    label: __("Name"),
     field: "title",
   },
   {
-    label: "Owner",
+    label: __("Owner"),
     field: "owner",
   },
   {
-    label: "Modified",
+    label: __("Modified"),
     field: "modified",
   },
   {
-    label: "Size",
+    label: __("Size"),
     field: "file_size",
   },
   {
-    label: "Type",
+    label: __("Type"),
     field: "mime_type",
   },
 ]
@@ -333,11 +333,11 @@ async function newLink() {
     new URL(text)
     localStorage.setItem("prevClip", text)
     toast({
-      title: "Link detected",
+      title: __("Link detected"),
       text,
       buttons: [
         {
-          label: "Add",
+          label: __("Add"),
           action: () => {
             dialog.value = "l"
           },

@@ -115,7 +115,7 @@ const formattedRows = computed(() => {
 
 const selectedColumns = [
   {
-    label: "Name",
+    label: __("Name"),
     key: "title",
     getLabel: ({ row: { title, is_group, document } }) =>
       title.lastIndexOf(".") === -1 || is_group || document
@@ -128,7 +128,7 @@ const selectedColumns = [
     width: 2,
   },
   {
-    label: "Owner",
+    label: __("Owner"),
     key: "",
     getLabel: ({ row }) =>
       row.owner === store.state.auth.userId
@@ -146,19 +146,19 @@ const selectedColumns = [
     },
   },
   {
-    label: "Last Modified",
+    label: __("Last Modified"),
     getLabel: ({ row }) => row.relativeModified,
     key: "modified",
     isEnabled: (n) => n !== "Recents",
   },
   {
-    label: "Last Accessed",
+    label: __("Last Accessed"),
     getLabel: ({ row }) => row.relativeAccessed,
     key: "modified",
     isEnabled: (n) => n === "Recents",
   },
   {
-    label: "Size",
+    label: __("Size"),
     key: "",
     getLabel: ({ row }) => row.file_size_pretty, // || "<em>empty</em>",
   },

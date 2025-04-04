@@ -13,12 +13,12 @@
     <div class="w-50 flex gap-15 my-10">
       <Button @click="$router.go(-1)" variant="subtle" size="lg"
         ><div class="flex gap-2">
-          <LucideArrowBigLeft class="w-4 h-4" />Go Back
+          <LucideArrowBigLeft class="w-4 h-4" />{{__('Go Back')}}
         </div>
       </Button>
       <Button @click="$router.replace({ path: '/' })" variant="solid" size="lg"
         ><div class="flex gap-2">
-          <LucideHome class="w-4 h-4" />Go Home
+          <LucideHome class="w-4 h-4" />{{__('Go Home')}}
         </div></Button
       >
     </div>

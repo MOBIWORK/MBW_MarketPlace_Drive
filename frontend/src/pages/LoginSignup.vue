@@ -15,29 +15,34 @@
             class="mx-auto w-full bg-white px-4 py-8 sm:mt-6 sm:w-112 sm:rounded-2xl sm:px-6 sm:py-6 sm:shadow-2xl"
           >
             <div class="mb-7.5 text-center">
+              <div class="items-center flex justify-center">
+                <div class="w-52">
+                  <SelectLanguage/>
+                </div>
+              </div>
               <p class="mb-2 text-2xl font-semibold leading-6 text-gray-900">
-                <template v-if="domainTeams.length">Welcome to Drive</template>
+                <template v-if="domainTeams.length">{{__('Welcome to Drive')}}</template>
                 <template v-else>{{
                   isLogin
-                    ? "Log in to Drive"
+                    ? __("Log in to Drive")
                     : params.get("t")
-                    ? "Join " + params.get("t")
-                    : "Create a new account"
+                    ? __("Join") + " " + params.get("t")
+                    : __("Create a new account")
                 }}</template>
               </p>
               <p
                 class="break-words text-base font-normal leading-[21px] text-gray-700"
               >
                 <template v-if="domainTeams.length"
-                  >We're glad you're here.</template
+                  >{{__("We're glad you're here.")}}</template
                 >
                 <template v-else>
                   {{
                     !isLogin
                       ? params.get("t")
-                        ? "Powered by Frappe Drive."
-                        : "Get 5 GB for free, no credit card required."
-                      : "Welcome back!"
+                        ? __("Powered by Frappe Drive.")
+                        : __("5 GB free - forever.")
+                      : __("Welcome back!")
                   }}
                 </template>
               </p>
@@ -45,21 +50,19 @@
             <template v-if="domainTeams.length">
               <div class="flex flex-col text-md gap-2">
                 <p>
-                  We noticed that you are on a
+                  {{__('We noticed that you are on a')}}
                   <strong>corporate domain</strong>.
                 </p>
                 <p v-if="domainTeams[0].title">
-                  Do you want to create a personal account, or request to join
-                  the team (<strong>{{ domainTeams[0].title }}</strong
-                  >) associated with your domain?
+                  {{__('Do you want to create a personal account, or request to join the team')}} (<strong>{{ domainTeams[0].title }}</strong
+                  >) {{__('associated with your domain')}}?
                 </p>
                 <p v-else>
-                  Do you want to create a personal account, or create a team
-                  with your domain?
+                  {{__('Do you want to create a personal account, or create a team with your domain')}}?
                 </p>
                 <FormControl
                   v-if="typeof team_name === 'string'"
-                  label="Team Name"
+                  :label="__('Team Name')"
                   class="py-2"
                   v-model="team_name"
                   type="text"
@@ -70,7 +73,7 @@
                     variant="subtle"
                     class="w-100"
                     @click="createPersonalTeam.submit()"
-                    >Create Personal</Button
+                    >{{__('Create Personal')}}</Button
                   >
                   <Button
                     v-if="domainTeams[0].title"
@@ -82,7 +85,7 @@
                         $router.replace({ path: '/drive/teams' })
                     "
                   >
-                    Join {{ domainTeams[0].title }}
+                    {{__('Join')}} {{ domainTeams[0].title }}
                   </Button>
                   <Button
                     variant="solid"
@@ -93,7 +96,7 @@
                         : (team_name = '')
                     "
                   >
-                    Create Team
+                    {{__('Create Team')}}
                   </Button>
                 </div>
               </div>
@@ -111,7 +114,7 @@
               <template v-if="otpValidated && !isLogin">
                 <div class="mt-5 flex flex-row gap-5">
                   <FormControl
-                    label="First Name"
+                    :label="__('First Name')"
                     type="text"
                     placeholder="Robin"
                     variant="outline"
@@ -119,7 +122,7 @@
                     required
                   />
                   <FormControl
-                    label="Last Name"
+                    :label="__('Last Name')"
                     type="text"
                     placeholder="Hood"
                     variant="outline"
@@ -129,13 +132,13 @@
                 <div class="!mt-6 flex gap-2">
                   <FormControl type="checkbox" v-model="terms_accepted" />
                   <label class="text-base">
-                    I accept the
+                    {{__('I accept the')}}
                     <Link
                       class="!text-gray-700"
                       to="https://frappecloud.com/policies"
                       target="_blank"
                     >
-                      Terms and Policies
+                      {{__('Terms and Policies')}}
                     </Link>
                   </label>
                 </div>
@@ -148,13 +151,13 @@
                     class="w-full font-medium"
                     @click="signup.submit()"
                   >
-                    Create Account
+                    {{__('Create Account')}}
                   </Button>
                 </div>
               </template>
               <div v-else-if="otpRequested">
                 <FormControl
-                  label="Verification code"
+                  :label="__('Verification code')"
                   type="text"
                   class="mt-4"
                   placeholder="123456"
@@ -186,7 +189,7 @@
                     })
                   "
                 >
-                  Verify
+                  {{__('Verify')}}
                 </Button>
                 <Button
                   class="mt-2 w-full"
@@ -195,7 +198,7 @@
                   @click="sendOTP.submit()"
                   :disabled="otpResendCountdown > 0"
                 >
-                  Resend verification code
+                  {{__('Resend verification code')}}
                   {{
                     otpResendCountdown > 0
                       ? `in ${otpResendCountdown} seconds`
@@ -210,7 +213,7 @@
                   variant="solid"
                   @click="sendOTP.submit({ email, login: isLogin })"
                 >
-                  {{ isLogin ? "Login" : "Join" }}
+                  {{ isLogin ? __("Login") : __("Join") }}
                 </Button>
                 <template v-if="isLogin">
                   <div class="mt-6 border-t text-center">
@@ -218,7 +221,7 @@
                       <span
                         class="relative bg-white px-2 text-sm font-medium leading-8 text-gray-800"
                       >
-                        or
+                        {{__('or')}}
                       </span>
                     </div>
                   </div>
@@ -232,7 +235,7 @@
                     <div class="flex items-center">
                       <div v-html="provider.icon"></div>
                       <span class="ml-2"
-                        >Continue with {{ provider.provider_name }}</span
+                        >{{__('Continue with')}} {{ provider.provider_name }}</span
                       >
                     </div>
                   </Button>
@@ -250,8 +253,8 @@
               >
                 {{
                   isLogin
-                    ? "New member? Create a new account."
-                    : "Already have an account? Log in."
+                    ? __("New member? Create a new account.")
+                    : __("Already have an account? Log in.")
                 }}
               </router-link>
             </div>
@@ -268,6 +271,7 @@ import { ref, onMounted, computed } from "vue"
 import FrappeDriveLogo from "../components/FrappeDriveLogo.vue"
 import { toast } from "@/utils/toasts"
 import { useRoute } from "vue-router"
+import SelectLanguage from "../components/Settings/SelectLanguage.vue"
 const route = useRoute()
 
 const params = new URLSearchParams(new URL(window.location.href).search)

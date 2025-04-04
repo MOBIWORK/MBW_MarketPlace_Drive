@@ -23,7 +23,7 @@
             >
               <Edit2
                 class="h-3.5 w-auto stroke-[1.5]"
-                title="Edit Link"
+                :title="__('Edit Link')"
                 @click="componentSlotProps.onClick(button)"
               />
             </button>
@@ -52,7 +52,7 @@
               v-else
               class="inline-block h-4 min-w-[1rem] text-sm leading-4"
             >
-              {{ button.text }}
+              {{ __(button.text) }}
             </span>
           </button>
         </template>

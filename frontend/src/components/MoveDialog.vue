@@ -81,7 +81,7 @@
           <template #prefix>
             <Move />
           </template>
-          Move
+          {{__('Move')}}
         </Button>
       </div>
       <Tabs as="div" v-model="tabIndex" :tabs="tabs">
@@ -146,7 +146,7 @@
               class="flex flex-col items-center justify-center h-[45vh] my-2"
             >
               <Folder class="text-gray-600 h-10 w-auto" />
-              <span class="text-gray-600 text-base mt-2">Folder is Empty</span>
+              <span class="text-gray-600 text-base mt-2">{{__('Folder is Empty')}}</span>
             </div>
           </div>
         </template>
@@ -198,9 +198,9 @@ const open = computed({
 
 const DialogTitle = computed(() => {
   if (props.entities.length > 1) {
-    return `Moving ${props.entities.length} items`
+    return `${__('Moving')} ${props.entities.length} items`
   } else {
-    return `Moving "${props.entities[0].title}"`
+    return `${__('Moving')} "${props.entities[0].title}"`
   }
 })
 
@@ -225,11 +225,11 @@ const dropDownItems = computed(() => {
 
 const tabs = [
   {
-    label: "Home",
+    label: __("Home"),
     icon: h(Home, { class: "w-4 h-4" }),
   },
   {
-    label: "Team",
+    label: __("Team"),
     icon: h(Team, { class: "w-4 h-4" }),
   },
   // {
@@ -239,7 +239,7 @@ const tabs = [
 ]
 
 const tabIndex = ref(0)
-const breadcrumbs = ref([{ name: "", title: "Home" }])
+const breadcrumbs = ref([{ name: "", title: __("Home") }])
 const folderSearch = ref({})
 
 const folderPermissions = createResource({
@@ -248,7 +248,7 @@ const folderPermissions = createResource({
     entity_name: currentFolder.value,
   },
   onSuccess: (data) => {
-    let first = [{ name: "", title: data.is_private ? "Home" : "Team" }]
+    let first = [{ name: "", title: data.is_private ? __("Home") : __("Team") }]
     breadcrumbs.value = first.concat(data.breadcrumbs.slice(1))
   },
 })

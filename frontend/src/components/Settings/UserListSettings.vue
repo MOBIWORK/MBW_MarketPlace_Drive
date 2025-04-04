@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-center mb-4">
-    <h1 class="font-semibold">Users</h1>
+    <h1 class="font-semibold">{{__('Users')}}</h1>
     <Button
       v-if="isAdmin?.data"
       variant="solid"
@@ -12,7 +12,7 @@
         }
       "
     >
-      Invite
+      {{__('Invite')}}
     </Button>
   </div>
   <div class="flex flex-col items-stretch justify-start overflow-y-auto">
@@ -53,14 +53,14 @@
     class="flex flex-col items-center justify-center h-1/2"
   >
     <FeatherIcon class="h-8 stroke-1 text-gray-600" name="users" />
-    <span class="text-gray-800 text-sm mt-2">No Users</span>
+    <span class="text-gray-800 text-sm mt-2">{{__('No Users')}}</span>
   </div>
-  <h3 class="my-4 text-base font-medium">Invites</h3>
+  <h3 class="my-4 text-base font-medium">{{__('Invites')}}</h3>
   <div
     class="text-center text-sm"
     v-if="!invites?.data || !invites.data.length"
   >
-    No invites found.
+    {{__('No invites found')}}.
   </div>
   <div v-for="(invite, index) in invites?.data" :key="invite.name">
     <div
@@ -161,7 +161,7 @@
               v-model="emailInput"
               type="text"
               autocomplete="off"
-              placeholder="Enter email address"
+              :placeholder="__('Enter email address')"
               class="h-7 w-full rounded border-none bg-gray-100 py-1.5 pl-2 pr-2 text-base text-gray-800 placeholder-gray-500 transition-colors focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
               @keydown="isValidEmail"
               @keydown.enter.capture.stop="extractEmails"
@@ -176,15 +176,15 @@
     v-if="showRemove"
     v-model="showRemove"
     :options="{
-      title: 'Are you sure?',
+      title: __('Are you sure?'),
       size: 'md',
-      message: `Removing ${selectedUser.full_name} will completely revoke their access to your team. You can always add them back using the same email ID.`,
+      message: `${__('Removing')} ${selectedUser.full_name} ${__('will completely revoke their access to your team. You can always add them back using the same email ID')}.`,
       actions: [
         {
           variant: 'solid',
           theme: 'red',
           label:
-            'I confirm that I want to remove ' + selectedUser.full_name + '.',
+            __('I confirm that I want to remove') + ' ' + selectedUser.full_name + '.',
           loading: removeUser.loading,
           onClick: () => {
             removeUser.submit({
@@ -234,7 +234,7 @@ const showRemove = ref(false)
 
 const roleOptions = [
   {
-    label: "Manager",
+    label: __("Manager"),
     onClick: () => {
       selectedUser.value.role = "admin"
       updateUserRole.submit({
@@ -245,7 +245,7 @@ const roleOptions = [
     },
   },
   {
-    label: "User",
+    label: __("User"),
     onClick: () => {
       selectedUser.value.role = "user"
       updateUserRole.submit({
@@ -256,7 +256,7 @@ const roleOptions = [
     },
   },
   {
-    label: "Remove",
+    label: __("Remove"),
     class: "text-red-500",
     component: () =>
       h(
@@ -267,7 +267,7 @@ const roleOptions = [
           ],
           onClick: () => (showRemove.value = true),
         },
-        "Remove"
+        __("Remove")
       ),
   },
 ]

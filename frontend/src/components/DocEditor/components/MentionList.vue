@@ -20,7 +20,7 @@
           :label="item.label"
           :image="item.user_image"
         />
-        {{ item.label }}
+        {{ __(item.label) }}
       </button>
     </div>
   </div>

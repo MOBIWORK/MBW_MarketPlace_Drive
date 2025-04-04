@@ -46,12 +46,12 @@ export default {
         return [
           {
             icon: "settings",
-            label: "Settings",
+            label: __("Settings"),
             onClick: () => (this.showSettings = true),
           },
           {
             icon: "log-out",
-            label: "Log out",
+            label: __("Log out"),
             onClick: () => this.logout(),
           },
         ]
@@ -59,7 +59,7 @@ export default {
       return [
         {
           icon: "log-out",
-          label: "Log out",
+          label: __("Log out"),
           onClick: () => this.logout(),
         },
       ]

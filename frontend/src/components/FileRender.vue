@@ -11,12 +11,12 @@
       class="h-12 mb-4 fill-blue-500 stroke-white"
       name="alert-circle"
     />
-    <span class="mb-4">Cannot open file</span>
+    <span class="mb-4">{{__('Cannot open file')}}</span>
     <span class="text-base text-center text-gray-700">
       {{ error }}
     </span>
     <Button class="mt-4 w-full" variant="solid" @click="download">
-      Download
+      {{__('Download')}}
     </Button>
   </div>
   <template v-else>

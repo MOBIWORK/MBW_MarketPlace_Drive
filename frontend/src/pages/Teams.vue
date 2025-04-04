@@ -16,15 +16,15 @@
             class="mx-auto w-full bg-white px-4 py-8 sm:mt-6 sm:w-112 sm:rounded-2xl sm:px-6 sm:py-6 sm:shadow-2xl"
           >
             <h2 class="grow font-bold text-xl text-center mb-4">
-              Welcome, {{ $store.state.user.fullName }}
+              {{__('Welcome')}}, {{ $store.state.user.fullName }}
             </h2>
             <div class="py-3">
-              <p class="font-bold text-lg mb-3">Teams</p>
+              <p class="font-bold text-lg mb-3">{{__('Teams')}}</p>
               <p
                 class="text-center text-sm"
                 v-if="!getTeams.data || !Object.values(getTeams.data).length"
               >
-                You haven't joined any teams yet.
+                {{__("You haven't joined any teams yet")}}.
               </p>
               <ul v-else class="ms-1">
                 <li
@@ -36,7 +36,7 @@
                     <div class="flex flex-col">
                       {{ team.title }}
                       <span class="text-sm"
-                        >{{ team.users.length }} members</span
+                        >{{ team.users.length }} {{__('members')}}</span
                       >
                     </div>
                     <router-link
@@ -51,7 +51,7 @@
             <div class="py-3">
               <p class="font-bold text-lg mb-3">Invites</p>
               <p class="text-center text-sm" v-if="!getInvites?.data?.length">
-                No invites found.
+                {{__('No invites found')}}.
               </p>
               <li
                 v-for="(invite, index) in getInvites?.data"
@@ -64,16 +64,16 @@
                     >{{
                       invite.status === "Proposed" ? "Requested" : "Sent"
                     }}
-                    at {{ formatDate(invite.creation) }}</span
+                    {{__('at')}} {{ formatDate(invite.creation) }}</span
                   >
                 </div>
                 <div class="flex gap-2">
-                  <Tooltip text="You requested an invite from this team.">
+                  <Tooltip :text="__('You requested an invite from this team.')">
                     <Badge
                       class="my-auto mr-2"
                       v-if="invite.status === 'Proposed'"
                       theme="orange"
-                      >Requested</Badge
+                      >{{__('Requested')}}</Badge
                     >
                   </Tooltip>
                   <Button

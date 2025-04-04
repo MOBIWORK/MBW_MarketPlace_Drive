@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model="open" :options="{ title: 'Rename', size: 'xs' }">
+  <Dialog v-model="open" :options="{ title: __('Rename'), size: 'xs' }">
     <template #body-content>
       <div class="flex items-center justify-center">
         <Input
@@ -19,7 +19,7 @@
         </span>
       </div>
       <div class="flex mt-8">
-        <Button variant="solid" class="w-full" @click="submit"> Rename </Button>
+        <Button variant="solid" class="w-full" @click="submit"> {{__('Rename')}} </Button>
       </div>
     </template>
   </Dialog>

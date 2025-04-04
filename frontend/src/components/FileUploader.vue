@@ -39,7 +39,7 @@ function doesRootFolderFullPathExist(k, file_parent) {
     const json = JSON.parse(xhr.responseText)
     return json.message
   } else {
-    throw new Error(`Request failed with status ${xhr.status}`)
+    throw new Error(`${__('Request failed with status')} ${xhr.status}`)
   }
 }
 
@@ -57,7 +57,7 @@ function rootFolderFullPathNewName(k, file_parent) {
     const json = JSON.parse(xhr.responseText)
     return json.message
   } else {
-    throw new Error(`Request failed with status ${xhr.status}`)
+    throw new Error(`${__('Request failed with status')} ${xhr.status}`)
   }
 }
 

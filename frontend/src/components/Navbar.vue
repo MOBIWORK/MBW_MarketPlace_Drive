@@ -28,12 +28,12 @@
             <template #prefix>
               <Share class="w-4" />
             </template>
-            Share
+            {{__('Share')}}
           </Button>
         </div>
         <div v-else class="ml-auto">
           <Button variant="solid" @click="$router.push({ name: 'Login' })">
-            Sign In
+            {{__('Sign In')}}
           </Button>
         </div>
       </div>
